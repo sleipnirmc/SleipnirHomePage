@@ -105,20 +105,37 @@ async function addSampleProducts() {
 // Display products based on filter
 async function displayProducts() {
     const productGrid = document.getElementById('productGrid');
-    const isMember = await checkMemberStatus();
+    let isMember = false;
     
-    // Filter products based on category and member status
+    // Check member status only if user is logged in
+    try {
+        const user = firebase.auth().currentUser;
+        if (user) {
+            isMember = await checkMemberStatus();
+        }
+    } catch (error) {
+        console.error('Error checking member status:', error);
+        isMember = false;
+    }
+    
+    // Filter products based on category
     let filteredProducts = currentFilter === 'all'
         ? products
         : products.filter(p => p.category === currentFilter);
     
-    // Hide member-only products from non-members
-    if (!isMember) {
-        filteredProducts = filteredProducts.filter(p => !p.membersOnly);
+    // For non-members, only hide member-only products if there are non-member products available
+    const nonMemberProducts = filteredProducts.filter(p => !p.membersOnly);
+    
+    if (!isMember && nonMemberProducts.length > 0) {
+        // Show only non-member products if any exist
+        filteredProducts = nonMemberProducts;
+    } else if (!isMember && nonMemberProducts.length === 0) {
+        // If all products are member-only, show them but with restricted access
+        // This prevents "No products found" message
     }
 
     if (filteredProducts.length === 0) {
-        productGrid.innerHTML = '<div class="no-products"><p><span class="is">Engar vörur fundust</span><span class="en">No products found</span></p></div>';
+        productGrid.innerHTML = '<div class="no-products"><p><span class="is">Engar vörur fundust í þessum flokki</span><span class="en">No products found in this category</span></p></div>';
         return;
     }
 

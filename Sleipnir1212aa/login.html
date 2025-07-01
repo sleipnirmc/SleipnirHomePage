@@ -198,7 +198,8 @@
                         return;
                     }
                 } else {
-                    // Auth state observer will handle normal redirect
+                    // Redirect to homepage after successful login
+                    window.location.href = 'Index.html';
                 }
             } catch (error) {
                 errorMessage.style.display = 'block';
