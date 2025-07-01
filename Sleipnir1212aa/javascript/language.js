@@ -34,7 +34,7 @@ function updatePageTitle(pageName) {
             is: 'Sleipnir MC Reykjavík - Opinber Verslun',
             en: 'Sleipnir MC Reykjavík - Official Store'
         },
-        'Index.html': {
+        'index.html': {
             is: 'Sleipnir MC Reykjavík - Opinber Verslun',
             en: 'Sleipnir MC Reykjavík - Official Store'
         },
@@ -47,8 +47,8 @@ function updatePageTitle(pageName) {
             en: 'Sleipnir MC - Shop'
         },
         'about.html': {
-            is: 'Sleipnir MC - Sagan Okkar',
-            en: 'Sleipnir MC - Our Saga'
+            is: 'Sleipnir MC - Hópurinn',
+            en: 'Sleipnir MC - About Us'
         },
         'contact.html': {
             is: 'Sleipnir MC - Hafa Samband',

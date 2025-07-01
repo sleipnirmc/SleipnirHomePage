@@ -31,8 +31,64 @@ async function loadProducts() {
         displayProducts();
     } catch (error) {
         console.error('Error loading products:', error);
-        productGrid.innerHTML = '<div class="no-products"><p>Error loading products. Please try again later.</p></div>';
+        
+        // Check if it's a permission error
+        if (error.code === 'permission-denied') {
+            // Try to load products without authentication requirement
+            productGrid.innerHTML = '<div class="no-products"><p><span class="is">Vinsamlegast bíðið, hleður vörur...</span><span class="en">Please wait, loading products...</span></p></div>';
+            
+            // For now, just display sample products if Firestore fails
+            products = getSampleProductsForDisplay();
+            displayProducts();
+        } else {
+            productGrid.innerHTML = `<div class="no-products"><p><span class="is">Villa við að hlaða vörum. Vinsamlegast reyndu aftur.</span><span class="en">Error loading products. Please try again later.</span></p><p style="font-size: 12px; color: var(--gray);">Error: ${error.message}</p></div>`;
+        }
     }
+}
+
+// Get sample products for display when Firebase fails
+function getSampleProductsForDisplay() {
+    return [
+        {
+            id: 'sample1',
+            nameIs: 'Valkyrju Hetta',
+            nameEn: 'Valkyrie Hood',
+            description: 'Protection from the northern winds',
+            category: 'hoodie',
+            price: 8999,
+            availableSizes: ['S', 'M', 'L', 'XL', 'XXL'],
+            membersOnly: false,
+            isNew: true,
+            isPopular: false,
+            images: []
+        },
+        {
+            id: 'sample2',
+            nameIs: 'Þórs Hamar Lykill',
+            nameEn: 'Thor\'s Hammer Keychain',
+            description: 'Carry the power of thunder',
+            category: 'other',
+            price: 2499,
+            availableSizes: ['One Size'],
+            membersOnly: false,
+            isNew: false,
+            isPopular: true,
+            images: []
+        },
+        {
+            id: 'sample3',
+            nameIs: 'Víkinga Bol',
+            nameEn: 'Viking T-Shirt',
+            description: 'Classic Norse design',
+            category: 'tshirt',
+            price: 3999,
+            availableSizes: ['S', 'M', 'L', 'XL', 'XXL'],
+            membersOnly: false,
+            isNew: false,
+            isPopular: false,
+            images: []
+        }
+    ];
 }
 
 // Add sample products function
@@ -415,7 +471,10 @@ document.getElementById('checkoutBtn').addEventListener('click', async () => {
 
     const user = firebase.auth().currentUser;
     if (!user) {
-        if (confirm('You need to be logged in to place an order. Would you like to login now?')) {
+        const msg = currentLang === 'is' 
+            ? 'Þú þarft að skrá þig inn til að panta. Viltu skrá þig inn núna?' 
+            : 'You need to be logged in to place an order. Would you like to login now?';
+        if (confirm(msg)) {
             window.location.href = 'login.html';
         }
         return;
@@ -782,6 +841,17 @@ window.goToSlide = goToSlide;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    loadProducts();
-    updateCartUI();
+    // Wait a moment for Firebase to initialize
+    setTimeout(() => {
+        loadProducts();
+        updateCartUI();
+    }, 500);
+    
+    // Also load when auth state changes
+    firebase.auth().onAuthStateChanged(() => {
+        // Only reload if products haven't been loaded yet
+        if (products.length === 0 && document.getElementById('productGrid')) {
+            loadProducts();
+        }
+    });
 });
