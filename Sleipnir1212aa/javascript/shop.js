@@ -32,64 +32,17 @@ async function loadProducts() {
     } catch (error) {
         console.error('Error loading products:', error);
         
-        // Check if it's a permission error
+        // Show error message instead of fallback products
         if (error.code === 'permission-denied') {
-            // Try to load products without authentication requirement
-            productGrid.innerHTML = '<div class="no-products"><p><span class="is">Vinsamlegast bíðið, hleður vörur...</span><span class="en">Please wait, loading products...</span></p></div>';
-            
-            // For now, just display sample products if Firestore fails
-            products = getSampleProductsForDisplay();
-            displayProducts();
+            productGrid.innerHTML = '<div class="no-products"><p><span class="is">Villa við að hlaða vörur. Vinsamlegast athugaðu tengingu þína.</span><span class="en">Error loading products. Please check your connection.</span></p></div>';
         } else {
             productGrid.innerHTML = `<div class="no-products"><p><span class="is">Villa við að hlaða vörum. Vinsamlegast reyndu aftur.</span><span class="en">Error loading products. Please try again later.</span></p><p style="font-size: 12px; color: var(--gray);">Error: ${error.message}</p></div>`;
         }
+        // Don't show any products if Firebase fails
+        products = [];
     }
 }
 
-// Get sample products for display when Firebase fails
-function getSampleProductsForDisplay() {
-    return [
-        {
-            id: 'sample1',
-            nameIs: 'Valkyrju Hetta',
-            nameEn: 'Valkyrie Hood',
-            description: 'Protection from the northern winds',
-            category: 'hoodie',
-            price: 8999,
-            availableSizes: ['S', 'M', 'L', 'XL', 'XXL'],
-            membersOnly: false,
-            isNew: true,
-            isPopular: false,
-            images: []
-        },
-        {
-            id: 'sample2',
-            nameIs: 'Þórs Hamar Lykill',
-            nameEn: 'Thor\'s Hammer Keychain',
-            description: 'Carry the power of thunder',
-            category: 'other',
-            price: 2499,
-            availableSizes: ['One Size'],
-            membersOnly: false,
-            isNew: false,
-            isPopular: true,
-            images: []
-        },
-        {
-            id: 'sample3',
-            nameIs: 'Víkinga Bol',
-            nameEn: 'Viking T-Shirt',
-            description: 'Classic Norse design',
-            category: 'tshirt',
-            price: 3999,
-            availableSizes: ['S', 'M', 'L', 'XL', 'XXL'],
-            membersOnly: false,
-            isNew: false,
-            isPopular: false,
-            images: []
-        }
-    ];
-}
 
 // Add sample products function
 async function addSampleProducts() {

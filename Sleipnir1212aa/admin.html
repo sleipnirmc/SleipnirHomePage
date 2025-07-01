@@ -838,6 +838,69 @@
         </div>
     </div>
 
+    <!-- Edit Member Modal -->
+    <div id="editMemberModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--norse-black); border: 2px solid var(--mc-red); padding: 30px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--white); margin: 0;">Edit Display Member</h2>
+                <button onclick="closeEditMemberModal()" style="background: none; border: none; color: var(--white); font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            
+            <form id="editMemberForm" class="admin-form">
+                <input type="hidden" id="editMemberId">
+                
+                <div class="form-group">
+                    <label>Member Name</label>
+                    <input type="text" class="admin-input" id="editMemberName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Role (Optional)</label>
+                    <input type="text" class="admin-input" id="editMemberRole" placeholder="e.g., President, Vice President">
+                </div>
+                
+                <div class="form-group">
+                    <label>Join Date</label>
+                    <input type="date" class="admin-input" id="editMemberJoinDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Display Order</label>
+                    <input type="number" class="admin-input" id="editMemberDisplayOrder" min="0" placeholder="Lower numbers appear first">
+                </div>
+                
+                <div class="form-group">
+                    <label>Status</label>
+                    <select class="admin-select" id="editMemberStatus">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Current Photo</label>
+                    <div id="editMemberCurrentPhoto" style="margin-bottom: 20px;">
+                        <!-- Current photo will be displayed here -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Change Photo</label>
+                    <div class="drop-zone" id="editMemberDropZone">
+                        <p>Drag & drop new photo here or click to upload</p>
+                        <input type="file" id="editMemberPhoto" accept="image/*" style="display: none;">
+                    </div>
+                    <div id="editMemberPhotoPreview" style="margin-top: 10px;"></div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="admin-btn">Save Changes</button>
+                    <button type="button" class="admin-btn secondary" onclick="closeEditMemberModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -898,6 +961,7 @@
                     // Load the default tab (member requests)
                     loadMemberRequests();
                     loadCurrentMembers();
+                    loadDisplayMembers();
                     break;
                 case 'orders':
                     loadOrders();
@@ -932,6 +996,11 @@
             // Update tab content
             document.querySelectorAll('#membersSection .tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(tab + 'Tab').classList.add('active');
+            
+            // Load appropriate data
+            if (tab === 'displayMembers') {
+                loadDisplayMembers();
+            }
         }
         
         function switchOrderTab(status) {

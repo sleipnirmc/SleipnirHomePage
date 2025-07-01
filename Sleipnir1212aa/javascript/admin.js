@@ -105,8 +105,13 @@ function handleFiles(files, mode) {
         if (files.length > 0) {
             handleMemberPhoto(files[0]);
         }
+    } else if (mode === 'editMember') {
+        // For edit member modal
+        if (files.length > 0) {
+            handleEditMemberPhoto(files[0]);
+        }
     } else if (mode === 'edit') {
-        // For edit modal, use separate handler
+        // For edit product modal, use separate handler
         handleEditFiles(files);
     } else {
         // For products, handle multiple files
@@ -828,10 +833,67 @@ async function deleteDisplayMember(memberId) {
     }
 }
 
-// Edit display member (placeholder for now)
-function editDisplayMember(memberId) {
-    alert('Edit functionality coming soon!');
-    // TODO: Implement edit modal
+// Edit display member
+let editMemberPhotoFile = null;
+let editMemberPhotoData = null;
+let currentEditMember = null;
+
+async function editDisplayMember(memberId) {
+    try {
+        // Get member data
+        const memberDoc = await firebase.firestore().collection('displayMembers').doc(memberId).get();
+        if (!memberDoc.exists) {
+            alert('Member not found');
+            return;
+        }
+        
+        currentEditMember = { id: memberId, ...memberDoc.data() };
+        
+        // Populate form fields
+        document.getElementById('editMemberId').value = memberId;
+        document.getElementById('editMemberName').value = currentEditMember.name || '';
+        document.getElementById('editMemberRole').value = currentEditMember.role || '';
+        
+        // Convert timestamp to date string for input
+        if (currentEditMember.joinDate) {
+            const date = new Date(currentEditMember.joinDate.seconds * 1000);
+            document.getElementById('editMemberJoinDate').value = date.toISOString().split('T')[0];
+        }
+        
+        document.getElementById('editMemberDisplayOrder').value = currentEditMember.displayOrder || '';
+        document.getElementById('editMemberStatus').value = currentEditMember.isActive !== false ? 'true' : 'false';
+        
+        // Display current photo
+        const currentPhotoDiv = document.getElementById('editMemberCurrentPhoto');
+        if (currentEditMember.photoUrl) {
+            currentPhotoDiv.innerHTML = `
+                <img src="${currentEditMember.photoUrl}" alt="${currentEditMember.name}" 
+                     style="max-width: 200px; height: auto; border-radius: 8px;">
+            `;
+        } else {
+            currentPhotoDiv.innerHTML = '<p style="color: var(--gray);">No photo uploaded</p>';
+        }
+        
+        // Clear preview
+        document.getElementById('editMemberPhotoPreview').innerHTML = '';
+        editMemberPhotoFile = null;
+        editMemberPhotoData = null;
+        
+        // Show modal
+        document.getElementById('editMemberModal').style.display = 'block';
+    } catch (error) {
+        console.error('Error loading member for edit:', error);
+        alert('Error loading member data');
+    }
+}
+
+// Close edit member modal
+function closeEditMemberModal() {
+    document.getElementById('editMemberModal').style.display = 'none';
+    document.getElementById('editMemberForm').reset();
+    editMemberPhotoFile = null;
+    editMemberPhotoData = null;
+    currentEditMember = null;
 }
 
 // Load orders for admin panel
@@ -1080,6 +1142,8 @@ window.searchUsers = searchUsers;
 window.clearSearch = clearSearch;
 window.loadAllAccounts = loadAllAccounts;
 window.makeUserMember = makeUserMember;
+window.closeEditMemberModal = closeEditMemberModal;
+window.removeEditMemberPhoto = removeEditMemberPhoto;
 
 // Search Users functionality
 async function searchUsers() {
@@ -1271,6 +1335,38 @@ async function makeUserMember(userId) {
     }
 }
 
+// Handle edit member photo
+function handleEditMemberPhoto(file) {
+    if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file');
+        return;
+    }
+    
+    editMemberPhotoFile = file;
+    
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = function() {
+        // Store the base64 data
+        editMemberPhotoData = reader.result;
+        
+        const preview = document.getElementById('editMemberPhotoPreview');
+        preview.innerHTML = `
+            <div class="image-preview" style="position: relative; max-width: 200px;">
+                <img src="${reader.result}" alt="Member photo" style="width: 100%; height: auto; border-radius: 8px;">
+                <button class="remove-btn" onclick="removeEditMemberPhoto()" style="position: absolute; top: -5px; right: -5px; background: var(--mc-red); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;">×</button>
+            </div>
+        `;
+    };
+}
+
+// Remove edit member photo
+function removeEditMemberPhoto() {
+    editMemberPhotoFile = null;
+    editMemberPhotoData = null;
+    document.getElementById('editMemberPhotoPreview').innerHTML = '';
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     initializeDragDrop();
@@ -1280,5 +1376,59 @@ document.addEventListener('DOMContentLoaded', () => {
         // The loadDashboardStats is called from admin.html after auth check
         // Initialize tabs with default sizes if elements exist
         updateSizes('tshirt', 'sizesContainer');
+        
+        // Setup edit member photo upload
+        const editMemberDropZone = document.getElementById('editMemberDropZone');
+        const editMemberPhotoInput = document.getElementById('editMemberPhoto');
+        
+        if (editMemberDropZone && editMemberPhotoInput) {
+            // Click to upload
+            editMemberDropZone.addEventListener('click', () => editMemberPhotoInput.click());
+            
+            // Handle file selection
+            editMemberPhotoInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    handleEditMemberPhoto(e.target.files[0]);
+                }
+            });
+            
+            // Setup drag and drop
+            setupDragDrop(editMemberDropZone, editMemberPhotoInput, 'editMember');
+        }
+        
+        // Setup edit member form submission
+        const editMemberForm = document.getElementById('editMemberForm');
+        if (editMemberForm) {
+            editMemberForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const memberId = document.getElementById('editMemberId').value;
+                
+                const updateData = {
+                    name: document.getElementById('editMemberName').value,
+                    role: document.getElementById('editMemberRole').value || '',
+                    joinDate: firebase.firestore.Timestamp.fromDate(new Date(document.getElementById('editMemberJoinDate').value)),
+                    displayOrder: parseInt(document.getElementById('editMemberDisplayOrder').value) || Date.now(),
+                    isActive: document.getElementById('editMemberStatus').value === 'true',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                // Add photo if a new one was uploaded
+                if (editMemberPhotoData) {
+                    updateData.photoUrl = editMemberPhotoData;
+                }
+                
+                try {
+                    await firebase.firestore().collection('displayMembers').doc(memberId).update(updateData);
+                    
+                    alert('Member updated successfully!');
+                    closeEditMemberModal();
+                    loadDisplayMembers();
+                } catch (error) {
+                    console.error('Error updating member:', error);
+                    alert('Error updating member. Please try again.');
+                }
+            });
+        }
     }
 });
