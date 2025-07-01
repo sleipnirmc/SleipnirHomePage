@@ -1,22 +1,7 @@
     /* Norse-inspired Font Import */
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:wght@300;400;600&family=Iceland&display=swap');
 
-    /* Viking Font - Multiple paths for better compatibility */
-    @font-face {
-        font-family: 'Viking';
-        src: url('fonts/VIKING-N.TTF') format('truetype'),
-             url('VIKING-N.TTF') format('truetype'),
-             url('./VIKING-N.TTF') format('truetype');
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
-    }
-
-    /* For headers that should use Viking font with fallbacks */
-    .viking-font {
-        font-family: 'Viking', 'Iceland', 'Cinzel', serif;
-        letter-spacing: 0.05em;
-    }
+    /* Viking font removed - using web fonts only */
 
     /* CSS Variables for MC Theme - BLACK & RED ONLY */
     :root {
@@ -114,7 +99,7 @@
     }
 
     .logo-text {
-        font-family: 'Viking', 'Cinzel', serif;
+        font-family: 'Cinzel', serif;
         font-size: 28px;
         font-weight: 900;
         color: var(--white);
@@ -313,7 +298,7 @@
     }
 
     .hero-title {
-        font-family: 'Viking', 'Cinzel', serif;
+        font-family: 'Cinzel', serif;
         font-size: 72px;
         font-weight: 900;
         margin-bottom: 20px;
@@ -411,7 +396,7 @@
     }
 
     .section-title {
-        font-family: 'Viking', 'Cinzel', serif;
+        font-family: 'Cinzel', serif;
         font-size: 48px;
         font-weight: 600;
         margin-bottom: 20px;
@@ -1184,7 +1169,7 @@
     }
 
     .auth-title {
-        font-family: 'Viking', 'Cinzel', serif;
+        font-family: 'Cinzel', serif;
         font-size: 36px;
         text-align: center;
         margin-bottom: 40px;
@@ -1599,7 +1584,7 @@
     }
 
     .modal-info h2 {
-        font-family: 'Viking', 'Cinzel', serif;
+        font-family: 'Cinzel', serif;
         font-size: 36px;
         margin-bottom: 20px;
         color: var(--white);
