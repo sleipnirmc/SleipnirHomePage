@@ -151,11 +151,11 @@
                 const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                // Check if user exists in database
+                // Ensure user profile exists in Firestore
                 const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
                 
                 if (!userDoc.exists) {
-                    // User exists in Auth but not in Firestore - create their profile
+                    // Create profile for users who exist in Auth but not Firestore
                     await firebase.firestore().collection('users').doc(user.uid).set({
                         email: user.email,
                         fullName: user.displayName || user.email.split('@')[0],
@@ -164,25 +164,9 @@
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                         emailVerified: user.emailVerified
                     });
-                    
-                    // If email not verified, send verification email
-                    if (!user.emailVerified) {
-                        await user.sendEmailVerification();
-                        window.location.href = 'verify-email.html';
-                        return;
-                    }
-                } else {
-                    // User exists in database
-                    const userData = userDoc.data();
-                    
-                    // Only check email verification for users who have the emailVerified field set to false
-                    if (!user.emailVerified && userData && userData.emailVerified === false) {
-                        window.location.href = 'verify-email.html';
-                        return;
-                    }
                 }
                 
-                // For existing users or verified users, redirect appropriately
+                // Redirect appropriately - auth.js will handle email verification
                 if (redirectTo === 'admin') {
                     // Check if user is admin before redirecting
                     const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();

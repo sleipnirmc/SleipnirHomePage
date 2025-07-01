@@ -97,6 +97,76 @@
             position: relative;
         }
 
+        /* Pagination Styles */
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 60px;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            padding: 10px 20px;
+            background: var(--norse-black);
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Iceland', cursive;
+            font-size: 16px;
+            min-width: 45px;
+        }
+
+        .pagination-btn:hover:not(.disabled) {
+            background: var(--mc-red);
+            border-color: var(--mc-red);
+            transform: translateY(-2px);
+        }
+
+        .pagination-btn.active {
+            background: var(--mc-red);
+            border-color: var(--mc-red);
+            font-weight: bold;
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-dots {
+            padding: 10px;
+            color: var(--gray);
+        }
+
+        .pagination-info {
+            margin-left: 20px;
+            color: var(--gray);
+            font-size: 14px;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        @media (max-width: 768px) {
+            .pagination-controls {
+                font-size: 14px;
+            }
+            
+            .pagination-btn {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            .pagination-info {
+                width: 100%;
+                text-align: center;
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+
         /* Product Image Gallery */
         .product-image-gallery {
             position: relative;
@@ -634,6 +704,9 @@
                     <div class="spinner"></div>
                     <p><span class="is">Hleður vörur...</span><span class="en">Loading products...</span></p>
                 </div>
+            </div>
+            <div class="pagination-controls" id="paginationControls">
+                <!-- Pagination will be added dynamically -->
             </div>
         </div>
     </section>

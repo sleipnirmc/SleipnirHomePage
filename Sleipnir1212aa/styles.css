@@ -177,6 +177,33 @@
         margin-left: 20px;
     }
     
+    /* Auth buttons */
+    .auth-buttons {
+        margin-left: 20px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .login-btn {
+        background: var(--norse-black);
+        border: 2px solid var(--mc-red);
+        color: var(--white);
+        padding: 8px 20px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+    
+    .login-btn:hover {
+        background: var(--mc-red);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(207, 35, 66, 0.3);
+    }
+    
     /* Member portal */
     .member-portal {
         margin-left: 20px;
@@ -231,6 +258,16 @@
         box-shadow: 0 5px 15px rgba(207, 35, 66, 0.3);
     }
 
+    /* Lazy loading styles */
+    .lazy-image {
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+    
+    .lazy-image.loaded {
+        opacity: 1;
+    }
+    
     /* Language visibility */
     .en {
         display: none;

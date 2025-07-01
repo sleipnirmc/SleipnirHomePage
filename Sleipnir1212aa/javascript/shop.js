@@ -3,12 +3,54 @@ let cart = [];
 let products = [];
 let currentFilter = 'all';
 
+// Lazy loading observer
+let imageObserver = null;
+
+// Pagination variables
+const PRODUCTS_PER_PAGE = 12;
+let currentPage = 1;
+let totalPages = 1;
+
+// Initialize lazy loading observer
+function initLazyLoading() {
+    const options = {
+        root: null,
+        rootMargin: '50px',
+        threshold: 0.01
+    };
+
+    imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                const src = img.getAttribute('data-src');
+                
+                if (src) {
+                    // Create a new image to preload
+                    const tempImg = new Image();
+                    tempImg.onload = function() {
+                        img.src = src;
+                        img.classList.add('loaded');
+                        img.removeAttribute('data-src');
+                    };
+                    tempImg.src = src;
+                    
+                    // Stop observing this image
+                    observer.unobserve(img);
+                }
+            }
+        });
+    }, options);
+}
+
 // Load products from Firebase
 async function loadProducts() {
     const productGrid = document.getElementById('productGrid');
     productGrid.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p><span class="is">Hleður vörur...</span><span class="en">Loading products...</span></p></div>';
 
     try {
+        // Try to load products - this should work for all users (authenticated or not)
+        // The Firebase rules should allow read access to products collection
         const snapshot = await firebase.firestore().collection('products').get();
         products = [];
 
@@ -32,9 +74,31 @@ async function loadProducts() {
     } catch (error) {
         console.error('Error loading products:', error);
         
-        // Show error message instead of fallback products
+        // Check if it's a permission error
         if (error.code === 'permission-denied') {
-            productGrid.innerHTML = '<div class="no-products"><p><span class="is">Villa við að hlaða vörur. Vinsamlegast athugaðu tengingu þína.</span><span class="en">Error loading products. Please check your connection.</span></p></div>';
+            // Show helpful message about Firebase rules
+            productGrid.innerHTML = `
+                <div class="no-products">
+                    <p><span class="is">Vara: Aðgangur að vörum neitar vegna öryggisreglna.</span><span class="en">Error: Access to products denied due to security rules.</span></p>
+                    <p style="font-size: 14px; color: var(--gray); margin-top: 10px;">
+                        <span class="is">Vinsamlegast uppfærðu Firebase Firestore reglur til að leyfa lestur á 'products' safninu.</span>
+                        <span class="en">Please update Firebase Firestore rules to allow read access to the 'products' collection.</span>
+                    </p>
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 5px; margin-top: 20px; font-family: monospace; font-size: 12px; text-align: left;">
+                        <p style="margin-bottom: 10px;">Suggested Firestore Rules:</p>
+                        <pre style="margin: 0;">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow all users to read products
+    match /products/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}</pre>
+                    </div>
+                </div>`;
         } else {
             productGrid.innerHTML = `<div class="no-products"><p><span class="is">Villa við að hlaða vörum. Vinsamlegast reyndu aftur.</span><span class="en">Error loading products. Please try again later.</span></p><p style="font-size: 12px; color: var(--gray);">Error: ${error.message}</p></div>`;
         }
@@ -141,10 +205,24 @@ async function displayProducts() {
 
     if (filteredProducts.length === 0) {
         productGrid.innerHTML = '<div class="no-products"><p><span class="is">Engar vörur fundust í þessum flokki</span><span class="en">No products found in this category</span></p></div>';
+        updatePaginationControls(0);
         return;
     }
 
-    productGrid.innerHTML = filteredProducts.map((product, index) => {
+    // Calculate pagination
+    totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+    
+    // Ensure current page is valid
+    if (currentPage > totalPages) {
+        currentPage = 1;
+    }
+    
+    // Get products for current page
+    const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+    const endIndex = startIndex + PRODUCTS_PER_PAGE;
+    const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+
+    productGrid.innerHTML = paginatedProducts.map((product, index) => {
         const images = product.images && product.images.length > 0 ? product.images : 
                        (product.imageUrl ? [{dataUrl: product.imageUrl}] : []);
         const hasMultipleImages = images.length > 1;
@@ -164,7 +242,11 @@ async function displayProducts() {
                 ${images.length > 0 ? `
                     <div class="gallery-images" data-product-id="${product.id}">
                         ${images.map((img, imgIndex) => `
-                            <img src="${img.dataUrl}" alt="${product.nameIs}" class="gallery-image">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Crect fill='%23222' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' fill='%23666' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='16'%3ELoading...%3C/text%3E%3C/svg%3E" 
+                                 data-src="${img.dataUrl}" 
+                                 alt="${product.nameIs}" 
+                                 class="gallery-image lazy-image"
+                                 style="${imgIndex === 0 ? '' : 'display: none;'}">
                         `).join('')}
                     </div>
                     ${hasMultipleImages ? `
@@ -214,6 +296,16 @@ async function displayProducts() {
     // Add event listeners
     addProductEventListeners();
     
+    // Initialize lazy loading if not already done
+    if (!imageObserver) {
+        initLazyLoading();
+    }
+    
+    // Observe all lazy images
+    document.querySelectorAll('.lazy-image').forEach(img => {
+        imageObserver.observe(img);
+    });
+    
     // Make cards visible with animation
     setTimeout(() => {
         document.querySelectorAll('.product-card').forEach((card, index) => {
@@ -222,6 +314,9 @@ async function displayProducts() {
             }, index * 100);
         });
     }, 100);
+    
+    // Update pagination controls
+    updatePaginationControls(filteredProducts.length);
 }
 
 // Get size options based on category
@@ -251,6 +346,98 @@ function getRandomRune() {
 // Format price with thousand separators
 function formatPrice(price) {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+// Update pagination controls
+function updatePaginationControls(totalProducts) {
+    const paginationContainer = document.getElementById('paginationControls');
+    if (!paginationContainer) return;
+    
+    if (totalPages <= 1) {
+        paginationContainer.style.display = 'none';
+        return;
+    }
+    
+    paginationContainer.style.display = 'flex';
+    
+    let paginationHTML = '';
+    
+    // Previous button
+    paginationHTML += `
+        <button class="pagination-btn ${currentPage === 1 ? 'disabled' : ''}" 
+                onclick="changePage(${currentPage - 1})" 
+                ${currentPage === 1 ? 'disabled' : ''}>
+            <span class="is">‹ Fyrri</span>
+            <span class="en">‹ Previous</span>
+        </button>
+    `;
+    
+    // Page numbers
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    
+    if (endPage - startPage < maxPagesToShow - 1) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    if (startPage > 1) {
+        paginationHTML += `<button class="pagination-btn" onclick="changePage(1)">1</button>`;
+        if (startPage > 2) {
+            paginationHTML += `<span class="pagination-dots">...</span>`;
+        }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `
+            <button class="pagination-btn ${i === currentPage ? 'active' : ''}" 
+                    onclick="changePage(${i})">${i}</button>
+        `;
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            paginationHTML += `<span class="pagination-dots">...</span>`;
+        }
+        paginationHTML += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+    }
+    
+    // Next button
+    paginationHTML += `
+        <button class="pagination-btn ${currentPage === totalPages ? 'disabled' : ''}" 
+                onclick="changePage(${currentPage + 1})" 
+                ${currentPage === totalPages ? 'disabled' : ''}>
+            <span class="is">Næsta ›</span>
+            <span class="en">Next ›</span>
+        </button>
+    `;
+    
+    // Product count
+    const startProduct = (currentPage - 1) * PRODUCTS_PER_PAGE + 1;
+    const endProduct = Math.min(currentPage * PRODUCTS_PER_PAGE, totalProducts);
+    
+    paginationHTML += `
+        <div class="pagination-info">
+            <span class="is">Sýnir ${startProduct}-${endProduct} af ${totalProducts}</span>
+            <span class="en">Showing ${startProduct}-${endProduct} of ${totalProducts}</span>
+        </div>
+    `;
+    
+    paginationContainer.innerHTML = paginationHTML;
+}
+
+// Change page
+function changePage(page) {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    
+    currentPage = page;
+    displayProducts();
+    
+    // Scroll to top of products
+    const shopSection = document.querySelector('.shop-section');
+    if (shopSection) {
+        shopSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 // Add event listeners to products
@@ -413,6 +600,7 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         currentFilter = this.dataset.category;
+        currentPage = 1; // Reset to first page when filtering
         displayProducts();
     });
 });
@@ -790,6 +978,25 @@ function updateGalleryPosition(productId, index) {
             dot.classList.remove('active');
         }
     });
+    
+    // Lazy load the current image if needed
+    const images = gallery.querySelectorAll('.gallery-image');
+    const currentImage = images[index];
+    if (currentImage && currentImage.getAttribute('data-src') && !currentImage.classList.contains('loaded')) {
+        const src = currentImage.getAttribute('data-src');
+        const tempImg = new Image();
+        tempImg.onload = function() {
+            currentImage.src = src;
+            currentImage.classList.add('loaded');
+            currentImage.removeAttribute('data-src');
+        };
+        tempImg.src = src;
+    }
+    
+    // Show current image, hide others
+    images.forEach((img, i) => {
+        img.style.display = i === index ? 'block' : 'none';
+    });
 }
 
 // Make functions globally available
@@ -799,6 +1006,7 @@ window.changeModalImage = changeModalImage;
 window.selectModalSize = selectModalSize;
 window.navigateGallery = navigateGallery;
 window.goToSlide = goToSlide;
+window.changePage = changePage;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
