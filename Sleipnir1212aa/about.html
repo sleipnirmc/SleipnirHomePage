@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC Reykjavík - Um Okkur</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* About page specific styles */
+        .about-hero {
+            margin-top: 80px;
+            height: 400px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.8)),
+                        radial-gradient(circle at center, rgba(255,0,0,0.1), transparent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Large background logo for about hero */
+        .about-hero-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1200px;
+            height: 1200px;
+            background: url('Images/SleipnirLogo.png') no-repeat center center;
+            background-size: contain;
+            opacity: 0.25;
+            z-index: 1;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.3; transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        .about-hero-content {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .about-title {
+            font-family: 'Viking', 'Cinzel', serif;
+            font-size: 56px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+        }
+
+        .about-subtitle {
+            font-size: 24px;
+            color: var(--gray);
+            font-style: italic;
+        }
+
+        /* Team Photo Styles */
+        .team-photo {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-wrapper {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .photo-wrapper:hover {
+            transform: scale(1.02);
+            box-shadow: 0 30px 60px rgba(255,0,0,0.4) !important;
+        }
+
+        .photo-wrapper img {
+            transition: all 0.4s ease;
+        }
+
+        .photo-wrapper:hover img {
+            transform: scale(1.05);
+        }
+
+        .photo-overlay {
+            opacity: 0.9;
+            transition: all 0.4s ease;
+        }
+
+        .photo-wrapper:hover .photo-overlay {
+            opacity: 1;
+            padding-bottom: 50px !important;
+        }
+
+        @media (max-width: 768px) {
+            .photo-overlay p {
+                font-size: 20px !important;
+            }
+            
+            .photo-caption p {
+                font-size: 16px !important;
+                padding: 0 20px;
+            }
+        }
+
+        /* Saga section with background logo */
+        .saga {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .saga::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: url('Images/SleipnirLogo.png') no-repeat center center;
+            background-size: contain;
+            opacity: 0.05;
+            z-index: 0;
+        }
+
+        .saga-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Make logo larger on desktop */
+        @media (min-width: 1200px) {
+            .about-hero-logo {
+                width: 1200px;
+                height: 1200px;
+            }
+            
+            .saga::before {
+                width: 1000px;
+                height: 1000px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <span class="logo-text">SLEIPNIR MC</span>
+                <span class="location">REYKJAVÍK</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><span class="is">Heim</span><span class="en">Home</span></a></li>
+                <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
+                <li><a href="about.html" class="active"><span class="is">Sagan</span><span class="en">Our Saga</span></a></li>
+                <li><a href="contact.html"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
+            </ul>
+            <div class="language-toggle">
+                <button class="lang-btn" onclick="toggleLanguage()">
+                    <span class="is">EN</span>
+                    <span class="en">IS</span>
+                </button>
+            </div>
+            <div class="member-portal">
+                <!-- Auth state will be loaded by auth.js -->
+            </div>
+        </nav>
+    </header>
+
+    <!-- About Hero -->
+    <section class="about-hero">
+        <div class="hero-overlay"></div>
+        <div class="northern-lights"></div>
+        <div class="about-hero-logo"></div>
+        <div class="about-hero-content">
+            <h1 class="about-title">
+                <span class="is">Um Sleipnir MC</span>
+                <span class="en">About Sleipnir MC</span>
+            </h1>
+            <p class="about-subtitle">
+                <span class="is">Sagan okkar og gildin sem við stöndum fyrir</span>
+                <span class="en">Our story and the values we stand for</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- Saga Section -->
+    <section class="saga" id="saga">
+        <div class="saga-container">
+            <h2 class="section-title">
+                <span class="norse-knotwork left"></span>
+                <span class="title-text">
+                    <span class="is">Sagan Okkar</span>
+                    <span class="en">Our Saga</span>
+                </span>
+                <span class="norse-knotwork right"></span>
+            </h2>
+            <div class="saga-content">
+                <div class="saga-text">
+                    <p class="saga-intro">
+                        <span class="is">
+                            Fæddur úr eldfjöllum Íslands, ríðum við áttfætta hest goðsagnanna.
+                            Sleipnir MC ber anda norrænna stríðsmanna inn í nútímann.
+                        </span>
+                        <span class="en">
+                            Born from the volcanic fires of Iceland, we ride the eight-legged steed of legend.
+                            Sleipnir MC carries the spirit of Norse warriors into the modern age.
+                        </span>
+                    </p>
+
+                    <p class="saga-intro">
+                        <span class="is">
+                            Stofnað árið 2015, hefur Sleipnir MC Reykjavík orðið að bræðralagi sem heiðrar
+                            fornar hefðir en faðmar nútímann. Við erum ekki bara mótorhjólaklúbbur - við erum
+                            samfélag stríðsmanna sem deila ást á frelsi, ævintýrum og bræðralagi.
+                        </span>
+                        <span class="en">
+                            Founded in 2015, Sleipnir MC Reykjavík has become a brotherhood that honors
+                            ancient traditions while embracing the modern age. We are not just a motorcycle club -
+                            we are a community of warriors who share a love for freedom, adventure, and fellowship.
+                        </span>
+                    </p>
+
+                    <div class="saga-values">
+                        <div class="value-item">
+                            <span class="rune">ᚠ</span>
+                            <h3>Félag / Fellowship</h3>
+                            <p>
+                                <span class="is">Sameinaðir sem einn, sterkari en Gleipnir</span>
+                                <span class="en">United as one, stronger than Gleipnir</span>
+                            </p>
+                        </div>
+                        <div class="value-item">
+                            <span class="rune">ᚺ</span>
+                            <h3>Heiður / Honor</h3>
+                            <p>
+                                <span class="is">Orð okkar er loforð okkar, skorið í stein</span>
+                                <span class="en">Our word is our bond, carved in stone</span>
+                            </p>
+                        </div>
+                        <div class="value-item">
+                            <span class="rune">ᚱ</span>
+                            <h3>NO DRUGS - NO ATTITUDE</h3>
+                            <p>
+                                <span class="is">Í gegnum eld og ís, höldum við áfram</span>
+                                <span class="en">Through fire and ice, we journey on</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Photo Section -->
+    <section class="team-photo" style="padding: 80px 0; background: linear-gradient(180deg, rgba(26,26,26,0.9), rgba(0,0,0,0.9));">
+        <div class="team-photo-container" style="max-width: 1200px; margin: 0 auto; padding: 0 40px;">
+            <h2 class="section-title" style="text-align: center; margin-bottom: 60px;">
+                <span class="norse-knotwork left"></span>
+                <span class="title-text">
+                    <span class="is">Bræðurnir</span>
+                    <span class="en">The Brothers</span>
+                </span>
+                <span class="norse-knotwork right"></span>
+            </h2>
+            
+            <div class="photo-wrapper" style="position: relative; overflow: hidden; border: 2px solid var(--mc-red); box-shadow: 0 20px 40px rgba(255,0,0,0.3);">
+                <img src="Images/HopMynd.png" alt="Sleipnir MC Brothers" style="width: 100%; height: auto; display: block;">
+                <div class="photo-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 40px; text-align: center;">
+                    <p style="font-family: 'Cinzel', serif; font-size: 24px; color: var(--white); margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
+                        <span class="is">Sameinaðir í bræðralagi</span>
+                        <span class="en">United in brotherhood</span>
+                    </p>
+                    <p style="font-family: 'Iceland', cursive; font-size: 18px; color: var(--mc-red); margin-top: 10px; letter-spacing: 3px; text-transform: uppercase;">
+                        NO DRUGS - NO ATTITUDE
+                    </p>
+                </div>
+            </div>
+            
+            <div class="photo-caption" style="text-align: center; margin-top: 40px;">
+                <p style="font-size: 18px; color: var(--gray); font-style: italic; max-width: 800px; margin: 0 auto;">
+                    <span class="is">
+                        Sleipnir MC Reykjavík - meira en klúbbur, við erum fjölskylda sameinuð í ferð gegnum ljósanótt lífsins.
+                    </span>
+                    <span class="en">
+                        Sleipnir MC Reykjavík - more than a club, we are a family united in the journey through life's midnight sun.
+                    </span>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Brotherhood Section -->
+    <section class="brotherhood" id="brotherhood">
+        <div class="brotherhood-content">
+            <h2 class="section-title">
+                <span class="is">Bræðralagið</span>
+                <span class="en">The Brotherhood</span>
+            </h2>
+            <p class="brotherhood-text">
+                <span class="is">
+                    Þeir sem leitast við að ríða með Sleipni verða að sanna sig verðuga áttfætta hestsins.
+                    Bræðralag okkar fagnar stríðsmönnum allra leiða sem heiðra gömlu leiðirnar.
+                </span>
+                <span class="en">
+                    Those who seek to ride with Sleipnir must prove worthy of the eight-legged steed.
+                    Our brotherhood welcomes warriors of all paths who honor the old ways.
+                </span>
+            </p>
+
+            <div class="brotherhood-values" style="margin-top: 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
+                <div class="brotherhood-item" style="text-align: center;">
+                    <span class="rune" style="font-size: 48px; color: var(--mc-red); display: block; margin-bottom: 20px;">ᛋ</span>
+                    <h3 style="font-family: 'Cinzel', serif; font-size: 24px; margin-bottom: 15px;">
+                        <span class="is">Styrk</span>
+                        <span class="en">Strength</span>
+                    </h3>
+                    <p style="color: var(--gray);">
+                        <span class="is">Í sameiningu finnum við styrk</span>
+                        <span class="en">In unity we find strength</span>
+                    </p>
+                </div>
+
+                <div class="brotherhood-item" style="text-align: center;">
+                    <span class="rune" style="font-size: 48px; color: var(--mc-red); display: block; margin-bottom: 20px;">ᛚ</span>
+                    <h3 style="font-family: 'Cinzel', serif; font-size: 24px; margin-bottom: 15px;">
+                        <span class="is">Tryggð</span>
+                        <span class="en">Loyalty</span>
+                    </h3>
+                    <p style="color: var(--gray);">
+                        <span class="is">Tryggð við bræður umfram allt</span>
+                        <span class="en">Loyalty to brothers above all</span>
+                    </p>
+                </div>
+
+                <div class="brotherhood-item" style="text-align: center;">
+                    <span class="rune" style="font-size: 48px; color: var(--mc-red); display: block; margin-bottom: 20px;">ᛖ</span>
+                    <h3 style="font-family: 'Cinzel', serif; font-size: 24px; margin-bottom: 15px;">
+                        <span class="is">Arfleifð</span>
+                        <span class="en">Legacy</span>
+                    </h3>
+                    <p style="color: var(--gray);">
+                        <span class="is">Við berum arfleifð forfeðra okkar</span>
+                        <span class="en">We carry the legacy of our ancestors</span>
+                    </p>
+                </div>
+            </div>
+
+            <div style="margin-top: 60px; text-align: center;">
+                <a href="register.html" class="cta-button primary">
+                    <span class="is">Hefja Ferðina</span>
+                    <span class="en">Begin Your Journey</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Sleipnir MC Reykjavík</h4>
+                <p>
+                    <span class="is">Ríðum í gegnum ljósanótt síðan 2015</span>
+                    <span class="en">Riding through ljósanótt since 2015</span>
+                </p>
+            </div>
+            <div class="social-links">
+                <a href="https://www.facebook.com/sleipnirmcreykjavik" target="_blank" rel="noopener noreferrer" aria-label="Facebook">f</a>
+                <a href="#" aria-label="Instagram">I</a>
+                <a href="mailto:sleipnirmcreykjavik@gmail.com" aria-label="Email">@</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Sleipnir MC Reykjavík.
+                    <span class="is">Allur réttur áskilinn.</span>
+                    <span class="en">All rights reserved.</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="javascript/firebase-config.js"></script>
+    <script src="javascript/auth.js"></script>
+    <script src="javascript/language.js"></script>
+    <script>
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.value-item').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

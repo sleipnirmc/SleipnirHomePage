@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC - Innskráning</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <span class="norse-text">ᛋᛚᛖᛁᛈᚾᛁᚱ</span>
+                <span class="logo-text">SLEIPNIR MC</span>
+                <span class="location">REYKJAVÍK</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><span class="is">Heim</span><span class="en">Home</span></a></li>
+                <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
+                <li><a href="contact.html"><span class="is">Samband</span><span class="en">Contact</span></a></li>
+            </ul>
+            <div class="language-toggle">
+                <button class="lang-btn" onclick="toggleLanguage()">
+                    <span class="is">EN</span>
+                    <span class="en">IS</span>
+                </button>
+            </div>
+            <div class="member-portal">
+                <!-- Auth state will be loaded by auth.js -->
+            </div>
+        </nav>
+    </header>
+
+    <!-- Login Section -->
+    <section class="auth-section">
+        <div class="auth-container">
+            <div class="auth-card">
+                <h2 class="auth-title">
+                    <span class="rune">ᛁ</span>
+                    <span class="is">Innskráning</span>
+                    <span class="en">Login</span>
+                </h2>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="email">
+                            <span class="is">Netfang</span>
+                            <span class="en">Email</span>
+                        </label>
+                        <input type="email" id="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <span class="is">Lykilorð</span>
+                            <span class="en">Password</span>
+                        </label>
+                        <input type="password" id="password" required>
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn">
+                        <span class="is">Innskrá</span>
+                        <span class="en">Sign In</span>
+                    </button>
+                </form>
+
+                <div class="auth-divider">
+                    <span class="divider-line"></span>
+                    <span class="divider-text">
+                        <span class="is">eða</span>
+                        <span class="en">or</span>
+                    </span>
+                    <span class="divider-line"></span>
+                </div>
+
+                <div class="auth-links">
+                    <p id="registerLink">
+                        <span class="is">Ekki með aðgang?</span>
+                        <span class="en">Don't have an account?</span>
+                        <a href="register.html" class="auth-link">
+                            <span class="is">Skráðu þig hér</span>
+                            <span class="en">Register here</span>
+                        </a>
+                    </p>
+                    <p style="margin-top: 10px;">
+                        <a href="forgot-password.html" class="auth-link">
+                            <span class="is">Gleymt lykilorð?</span>
+                            <span class="en">Forgot password?</span>
+                        </a>
+                    </p>
+                </div>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Sleipnir MC Reykjavík</h4>
+                <p>Riding through ljósanótt since 2015</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="javascript/firebase-config.js"></script>
+    <script src="javascript/auth.js"></script>
+    <script src="javascript/language.js"></script>
+    <script>
+        // Check for redirect parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTo = urlParams.get('redirect');
+        
+        // If coming from admin, hide registration link and show message
+        if (redirectTo === 'admin') {
+            const registerLink = document.getElementById('registerLink');
+            registerLink.style.display = 'none';
+            
+            // Add admin access message
+            const authLinks = document.querySelector('.auth-links');
+            const adminMessage = document.createElement('p');
+            adminMessage.style.color = 'var(--mc-red)';
+            adminMessage.style.marginBottom = '10px';
+            adminMessage.innerHTML = `
+                <strong>
+                    <span class="is">Stjórnborð - Eingöngu fyrir stjórnendur</span>
+                    <span class="en">Admin Panel - Administrators Only</span>
+                </strong>
+            `;
+            authLinks.insertBefore(adminMessage, authLinks.firstChild);
+        }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            try {
+                const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // Check if user exists in database
+                const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                
+                if (!userDoc.exists) {
+                    // User exists in Auth but not in Firestore - create their profile
+                    await firebase.firestore().collection('users').doc(user.uid).set({
+                        email: user.email,
+                        fullName: user.displayName || user.email.split('@')[0],
+                        role: 'customer',
+                        isMember: false,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        emailVerified: user.emailVerified
+                    });
+                    
+                    // If email not verified, send verification email
+                    if (!user.emailVerified) {
+                        await user.sendEmailVerification();
+                        window.location.href = 'verify-email.html';
+                        return;
+                    }
+                } else {
+                    // User exists in database
+                    const userData = userDoc.data();
+                    
+                    // Only check email verification for users who have the emailVerified field set to false
+                    if (!user.emailVerified && userData && userData.emailVerified === false) {
+                        window.location.href = 'verify-email.html';
+                        return;
+                    }
+                }
+                
+                // For existing users or verified users, redirect appropriately
+                if (redirectTo === 'admin') {
+                    // Check if user is admin before redirecting
+                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                    if (userDoc.exists && userDoc.data().role === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        errorMessage.style.display = 'block';
+                        errorMessage.innerHTML = `
+                            <span class="is">Aðgangur hafnaður. Stjórnendaréttindi krafist.</span>
+                            <span class="en">Access denied. Admin privileges required.</span>
+                        `;
+                        firebase.auth().signOut();
+                        return;
+                    }
+                } else {
+                    // Auth state observer will handle normal redirect
+                }
+            } catch (error) {
+                errorMessage.style.display = 'block';
+                
+                // Provide better error messages
+                if (error.code === 'auth/configuration-not-found') {
+                    errorMessage.innerHTML = `
+                        <strong>Authentication Not Configured</strong><br>
+                        Firebase Authentication needs to be enabled in the Firebase Console.<br>
+                        Please contact the administrator.
+                    `;
+                } else if (error.code === 'auth/user-not-found') {
+                    errorMessage.textContent = 'No account found with this email. Please register first.';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage.textContent = 'Incorrect password. Please try again.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage.textContent = 'Please enter a valid email address.';
+                } else if (error.code === 'auth/user-disabled') {
+                    errorMessage.textContent = 'This account has been disabled. Please contact support.';
+                } else {
+                    errorMessage.textContent = error.message;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

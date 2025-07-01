@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC - Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Hide body until authentication is verified */
+        body {
+            display: none;
+        }
+        
+        /* Simple admin styles */
+        .admin-container {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 20px;
+        }
+        .admin-section {
+            background: rgba(26,26,26,0.9);
+            border: 1px solid var(--mc-red);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .admin-card {
+            background: rgba(10,10,10,0.8);
+            border: 1px solid rgba(255,0,0,0.2);
+            padding: 20px;
+            position: relative;
+        }
+        .admin-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+        .admin-btn {
+            padding: 10px 20px;
+            background: var(--mc-red);
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        .admin-btn:hover {
+            background: var(--dark-red);
+            transform: translateY(-2px);
+        }
+        .admin-btn.secondary {
+            background: var(--charcoal);
+        }
+        .admin-btn.edit {
+            background: var(--crimson);
+        }
+        .admin-input, .admin-textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+        }
+        .admin-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .member-request {
+            background: rgba(255,0,0,0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid var(--mc-red);
+        }
+        
+        /* Drag and Drop Styles */
+        .drop-zone {
+            border: 2px dashed var(--mc-red);
+            border-radius: 5px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            background: rgba(255,0,0,0.05);
+        }
+        .drop-zone:hover {
+            background: rgba(255,0,0,0.1);
+            border-color: var(--white);
+        }
+        .drop-zone.dragover {
+            background: rgba(255,0,0,0.2);
+            transform: scale(1.02);
+        }
+        .drop-zone input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .drop-zone-text {
+            pointer-events: none;
+        }
+        .drop-zone-icon {
+            font-size: 48px;
+            color: var(--mc-red);
+            margin-bottom: 10px;
+        }
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .image-preview {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+        }
+        .image-preview img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: 1px solid var(--mc-red);
+        }
+        .image-preview .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--mc-red);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            overflow-y: auto;
+        }
+        .modal-content {
+            background-color: var(--norse-black);
+            margin: 50px auto;
+            padding: 40px;
+            border: 2px solid var(--mc-red);
+            width: 90%;
+            max-width: 800px;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: var(--mc-red);
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .close-modal:hover {
+            color: var(--white);
+            transform: rotate(90deg);
+        }
+        
+        /* Form Styling */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--mc-red);
+            font-weight: bold;
+        }
+        .sizes-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .size-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: rgba(255,0,0,0.1);
+            border: 1px solid var(--mc-red);
+        }
+        .size-checkbox input[type="checkbox"] {
+            accent-color: var(--mc-red);
+        }
+        
+        /* Members Only Checkbox Styling */
+        .members-only-container {
+            background: rgba(255,0,0,0.1);
+            border: 2px solid var(--mc-red);
+            padding: 15px;
+            margin: 20px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .members-only-container:hover {
+            background: rgba(255,0,0,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,0,0,0.3);
+        }
+        
+        .members-only-container input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--mc-red);
+            cursor: pointer;
+        }
+        
+        .members-only-container label {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--white);
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .members-only-icon {
+            font-size: 24px;
+            color: var(--mc-red);
+        }
+        
+        /* Orders Styles */
+        .order-card {
+            background: rgba(10,10,10,0.8);
+            border: 1px solid rgba(255,0,0,0.2);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .order-card.new-order {
+            border-color: var(--mc-red);
+            animation: pulse-border 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-border {
+            0%, 100% { border-color: var(--mc-red); }
+            50% { border-color: rgba(255,0,0,0.3); }
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .order-number {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            color: var(--mc-red);
+        }
+        
+        .order-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .order-status.pending {
+            background: rgba(255,165,0,0.2);
+            color: orange;
+        }
+        
+        .order-status.processing {
+            background: rgba(0,0,255,0.2);
+            color: #4169e1;
+        }
+        
+        .order-status.completed {
+            background: rgba(0,255,0,0.2);
+            color: #00ff00;
+        }
+        
+        .order-items {
+            margin: 15px 0;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .order-total {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--mc-red);
+            text-align: right;
+            margin-top: 15px;
+        }
+        
+        .order-customer {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+        }
+        
+        .order-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .new-order-badge {
+            background: var(--mc-red);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            animation: blink 1s ease-in-out infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <span class="norse-text">ᛋᛚᛖᛁᛈᚾᛁᚱ</span>
+                <span class="logo-text">SLEIPNIR MC ADMIN</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+            <div class="language-toggle">
+                <button class="lang-btn" onclick="toggleLanguage()">
+                    <span class="is">EN</span>
+                    <span class="en">IS</span>
+                </button>
+            </div>
+            <div class="member-portal">
+                <!-- Auth state will be loaded by auth.js -->
+            </div>
+        </nav>
+    </header>
+
+    <div class="admin-container">
+        <h1>Admin Dashboard</h1>
+
+        <!-- Add Product Section -->
+        <div class="admin-section">
+            <h2>Add New Product</h2>
+            <form id="addProductForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productName">Product Name (Icelandic)</label>
+                        <input type="text" id="productName" class="admin-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productNameEn">Product Name (English)</label>
+                        <input type="text" id="productNameEn" class="admin-input" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="productDescription">Description</label>
+                    <textarea id="productDescription" class="admin-textarea" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productCategory">Category</label>
+                        <select id="productCategory" class="admin-input" required>
+                            <option value="">Select Category</option>
+                            <option value="tshirt">T-Shirt</option>
+                            <option value="jeans">Jeans/Trousers</option>
+                            <option value="jacket">Jacket</option>
+                            <option value="hoodie">Hoodie</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productPrice">Price (ISK)</label>
+                        <input type="number" id="productPrice" class="admin-input" required>
+                    </div>
+                </div>
+                
+                <!-- Drag and Drop Image Upload -->
+                <div class="form-group">
+                    <label>Product Images</label>
+                    <div class="drop-zone" id="dropZone">
+                        <input type="file" id="fileInput" multiple accept="image/*">
+                        <div class="drop-zone-text">
+                            <div class="drop-zone-icon">📸</div>
+                            <p>Drag & drop images here or click to browse</p>
+                            <p style="font-size: 14px; color: var(--gray);">Supports: JPG, PNG, GIF</p>
+                        </div>
+                    </div>
+                    <div class="preview-container" id="previewContainer"></div>
+                </div>
+
+                <!-- Available Sizes -->
+                <div class="form-group">
+                    <label>Available Sizes</label>
+                    <div class="sizes-container" id="sizesContainer">
+                        <!-- Sizes will be populated based on category -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="members-only-container">
+                        <label for="membersOnly">
+                            <span class="members-only-icon">🔒</span>
+                            <input type="checkbox" id="membersOnly">
+                            <span>Members Only</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="admin-btn">Add Product</button>
+            </form>
+        </div>
+
+        <!-- Products List Section -->
+        <div class="admin-section">
+            <h2>Manage Products</h2>
+            <div id="productsList" class="admin-grid">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Member Requests Section -->
+        <div class="admin-section">
+            <h2>Member Requests</h2>
+            <div id="memberRequests">
+                <!-- Member requests will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Current Members Section -->
+        <div class="admin-section">
+            <h2>Current Members</h2>
+            <div id="currentMembers" class="admin-grid">
+                <!-- Current members will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Admin Management Section -->
+        <div class="admin-section">
+            <h2>Admin Management</h2>
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: var(--mc-red); margin-bottom: 15px;">Grant Admin Access</h3>
+                <div style="background: rgba(255,0,0,0.1); border: 1px solid var(--mc-red); padding: 20px; margin-bottom: 20px;">
+                    <p style="color: var(--gray); margin-bottom: 15px;">⚠️ <strong>Warning:</strong> Admin users have full access to manage products, orders, and users.</p>
+                    <form id="grantAdminForm" style="display: flex; gap: 15px; align-items: flex-end;">
+                        <div style="flex: 1;">
+                            <label for="adminEmail" style="display: block; margin-bottom: 5px; color: var(--white);">User Email:</label>
+                            <input type="email" id="adminEmail" class="admin-input" placeholder="user@example.com" required>
+                        </div>
+                        <button type="submit" class="admin-btn">Grant Admin Access</button>
+                    </form>
+                </div>
+                <div id="adminGrantMessage" style="display: none; padding: 15px; margin-bottom: 20px;"></div>
+            </div>
+            <h3 style="margin-bottom: 20px;">Current Admins</h3>
+            <div id="currentAdmins" class="admin-grid">
+                <!-- Current admins will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="admin-section">
+            <h2>Recent Orders <span id="newOrderBadge" class="new-order-badge" style="display:none;">New!</span></h2>
+            <div id="ordersList">
+                <!-- Orders will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Product</h2>
+            <form id="editProductForm">
+                <input type="hidden" id="editProductId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editProductName">Product Name (Icelandic)</label>
+                        <input type="text" id="editProductName" class="admin-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editProductNameEn">Product Name (English)</label>
+                        <input type="text" id="editProductNameEn" class="admin-input" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editProductDescription">Description</label>
+                    <textarea id="editProductDescription" class="admin-textarea" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editProductCategory">Category</label>
+                        <select id="editProductCategory" class="admin-input" required>
+                            <option value="tshirt">T-Shirt</option>
+                            <option value="jeans">Jeans/Trousers</option>
+                            <option value="jacket">Jacket</option>
+                            <option value="hoodie">Hoodie</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editProductPrice">Price (ISK)</label>
+                        <input type="number" id="editProductPrice" class="admin-input" required>
+                    </div>
+                </div>
+                
+                <!-- Image Upload for Edit -->
+                <div class="form-group">
+                    <label>Product Images</label>
+                    <div class="drop-zone" id="editDropZone">
+                        <input type="file" id="editFileInput" multiple accept="image/*">
+                        <div class="drop-zone-text">
+                            <div class="drop-zone-icon">📸</div>
+                            <p>Drag & drop new images or click to browse</p>
+                        </div>
+                    </div>
+                    <div class="preview-container" id="editPreviewContainer"></div>
+                </div>
+
+                <!-- Available Sizes -->
+                <div class="form-group">
+                    <label>Available Sizes</label>
+                    <div class="sizes-container" id="editSizesContainer">
+                        <!-- Sizes will be populated based on category -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="members-only-container">
+                        <label for="editMembersOnly">
+                            <span class="members-only-icon">🔒</span>
+                            <input type="checkbox" id="editMembersOnly">
+                            <span>Members Only</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="admin-btn">Update Product</button>
+                <button type="button" class="admin-btn secondary" onclick="closeEditModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="javascript/firebase-config.js"></script>
+    <script>
+        // Check authentication immediately
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (!user) {
+                // No user logged in, redirect to login
+                window.location.href = 'login.html?redirect=admin';
+                return;
+            }
+
+            // Check if user is admin
+            try {
+                const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                if (!userDoc.exists || userDoc.data().role !== 'admin') {
+                    // Not an admin, show error and redirect
+                    alert('Access denied. Admin privileges required.');
+                    firebase.auth().signOut();
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // User is admin, show the page
+                document.body.style.display = 'block';
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                alert('Error verifying admin status. Please try again.');
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+    <script src="javascript/auth.js"></script>
+    <script src="javascript/language.js"></script>
+    <script src="javascript/admin.js"></script>
+</body>
+</html>

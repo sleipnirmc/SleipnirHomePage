@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viking Font Test - Sleipnir MC</title>
+    <style>
+        /* Define the Viking font with multiple sources for better compatibility */
+        @font-face {
+            font-family: 'Viking';
+            src: url('fonts/VIKING-N.TTF') format('truetype'),
+                 url('VIKING-N.TTF') format('truetype'),
+                 url('./VIKING-N.TTF') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        /* Alternative font-face definition */
+        @font-face {
+            font-family: 'VikingAlt';
+            src: local('Viking N'),
+                 local('VIKING-N'),
+                 url('fonts/VIKING-N.TTF') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* Test styles */
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #ff0000;
+            text-align: center;
+            margin-bottom: 50px;
+            font-family: 'Viking', serif;
+            font-size: 48px;
+        }
+
+        .test-section {
+            background: rgba(26,26,26,0.9);
+            border: 2px solid #ff0000;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .test-title {
+            color: #ff0000;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Viking font tests */
+        .viking-test {
+            font-family: 'Viking', serif;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255,0,0,0.1);
+            border-left: 4px solid #ff0000;
+        }
+
+        .size-test-1 {
+            font-size: 72px;
+            text-transform: uppercase;
+        }
+
+        .size-test-2 {
+            font-size: 56px;
+        }
+
+        .size-test-3 {
+            font-size: 42px;
+        }
+
+        .size-test-4 {
+            font-size: 32px;
+        }
+
+        .size-test-5 {
+            font-size: 24px;
+        }
+
+        .size-test-6 {
+            font-size: 18px;
+        }
+
+        /* Fallback test */
+        .fallback-test {
+            font-family: serif;
+            color: #888;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        /* Status indicator */
+        .status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #ff0000;
+            color: white;
+            font-weight: bold;
+        }
+
+        .alphabet-test {
+            font-family: 'Viking', serif;
+            font-size: 28px;
+            line-height: 2;
+            letter-spacing: 5px;
+        }
+
+        .mixed-fonts {
+            margin: 20px 0;
+        }
+
+        .mixed-fonts span {
+            font-size: 36px;
+        }
+
+        .viking-span {
+            font-family: 'Viking', serif;
+            color: #ff0000;
+        }
+
+        .regular-span {
+            font-family: 'Cinzel', serif;
+            color: #fff;
+        }
+
+        /* Animation test */
+        @keyframes vikingGlow {
+            0% { text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+            50% { text-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 30px rgba(255,0,0,0.5); }
+            100% { text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+        }
+
+        .animated-viking {
+            font-family: 'Viking', serif;
+            font-size: 48px;
+            text-align: center;
+            animation: vikingGlow 2s ease-in-out infinite;
+            margin: 30px 0;
+        }
+
+        /* Color tests */
+        .color-test {
+            font-family: 'Viking', serif;
+            font-size: 36px;
+            margin: 10px 0;
+        }
+
+        .color-red { color: #ff0000; }
+        .color-white { color: #ffffff; }
+        .color-gray { color: #888888; }
+        .color-crimson { color: #dc143c; }
+
+        /* Special characters */
+        .special-chars {
+            font-family: 'Viking', serif;
+            font-size: 32px;
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        /* Font weight test */
+        .weight-test {
+            font-family: 'Viking', serif;
+            font-size: 28px;
+            margin: 10px 0;
+        }
+
+        .weight-normal { font-weight: normal; }
+        .weight-bold { font-weight: bold; }
+        .weight-lighter { font-weight: lighter; }
+
+        /* Comparison */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .comparison-box {
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #333;
+        }
+
+        .comparison-title {
+            font-size: 18px;
+            color: #ff0000;
+            margin-bottom: 10px;
+        }
+
+        .comparison-text {
+            font-size: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status" id="fontStatus">Checking font...</div>
+        
+        <h1>VIKING FONT TEST</h1>
+
+        <!-- Basic Test -->
+        <div class="test-section">
+            <h2 class="test-title">1. Basic Font Test</h2>
+            <div class="viking-test size-test-1">SLEIPNIR MC</div>
+            <div class="viking-test size-test-2" style="font-family: 'VikingAlt', serif;">SLEIPNIR MC (Alt)</div>
+            <div class="fallback-test">If you see this in a different font, Viking font is not loading</div>
+            
+            <!-- Direct inline test -->
+            <div style="font-family: Viking, serif; font-size: 48px; color: #ff0000; margin: 20px 0;">
+                INLINE FONT TEST
+            </div>
+        </div>
+
+        <!-- Size Variations -->
+        <div class="test-section">
+            <h2 class="test-title">2. Size Variations</h2>
+            <div class="viking-test size-test-1">72px - REYKJAVÍK</div>
+            <div class="viking-test size-test-2">56px - NO DRUGS NO ATTITUDE</div>
+            <div class="viking-test size-test-3">42px - Brotherhood of the Road</div>
+            <div class="viking-test size-test-4">32px - Riding Through Ljósanótt</div>
+            <div class="viking-test size-test-5">24px - Since 2015</div>
+            <div class="viking-test size-test-6">18px - Official Merchandise Store</div>
+        </div>
+
+        <!-- Alphabet Test -->
+        <div class="test-section">
+            <h2 class="test-title">3. Full Alphabet & Numbers</h2>
+            <div class="alphabet-test">
+                ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+                abcdefghijklmnopqrstuvwxyz<br>
+                0123456789
+            </div>
+        </div>
+
+        <!-- Special Characters -->
+        <div class="test-section">
+            <h2 class="test-title">4. Special Characters & Symbols</h2>
+            <div class="special-chars">
+                !@#$%^&*()_+-=[]{}|;':",./<>?
+            </div>
+        </div>
+
+        <!-- Icelandic Characters -->
+        <div class="test-section">
+            <h2 class="test-title">5. Icelandic Characters</h2>
+            <div class="viking-test size-test-3">
+                ÁÉÍÓÚÝÞÆÐ<br>
+                áéíóúýþæð
+            </div>
+        </div>
+
+        <!-- Mixed Fonts -->
+        <div class="test-section">
+            <h2 class="test-title">6. Mixed Font Usage</h2>
+            <div class="mixed-fonts">
+                <span class="viking-span">SLEIPNIR MC</span>
+                <span class="regular-span">REYKJAVÍK</span>
+            </div>
+            <div class="mixed-fonts">
+                <span class="regular-span">Welcome to</span>
+                <span class="viking-span">VALHALLA</span>
+            </div>
+        </div>
+
+        <!-- Color Tests -->
+        <div class="test-section">
+            <h2 class="test-title">7. Color Variations</h2>
+            <div class="color-test color-red">RED - SLEIPNIR MC</div>
+            <div class="color-test color-white">WHITE - SLEIPNIR MC</div>
+            <div class="color-test color-gray">GRAY - SLEIPNIR MC</div>
+            <div class="color-test color-crimson">CRIMSON - SLEIPNIR MC</div>
+        </div>
+
+        <!-- Animation Test -->
+        <div class="test-section">
+            <h2 class="test-title">8. Animation Test</h2>
+            <div class="animated-viking">RIDE OR DIE</div>
+        </div>
+
+        <!-- Font Weight Test -->
+        <div class="test-section">
+            <h2 class="test-title">9. Font Weight Test</h2>
+            <div class="weight-test weight-normal">Normal - BROTHERHOOD</div>
+            <div class="weight-test weight-bold">Bold - BROTHERHOOD</div>
+            <div class="weight-test weight-lighter">Lighter - BROTHERHOOD</div>
+        </div>
+
+        <!-- Comparison -->
+        <div class="test-section">
+            <h2 class="test-title">10. Font Comparison</h2>
+            <div class="comparison-grid">
+                <div class="comparison-box">
+                    <div class="comparison-title">Viking Font:</div>
+                    <div class="comparison-text" style="font-family: 'Viking', serif;">SLEIPNIR MC</div>
+                </div>
+                <div class="comparison-box">
+                    <div class="comparison-title">Default Serif:</div>
+                    <div class="comparison-text" style="font-family: serif;">SLEIPNIR MC</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Use Cases -->
+        <div class="test-section">
+            <h2 class="test-title">11. Potential Use Cases</h2>
+            <div style="margin: 20px 0;">
+                <h3 style="font-family: 'Viking', serif; font-size: 36px; color: #ff0000;">Page Headers</h3>
+                <h4 style="font-family: 'Viking', serif; font-size: 28px;">Section Titles</h4>
+                <button style="font-family: 'Viking', serif; font-size: 20px; padding: 15px 30px; background: #ff0000; color: white; border: none; cursor: pointer;">SHOP NOW</button>
+            </div>
+        </div>
+
+        <!-- Long Text Test -->
+        <div class="test-section">
+            <h2 class="test-title">12. Readability Test</h2>
+            <div style="font-family: 'Viking', serif; font-size: 18px; line-height: 1.8;">
+                Born from the volcanic fires of Iceland, we ride the eight-legged steed of legend. 
+                Sleipnir MC carries the spirit of Norse warriors into the modern age. 
+                No drugs, no attitude - just brotherhood and the open road.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if font is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const testElement = document.createElement('span');
+            testElement.style.fontFamily = 'Viking, serif';
+            testElement.style.position = 'absolute';
+            testElement.style.visibility = 'hidden';
+            testElement.innerHTML = 'Test';
+            document.body.appendChild(testElement);
+
+            // Check font loading
+            document.fonts.ready.then(() => {
+                const fontStatus = document.getElementById('fontStatus');
+                
+                // Check if Viking font is in the loaded fonts
+                let vikingLoaded = false;
+                document.fonts.forEach(font => {
+                    if (font.family === 'Viking') {
+                        vikingLoaded = true;
+                    }
+                });
+
+                if (vikingLoaded || document.fonts.check('32px Viking')) {
+                    fontStatus.textContent = '✓ Font Loaded Successfully';
+                    fontStatus.style.background = '#00ff00';
+                    fontStatus.style.color = '#000';
+                } else {
+                    fontStatus.textContent = '✗ Font Not Loaded';
+                    fontStatus.style.background = '#ff0000';
+                    
+                    // Add debugging info
+                    console.error('Viking font failed to load. Check:');
+                    console.error('1. File path: VIKING-N.TTF exists in root directory');
+                    console.error('2. File name case sensitivity');
+                    console.error('3. Browser console for CORS or 404 errors');
+                }
+
+                document.body.removeChild(testElement);
+            });
+
+            // Additional check using width comparison
+            setTimeout(() => {
+                const viking = document.createElement('span');
+                const serif = document.createElement('span');
+                
+                viking.style.fontFamily = 'Viking, serif';
+                serif.style.fontFamily = 'serif';
+                
+                viking.style.position = serif.style.position = 'absolute';
+                viking.style.visibility = serif.style.visibility = 'hidden';
+                viking.innerHTML = serif.innerHTML = 'MMMMMMMMMM';
+                
+                document.body.appendChild(viking);
+                document.body.appendChild(serif);
+                
+                if (viking.offsetWidth !== serif.offsetWidth) {
+                    console.log('Viking font is rendering differently - likely loaded correctly');
+                } else {
+                    console.warn('Viking font may be falling back to serif');
+                }
+                
+                document.body.removeChild(viking);
+                document.body.removeChild(serif);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

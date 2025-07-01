@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC Reykjavík - Official Homepage</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Homepage specific styles */
+        .hero {
+            height: 100vh;
+            margin-top: 0;
+            position: relative;
+        }
+
+        /* Make hero take full screen */
+        body.homepage {
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Prevent animation shift */
+        .hero-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 2;
+            animation: none !important; /* Override any animation */
+        }
+
+        /* Large background logo */
+        .hero-logo-bg {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1200px;
+            height: 1200px;
+            background: url('Images/SleipnirLogo.png') no-repeat center center;
+            background-size: contain;
+            opacity: 0.4;
+            z-index: 1;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.15; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.25; transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        /* Footer only visible if user scrolls */
+        footer {
+            position: absolute;
+            bottom: -100%;
+            width: 100%;
+        }
+
+        /* Override body background watermark for homepage */
+        body.homepage::before {
+            display: none;
+        }
+
+        /* Ensure no margin/padding issues */
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="homepage">
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <span class="logo-text">SLEIPNIR MC</span>
+                <span class="location">REYKJAVÍK</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="Index.html" class="active"><span class="is">Heim</span><span class="en">Home</span></a></li>
+                <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
+                <li><a href="about.html"><span class="is">Sagan</span><span class="en">Our Saga</span></a></li>
+                <li><a href="contact.html"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
+            </ul>
+            <div class="language-toggle">
+                <button class="lang-btn" onclick="toggleLanguage()">
+                    <span class="is">EN</span>
+                    <span class="en">IS</span>
+                </button>
+            </div>
+            <div class="member-portal">
+                <!-- Auth state will be loaded by auth.js -->
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section - Full Screen -->
+    <section class="hero" id="home">
+        <div class="hero-overlay"></div>
+        <div class="northern-lights"></div>
+        <div class="hero-logo-bg"></div>
+        <div class="hero-content">
+            <h1 class="hero-title viking-font">
+                NO DRUGS<br>
+                NO ATTITUDE
+            </h1>
+            <div class="cta-group">
+                <a href="shop.html" class="cta-button primary">
+                    <span class="is">Versla</span>
+                    <span class="en">Shop</span>
+                </a>
+                <a href="about.html" class="cta-button secondary">
+                    <span class="is">Meðlimir</span>
+                    <span class="en">Members</span>
+                </a>
+            </div>
+        </div>
+        <div class="frost-border"></div>
+    </section>
+
+    <!-- Minimal Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Sleipnir MC Reykjavík</h4>
+                <p>
+                    <span class="is">Ríðum í gegnum ljósanótt síðan 2015</span>
+                    <span class="en">Riding through ljósanótt since 2015</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="javascript/firebase-config.js"></script>
+    <script src="javascript/auth.js"></script>
+    <script src="javascript/language.js"></script>
+    <script>
+        // Northern lights animation
+        let lastScrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const lights = document.querySelector('.northern-lights');
+            if (lights) {
+                lights.style.transform = `translateY(${scrolled * 0.3}px)`;
+            }
+            lastScrollY = scrolled;
+        });
+    </script>
+</body>
+</html>

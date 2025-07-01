@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC - Nýskráning</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <span class="norse-text">ᛋᛚᛖᛁᛈᚾᛁᚱ</span>
+                <span class="logo-text">SLEIPNIR MC</span>
+                <span class="location">REYKJAVÍK</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><span class="is">Heim</span><span class="en">Home</span></a></li>
+                <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
+                <li><a href="contact.html"><span class="is">Samband</span><span class="en">Contact</span></a></li>
+            </ul>
+            <div class="language-toggle">
+                <button class="lang-btn" onclick="toggleLanguage()">
+                    <span class="is">EN</span>
+                    <span class="en">IS</span>
+                </button>
+            </div>
+            <div class="member-portal">
+                <!-- Auth state will be loaded by auth.js -->
+            </div>
+        </nav>
+    </header>
+
+    <!-- Registration Section -->
+    <section class="auth-section">
+        <div class="auth-container">
+            <div class="auth-card register-card">
+                <h2 class="auth-title">
+                    <span class="rune">ᚱ</span>
+                    <span class="is">Nýskráning</span>
+                    <span class="en">Registration</span>
+                </h2>
+
+                <!-- Registration Form -->
+                <form id="registerForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="fullName">
+                            <span class="is">Fullt nafn</span>
+                            <span class="en">Full Name</span>
+                        </label>
+                        <input type="text" id="fullName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            <span class="is">Netfang</span>
+                            <span class="en">Email</span>
+                        </label>
+                        <input type="email" id="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">
+                            <span class="is">Heimilisfang</span>
+                            <span class="en">Address</span>
+                        </label>
+                        <input type="text" id="address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city">
+                            <span class="is">Borg/Bær</span>
+                            <span class="en">City</span>
+                        </label>
+                        <input type="text" id="city" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="postalCode">
+                            <span class="is">Póstnúmer</span>
+                            <span class="en">Postal Code</span>
+                        </label>
+                        <input type="text" id="postalCode" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <span class="is">Lykilorð</span>
+                            <span class="en">Password</span>
+                        </label>
+                        <input type="password" id="password" required minlength="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">
+                            <span class="is">Staðfesta lykilorð</span>
+                            <span class="en">Confirm Password</span>
+                        </label>
+                        <input type="password" id="confirmPassword" required>
+                    </div>
+
+                    <!-- Member Request Checkbox -->
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="memberRequest">
+                            <span class="checkbox-custom"></span>
+                            <span>
+                                <span class="is">Ég er meðlimur Sleipnir MC</span>
+                                <span class="en">I am a member of Sleipnir MC</span>
+                            </span>
+                        </label>
+                        <p class="checkbox-note">
+                            <span class="is">Stjórnandi mun staðfesta meðlimsstöðu þína</span>
+                            <span class="en">Admin will verify your membership status</span>
+                        </p>
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn">
+                        <span class="is">Skrá mig</span>
+                        <span class="en">Register</span>
+                    </button>
+                </form>
+
+                <div class="auth-links">
+                    <p>
+                        <span class="is">Ertu þegar með aðgang?</span>
+                        <span class="en">Already have an account?</span>
+                        <a href="login.html" class="auth-link">
+                            <span class="is">Innskrá</span>
+                            <span class="en">Sign in</span>
+                        </a>
+                    </p>
+                </div>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                <!-- Success Message -->
+                <div id="successMessage" class="success-message" style="display: none;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Sleipnir MC Reykjavík</h4>
+                <p>Riding through ljósanótt since 2015</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="javascript/firebase-config.js"></script>
+    <script src="javascript/auth.js"></script>
+    <script src="javascript/language.js"></script>
+    <script>
+        // Registration form handler
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const address = document.getElementById('address').value;
+            const city = document.getElementById('city').value;
+            const postalCode = document.getElementById('postalCode').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const memberRequest = document.getElementById('memberRequest').checked;
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            // Reset messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Passwords do not match';
+                return;
+            }
+
+            try {
+                // Create user
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // Store user data in Firestore
+                await firebase.firestore().collection('users').doc(user.uid).set({
+                    fullName: fullName,
+                    email: email,
+                    address: address,
+                    city: city,
+                    postalCode: postalCode,
+                    role: 'customer',
+                    isMember: false,
+                    memberRequestPending: memberRequest,
+                    emailVerified: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Send verification email
+                await user.sendEmailVerification({
+                    url: window.location.origin + '/shop.html',
+                    handleCodeInApp: false
+                });
+
+                // Show success message
+                successMessage.style.display = 'block';
+                successMessage.innerHTML = `
+                    <strong><span class="is">Skráning tókst!</span><span class="en">Registration successful!</span></strong><br>
+                    <span class="is">Við höfum sent staðfestingarpóst á ${email}. Vinsamlegast staðfestu netfangið þitt til að halda áfram.</span>
+                    <span class="en">We've sent a verification email to ${email}. Please verify your email to continue.</span>
+                    ${memberRequest ? '<br><br><span class="is">Meðlimsbeiðni þín hefur verið send til samþykktar.</span><span class="en">Your member request has been sent for approval.</span>' : ''}
+                `;
+
+                // Redirect to verification page after 3 seconds
+                setTimeout(() => {
+                    window.location.href = 'verify-email.html';
+                }, 3000);
+
+            } catch (error) {
+                errorMessage.style.display = 'block';
+                
+                // Provide better error messages
+                if (error.code === 'auth/configuration-not-found') {
+                    errorMessage.innerHTML = `
+                        <strong>Authentication Not Configured</strong><br>
+                        Firebase Authentication needs to be enabled in the Firebase Console.<br>
+                        Please contact the administrator.
+                    `;
+                } else if (error.code === 'auth/email-already-in-use') {
+                    errorMessage.textContent = 'This email is already registered. Please sign in instead.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage.textContent = 'Password should be at least 6 characters long.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage.textContent = 'Please enter a valid email address.';
+                } else {
+                    errorMessage.textContent = error.message;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
