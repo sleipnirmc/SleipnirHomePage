@@ -469,6 +469,8 @@
                     <a href="#" onclick="showSection('products')">Manage Products</a>
                     <a href="#" onclick="showSection('members')">Manage Members</a>
                     <a href="#" onclick="showSection('orders')">View Orders</a>
+                    <a href="#" onclick="showSection('searchUsers')">Search Users</a>
+                    <a href="#" onclick="showSection('allAccounts')">View All Accounts</a>
                     <a href="#" onclick="showSection('export')">Export Data</a>
                 </div>
             </div>
@@ -681,6 +683,60 @@
             </div>
         </div>
         
+        <!-- Search Users Section -->
+        <div class="admin-section" id="searchUsersSection">
+            <div class="section-header">
+                <h2 class="section-title">Search Users</h2>
+            </div>
+            
+            <div class="form-group">
+                <label>Search by name, email, or address</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" class="admin-input" id="userSearchInput" placeholder="Enter search term..." style="flex: 1;">
+                    <button class="admin-btn" onclick="searchUsers()">Search</button>
+                    <button class="admin-btn secondary" onclick="clearSearch()">Clear</button>
+                </div>
+            </div>
+            
+            <div id="searchResults" style="margin-top: 30px;">
+                <!-- Search results will appear here -->
+            </div>
+        </div>
+        
+        <!-- All Accounts Section -->
+        <div class="admin-section" id="allAccountsSection">
+            <div class="section-header">
+                <h2 class="section-title">All User Accounts</h2>
+            </div>
+            
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchAccountTab('all')">All Users</button>
+                <button class="tab-btn" onclick="switchAccountTab('members')">Members Only</button>
+                <button class="tab-btn" onclick="switchAccountTab('nonMembers')">Non-Members</button>
+            </div>
+            
+            <!-- All Users Tab -->
+            <div class="tab-content active" id="allUsersTab">
+                <div id="allUsersList">
+                    <!-- All users will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Members Tab -->
+            <div class="tab-content" id="membersTab">
+                <div id="membersList">
+                    <!-- Members will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Non-Members Tab -->
+            <div class="tab-content" id="nonMembersTab">
+                <div id="nonMembersList">
+                    <!-- Non-members will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
         <!-- Export Section -->
         <div class="admin-section" id="exportSection">
             <div class="section-header">
@@ -846,6 +902,14 @@
                 case 'orders':
                     loadOrders();
                     break;
+                case 'searchUsers':
+                    // Clear search results when opening section
+                    document.getElementById('searchResults').innerHTML = '';
+                    document.getElementById('userSearchInput').value = '';
+                    break;
+                case 'allAccounts':
+                    loadAllAccounts('all');
+                    break;
             }
         }
         
@@ -878,6 +942,19 @@
             // Update tab content
             document.querySelectorAll('#ordersSection .tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(status + 'OrdersTab').classList.add('active');
+        }
+        
+        function switchAccountTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('#allAccountsSection .tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('#allAccountsSection .tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.add('active');
+            
+            // Load appropriate data
+            loadAllAccounts(tab);
         }
         
         // Load dashboard stats

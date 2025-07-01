@@ -4,6 +4,7 @@
 let uploadedImages = [];
 let editImages = [];
 let memberPhotoFile = null;
+let memberPhotoData = null;
 let currentProductImages = [];
 let editUploadedImages = [];
 
@@ -149,9 +150,12 @@ function handleMemberPhoto(file) {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = function() {
+        // Store the base64 data
+        memberPhotoData = reader.result;
+        
         const preview = document.getElementById('memberPhotoPreview');
         preview.innerHTML = `
-            <div class="image-preview" style="max-width: 200px;">
+            <div class="image-preview" style="position: relative; max-width: 200px;">
                 <img src="${reader.result}" alt="Member photo" style="width: 100%; height: auto; border-radius: 8px;">
                 <button class="remove-btn" onclick="removeMemberPhoto()" style="position: absolute; top: -5px; right: -5px; background: var(--mc-red); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;">×</button>
             </div>
@@ -191,6 +195,7 @@ function removeProductImage(index) {
 // Remove member photo
 function removeMemberPhoto() {
     memberPhotoFile = null;
+    memberPhotoData = null;
     document.getElementById('memberPhotoPreview').innerHTML = '';
 }
 
@@ -783,22 +788,13 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             
             try {
-                // Add member to displayMembers collection
-                const docRef = await firebase.firestore().collection('displayMembers').add(memberData);
-                
-                // Upload photo if provided
-                if (memberPhotoFile) {
-                    const storage = firebase.storage();
-                    const storageRef = storage.ref(`displayMembers/${docRef.id}/${memberPhotoFile.name}`);
-                    
-                    const uploadTask = await storageRef.put(memberPhotoFile);
-                    const photoUrl = await uploadTask.ref.getDownloadURL();
-                    
-                    // Update member with photo URL
-                    await firebase.firestore().collection('displayMembers').doc(docRef.id).update({
-                        photoUrl: photoUrl
-                    });
+                // Add photo data if provided
+                if (memberPhotoData) {
+                    memberData.photoUrl = memberPhotoData;
                 }
+                
+                // Add member to displayMembers collection with photo
+                const docRef = await firebase.firestore().collection('displayMembers').add(memberData);
                 
                 alert('Display member added successfully!');
                 e.target.reset();
@@ -1080,6 +1076,200 @@ window.exportOrders = exportOrders;
 window.switchTab = switchTab;
 window.switchMemberTab = switchMemberTab;
 window.switchOrderTab = switchOrderTab;
+window.searchUsers = searchUsers;
+window.clearSearch = clearSearch;
+window.loadAllAccounts = loadAllAccounts;
+window.makeUserMember = makeUserMember;
+
+// Search Users functionality
+async function searchUsers() {
+    const searchTerm = document.getElementById('userSearchInput').value.trim().toLowerCase();
+    const searchResults = document.getElementById('searchResults');
+    
+    if (!searchTerm) {
+        searchResults.innerHTML = '<p style="color: var(--gray);">Please enter a search term.</p>';
+        return;
+    }
+    
+    searchResults.innerHTML = '<p>Searching...</p>';
+    
+    try {
+        // Get all users
+        const usersSnapshot = await firebase.firestore().collection('users').get();
+        
+        // Filter users based on search term
+        const matchingUsers = [];
+        usersSnapshot.forEach(doc => {
+            const user = doc.data();
+            const fullName = (user.fullName || '').toLowerCase();
+            const email = (user.email || '').toLowerCase();
+            const address = (user.address || '').toLowerCase();
+            const city = (user.city || '').toLowerCase();
+            
+            if (fullName.includes(searchTerm) || 
+                email.includes(searchTerm) || 
+                address.includes(searchTerm) || 
+                city.includes(searchTerm)) {
+                matchingUsers.push({ id: doc.id, ...user });
+            }
+        });
+        
+        if (matchingUsers.length === 0) {
+            searchResults.innerHTML = '<p style="color: var(--gray);">No users found matching your search.</p>';
+            return;
+        }
+        
+        // Display results
+        searchResults.innerHTML = `
+            <h3>Found ${matchingUsers.length} user${matchingUsers.length > 1 ? 's' : ''}</h3>
+            <div class="admin-grid">
+                ${matchingUsers.map(user => `
+                    <div class="admin-card">
+                        <h4>${user.fullName || 'Unknown Name'}</h4>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>Member Status:</strong> ${user.isMember ? '<span style="color: var(--mc-red);">Member</span>' : 'Non-Member'}</p>
+                        <p><strong>Role:</strong> ${user.role || 'User'}</p>
+                        ${user.address ? `<p><strong>Address:</strong> ${user.address}, ${user.city} ${user.postalCode}</p>` : ''}
+                        <p><strong>Joined:</strong> ${user.createdAt ? new Date(user.createdAt.toDate()).toLocaleDateString() : 'Unknown'}</p>
+                        <div style="margin-top: 15px;">
+                            ${user.role !== 'admin' ? `
+                                ${!user.isMember ? `
+                                    <button class="admin-btn" onclick="makeUserMember('${user.id}')">
+                                        Make Member
+                                    </button>
+                                ` : `
+                                    <button class="admin-btn secondary" onclick="removeMembership('${user.id}')">
+                                        Remove Membership
+                                    </button>
+                                `}
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error searching users:', error);
+        searchResults.innerHTML = '<p style="color: var(--dark-red);">Error searching users. Please try again.</p>';
+    }
+}
+
+// Clear search
+function clearSearch() {
+    document.getElementById('userSearchInput').value = '';
+    document.getElementById('searchResults').innerHTML = '';
+}
+
+// Load all accounts
+async function loadAllAccounts(filter = 'all') {
+    let targetElement;
+    let query = firebase.firestore().collection('users');
+    
+    switch(filter) {
+        case 'all':
+            targetElement = document.getElementById('allUsersList');
+            break;
+        case 'members':
+            targetElement = document.getElementById('membersList');
+            query = query.where('isMember', '==', true);
+            break;
+        case 'nonMembers':
+            targetElement = document.getElementById('nonMembersList');
+            query = query.where('isMember', '==', false);
+            break;
+    }
+    
+    if (!targetElement) return;
+    
+    targetElement.innerHTML = '<p>Loading users...</p>';
+    
+    try {
+        const snapshot = await query.orderBy('createdAt', 'desc').get();
+        
+        if (snapshot.empty) {
+            targetElement.innerHTML = '<p style="color: var(--gray);">No users found.</p>';
+            return;
+        }
+        
+        const users = [];
+        snapshot.forEach(doc => {
+            users.push({ id: doc.id, ...doc.data() });
+        });
+        
+        targetElement.innerHTML = `
+            <p style="margin-bottom: 20px;">Total: ${users.length} user${users.length > 1 ? 's' : ''}</p>
+            <div class="admin-grid">
+                ${users.map(user => `
+                    <div class="admin-card">
+                        <h4>${user.fullName || 'Unknown Name'}</h4>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>Member Status:</strong> ${user.isMember ? '<span style="color: var(--mc-red);">Member</span>' : 'Non-Member'}</p>
+                        <p><strong>Role:</strong> ${user.role || 'User'}</p>
+                        ${user.memberRequestPending ? '<p style="color: orange;"><strong>Membership Pending</strong></p>' : ''}
+                        <p><strong>Joined:</strong> ${user.createdAt ? new Date(user.createdAt.toDate()).toLocaleDateString() : 'Unknown'}</p>
+                        <div style="margin-top: 15px;">
+                            ${user.role !== 'admin' ? `
+                                ${!user.isMember && !user.memberRequestPending ? `
+                                    <button class="admin-btn" onclick="makeUserMember('${user.id}')">
+                                        Make Member
+                                    </button>
+                                ` : ''}
+                                ${user.isMember ? `
+                                    <button class="admin-btn secondary" onclick="removeMembership('${user.id}')">
+                                        Remove Membership
+                                    </button>
+                                ` : ''}
+                                ${user.memberRequestPending ? `
+                                    <button class="admin-btn" onclick="approveMember('${user.id}')">
+                                        Approve Request
+                                    </button>
+                                    <button class="admin-btn secondary" onclick="rejectMember('${user.id}')">
+                                        Reject Request
+                                    </button>
+                                ` : ''}
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error loading accounts:', error);
+        targetElement.innerHTML = '<p style="color: var(--dark-red);">Error loading users. Please try again.</p>';
+    }
+}
+
+// Make user a member directly
+async function makeUserMember(userId) {
+    if (!confirm('Are you sure you want to grant membership to this user?')) return;
+    
+    try {
+        await firebase.firestore().collection('users').doc(userId).update({
+            isMember: true,
+            memberRequestPending: false,
+            memberApprovedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        alert('Membership granted successfully!');
+        
+        // Reload the current view
+        const activeTab = document.querySelector('#allAccountsSection .tab-btn.active');
+        if (activeTab) {
+            const tabText = activeTab.textContent;
+            if (tabText.includes('All')) loadAllAccounts('all');
+            else if (tabText.includes('Members Only')) loadAllAccounts('members');
+            else if (tabText.includes('Non-Members')) loadAllAccounts('nonMembers');
+        }
+        
+        // Also reload search results if we're in search view
+        if (document.getElementById('searchUsersSection').classList.contains('active')) {
+            searchUsers();
+        }
+    } catch (error) {
+        console.error('Error granting membership:', error);
+        alert('Error granting membership. Please try again.');
+    }
+}
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
