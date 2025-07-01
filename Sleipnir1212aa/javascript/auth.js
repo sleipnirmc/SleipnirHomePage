@@ -126,6 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const memberPortal = document.querySelector('.member-portal');
     if (memberPortal) {
         memberPortal.classList.add('loading');
+        // Add skeleton loader
+        memberPortal.innerHTML = `
+            <div class="skeleton-loader" style="width: 100px; height: 36px; background: rgba(255,255,255,0.1); border-radius: 4px; animation: pulse 1.5s ease-in-out infinite;"></div>
+        `;
     }
 });
 

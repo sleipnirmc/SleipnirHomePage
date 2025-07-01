@@ -97,6 +97,7 @@
         max-width: 1400px;
         margin: 0 auto;
         padding: 0 40px;
+        min-height: 60px; /* Consistent height to prevent jumps */
     }
 
     .logo {
@@ -132,6 +133,7 @@
         display: flex;
         list-style: none;
         gap: 40px;
+        flex-shrink: 0; /* Prevent links from compressing */
     }
 
     .nav-links a {
@@ -193,6 +195,34 @@
     /* Member portal */
     .member-portal {
         margin-left: 20px;
+        min-width: 150px; /* Reserve space to prevent layout shift */
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+    
+    /* Prevent layout shift during auth loading */
+    .member-portal.loading {
+        opacity: 1; /* Keep visible to prevent shift */
+        pointer-events: none;
+    }
+    
+    .member-portal.loaded {
+        opacity: 1;
+        transition: opacity 0.2s ease;
+    }
+    
+    /* Skeleton loader animation */
+    @keyframes pulse {
+        0% {
+            opacity: 0.6;
+        }
+        50% {
+            opacity: 0.8;
+        }
+        100% {
+            opacity: 0.6;
+        }
     }
 
     .lang-btn {
@@ -1360,13 +1390,6 @@
         text-align: right;
     }
     
-    .member-portal.loading {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    .member-portal.loaded {
-        opacity: 1;
     }
     
     /* User dropdown menu */
