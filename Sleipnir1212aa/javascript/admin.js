@@ -4,6 +4,8 @@
 let uploadedImages = [];
 let editImages = [];
 let memberPhotoFile = null;
+let currentProductImages = [];
+let editUploadedImages = [];
 
 // Dashboard Stats Loading
 async function loadDashboardStats() {
@@ -102,6 +104,9 @@ function handleFiles(files, mode) {
         if (files.length > 0) {
             handleMemberPhoto(files[0]);
         }
+    } else if (mode === 'edit') {
+        // For edit modal, use separate handler
+        handleEditFiles(files);
     } else {
         // For products, handle multiple files
         ([...files]).forEach(file => uploadFile(file, mode));
@@ -173,6 +178,12 @@ function displayProductPreviews() {
 
 // Remove product image
 function removeProductImage(index) {
+    // Prevent removing if it's the last image
+    if (uploadedImages.length <= 1) {
+        alert('Cannot remove the last image. Each product must have at least one image.');
+        return;
+    }
+    
     uploadedImages.splice(index, 1);
     displayProductPreviews();
 }
@@ -216,6 +227,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (productCategorySelect) {
         productCategorySelect.addEventListener('change', (e) => {
             updateSizes(e.target.value, 'sizesContainer');
+        });
+    }
+    
+    const editProductCategorySelect = document.getElementById('editProductCategory');
+    if (editProductCategorySelect) {
+        editProductCategorySelect.addEventListener('change', (e) => {
+            updateSizes(e.target.value, 'editSizesContainer');
         });
     }
 });
@@ -295,7 +313,7 @@ async function loadProducts() {
                     <p><strong>Sizes:</strong> ${product.availableSizes ? product.availableSizes.join(', ') : 'N/A'}</p>
                     <p><strong>Members Only:</strong> ${product.membersOnly ? 'Yes' : 'No'}</p>
                     <div style="margin-top: 15px;">
-                        <button class="admin-btn edit" onclick="alert('Edit functionality coming soon!')">
+                        <button class="admin-btn edit" onclick="editProduct('${doc.id}')">
                             Edit
                         </button>
                         <button class="admin-btn secondary" onclick="togglePopular('${doc.id}', ${!product.isPopular})">
@@ -339,6 +357,234 @@ async function deleteProduct(productId) {
         alert('Error deleting product.');
     }
 }
+
+// Edit product
+async function editProduct(productId) {
+    try {
+        // Get product data
+        const doc = await firebase.firestore().collection('products').doc(productId).get();
+        if (!doc.exists) {
+            alert('Product not found');
+            return;
+        }
+
+        const product = doc.data();
+        
+        // Populate form fields
+        document.getElementById('editProductId').value = productId;
+        document.getElementById('editProductNameIs').value = product.nameIs || '';
+        document.getElementById('editProductNameEn').value = product.nameEn || '';
+        document.getElementById('editProductDescription').value = product.description || '';
+        document.getElementById('editProductCategory').value = product.category || '';
+        document.getElementById('editProductPrice').value = product.price || '';
+        document.getElementById('editProductMembersOnly').value = product.membersOnly ? 'true' : 'false';
+        
+        // Update sizes for the category
+        updateSizes(product.category || 'other', 'editSizesContainer');
+        
+        // Check the available sizes
+        setTimeout(() => {
+            if (product.availableSizes) {
+                product.availableSizes.forEach(size => {
+                    const checkbox = document.querySelector(`#editSizesContainer input[value="${size}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+        }, 100);
+        
+        // Display current images
+        currentProductImages = product.images || [];
+        displayCurrentImages();
+        
+        // Clear any new uploaded images
+        editUploadedImages = [];
+        document.getElementById('editImagePreview').innerHTML = '';
+        
+        // Show modal
+        document.getElementById('editProductModal').style.display = 'block';
+        
+        // Initialize drag and drop for edit modal
+        initializeEditDragDrop();
+        
+    } catch (error) {
+        console.error('Error loading product for edit:', error);
+        alert('Error loading product details.');
+    }
+}
+
+// Display current product images
+function displayCurrentImages() {
+    const container = document.getElementById('editCurrentImages');
+    container.innerHTML = '';
+    
+    if (currentProductImages.length === 0) {
+        container.innerHTML = '<p style="color: var(--gray);">No current images</p>';
+        return;
+    }
+    
+    currentProductImages.forEach((image, index) => {
+        const preview = document.createElement('div');
+        preview.className = 'image-preview';
+        preview.style = 'position: relative; width: 100px; height: 100px; display: inline-block; margin: 5px;';
+        preview.innerHTML = `
+            <img src="${image.dataUrl}" alt="Product image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+            <button class="remove-btn" onclick="removeCurrentImage(${index})" style="position: absolute; top: -5px; right: -5px; background: var(--mc-red); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;">×</button>
+        `;
+        container.appendChild(preview);
+    });
+}
+
+// Remove current image
+function removeCurrentImage(index) {
+    // Calculate total images (current + new uploads)
+    const totalImages = currentProductImages.length + editUploadedImages.length;
+    
+    // Prevent removing if it's the last image
+    if (totalImages <= 1) {
+        alert('Cannot remove the last image. Each product must have at least one image.');
+        return;
+    }
+    
+    currentProductImages.splice(index, 1);
+    displayCurrentImages();
+}
+
+// Initialize drag and drop for edit modal
+function initializeEditDragDrop() {
+    const editDropZone = document.getElementById('editProductDropZone');
+    const editProductImages = document.getElementById('editProductImages');
+    
+    if (editDropZone && editProductImages) {
+        // Remove any existing listeners
+        const newDropZone = editDropZone.cloneNode(true);
+        editDropZone.parentNode.replaceChild(newDropZone, editDropZone);
+        
+        setupDragDrop(newDropZone, editProductImages, 'edit');
+        
+        // Click to upload
+        newDropZone.addEventListener('click', () => editProductImages.click());
+        
+        // Handle file input change
+        editProductImages.addEventListener('change', (e) => {
+            const files = e.target.files;
+            handleEditFiles(files);
+        });
+    }
+}
+
+// Handle files for edit modal
+function handleEditFiles(files) {
+    ([...files]).forEach(file => uploadEditFile(file));
+}
+
+// Upload file for edit modal
+function uploadEditFile(file) {
+    if (!file.type.startsWith('image/')) {
+        alert('Please upload image files only');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = function() {
+        const imageData = {
+            dataUrl: reader.result,
+            name: file.name,
+            size: file.size,
+            file: file
+        };
+        
+        editUploadedImages.push(imageData);
+        displayEditPreviews();
+    };
+}
+
+// Display edit image previews
+function displayEditPreviews() {
+    const container = document.getElementById('editImagePreview');
+    container.innerHTML = '';
+    
+    editUploadedImages.forEach((image, index) => {
+        const preview = document.createElement('div');
+        preview.className = 'image-preview';
+        preview.style = 'position: relative; width: 100px; height: 100px; display: inline-block; margin: 5px;';
+        preview.innerHTML = `
+            <img src="${image.dataUrl}" alt="${image.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+            <button class="remove-btn" onclick="removeEditImage(${index})" style="position: absolute; top: -5px; right: -5px; background: var(--mc-red); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;">×</button>
+        `;
+        container.appendChild(preview);
+    });
+}
+
+// Remove edit image
+function removeEditImage(index) {
+    // Calculate total images (current + new uploads)
+    const totalImages = currentProductImages.length + editUploadedImages.length;
+    
+    // Prevent removing if it's the last image
+    if (totalImages <= 1) {
+        alert('Cannot remove the last image. Each product must have at least one image.');
+        return;
+    }
+    
+    editUploadedImages.splice(index, 1);
+    displayEditPreviews();
+}
+
+// Close edit modal
+function closeEditModal() {
+    document.getElementById('editProductModal').style.display = 'none';
+    currentProductImages = [];
+    editUploadedImages = [];
+}
+
+// Handle edit product form submission
+document.addEventListener('DOMContentLoaded', () => {
+    const editProductForm = document.getElementById('editProductForm');
+    if (editProductForm) {
+        editProductForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const productId = document.getElementById('editProductId').value;
+            
+            // Get selected sizes
+            const selectedSizes = [];
+            document.querySelectorAll('#editSizesContainer input[type="checkbox"]:checked').forEach(cb => {
+                selectedSizes.push(cb.value);
+            });
+            
+            // Combine current images with new uploads
+            const allImages = [...currentProductImages, ...editUploadedImages.map(img => ({ dataUrl: img.dataUrl, name: img.name }))];
+            
+            if (allImages.length === 0) {
+                alert('Please keep at least one product image');
+                return;
+            }
+            
+            const updatedData = {
+                nameIs: document.getElementById('editProductNameIs').value,
+                nameEn: document.getElementById('editProductNameEn').value,
+                description: document.getElementById('editProductDescription').value,
+                category: document.getElementById('editProductCategory').value,
+                price: parseFloat(document.getElementById('editProductPrice').value),
+                images: allImages,
+                availableSizes: selectedSizes,
+                membersOnly: document.getElementById('editProductMembersOnly').value === 'true',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            try {
+                await firebase.firestore().collection('products').doc(productId).update(updatedData);
+                alert('Product updated successfully!');
+                closeEditModal();
+                loadProducts();
+            } catch (error) {
+                console.error('Error updating product:', error);
+                alert('Error updating product. Please try again.');
+            }
+        });
+    }
+});
 
 // Load member requests (users who requested membership)
 async function loadMemberRequests() {
@@ -815,6 +1061,10 @@ window.removeProductImage = removeProductImage;
 window.removeMemberPhoto = removeMemberPhoto;
 window.togglePopular = togglePopular;
 window.deleteProduct = deleteProduct;
+window.editProduct = editProduct;
+window.closeEditModal = closeEditModal;
+window.removeCurrentImage = removeCurrentImage;
+window.removeEditImage = removeEditImage;
 window.loadProducts = loadProducts;
 window.loadMemberRequests = loadMemberRequests;
 window.loadCurrentMembers = loadCurrentMembers;

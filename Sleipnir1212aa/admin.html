@@ -391,6 +391,27 @@
             gap: 10px;
         }
         
+        /* Size checkboxes */
+        .size-checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .size-checkbox:hover {
+            border-color: var(--mc-red);
+        }
+        
+        .size-checkbox input[type="checkbox"] {
+            cursor: pointer;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .admin-header {
@@ -513,6 +534,10 @@
                     <div class="form-group">
                         <label>Price (ISK)</label>
                         <input type="number" class="admin-input" id="productPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Available Sizes</label>
+                        <div id="sizesContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
                     </div>
                     <div class="form-group">
                         <label>Members Only</label>
@@ -676,6 +701,84 @@
                 <button class="admin-btn secondary" onclick="exportOrders('pending')">Export Pending Orders</button>
                 <button class="admin-btn secondary" onclick="exportOrders('completed')">Export Completed Orders</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="editProductModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--norse-black); border: 2px solid var(--mc-red); padding: 30px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--white); margin: 0;">Edit Product</h2>
+                <button onclick="closeEditModal()" style="background: none; border: none; color: var(--white); font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            
+            <form id="editProductForm" class="admin-form">
+                <input type="hidden" id="editProductId">
+                
+                <div class="form-group">
+                    <label>Product Name (Icelandic)</label>
+                    <input type="text" class="admin-input" id="editProductNameIs" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Product Name (English)</label>
+                    <input type="text" class="admin-input" id="editProductNameEn" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="admin-textarea" id="editProductDescription" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Category</label>
+                    <select class="admin-select" id="editProductCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="tshirt">T-Shirt</option>
+                        <option value="hoodie">Hoodie</option>
+                        <option value="jacket">Jacket</option>
+                        <option value="jeans">Jeans</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Price (ISK)</label>
+                    <input type="number" class="admin-input" id="editProductPrice" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Available Sizes</label>
+                    <div id="editSizesContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Members Only</label>
+                    <select class="admin-select" id="editProductMembersOnly">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Current Images</label>
+                    <div id="editCurrentImages" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Add New Images</label>
+                    <div class="drop-zone" id="editProductDropZone">
+                        <p>Drag & drop images here or click to upload</p>
+                        <input type="file" id="editProductImages" multiple accept="image/*" style="display: none;">
+                    </div>
+                    <div id="editImagePreview" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="admin-btn">Save Changes</button>
+                    <button type="button" class="admin-btn secondary" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 
