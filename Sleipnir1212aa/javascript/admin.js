@@ -1,19 +1,57 @@
-// Admin functionality
+// Admin functionality - Comprehensive management system
 
 // Image upload handling
 let uploadedImages = [];
 let editImages = [];
+let memberPhotoFile = null;
+
+// Dashboard Stats Loading
+async function loadDashboardStats() {
+    try {
+        // Get orders count
+        const ordersSnapshot = await firebase.firestore().collection('orders').get();
+        const pendingOrders = ordersSnapshot.docs.filter(doc => doc.data().status !== 'completed').length;
+        
+        document.getElementById('totalOrders').textContent = ordersSnapshot.size;
+        document.getElementById('pendingOrders').textContent = pendingOrders;
+        
+        // Get products count
+        const productsSnapshot = await firebase.firestore().collection('products').get();
+        document.getElementById('totalProducts').textContent = productsSnapshot.size;
+        
+        // Get members count
+        const membersSnapshot = await firebase.firestore().collection('displayMembers').where('isActive', '==', true).get();
+        document.getElementById('totalMembers').textContent = membersSnapshot.size;
+    } catch (error) {
+        console.error('Error loading dashboard stats:', error);
+    }
+}
 
 // Initialize drag and drop
 function initializeDragDrop() {
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    const editDropZone = document.getElementById('editDropZone');
-    const editFileInput = document.getElementById('editFileInput');
-
-    // Setup drag and drop for add product
-    setupDragDrop(dropZone, fileInput, 'add');
-    setupDragDrop(editDropZone, editFileInput, 'edit');
+    // Product image drop zones
+    const productDropZone = document.getElementById('productDropZone');
+    const productImages = document.getElementById('productImages');
+    
+    // Member photo drop zone
+    const memberDropZone = document.getElementById('memberDropZone');
+    const memberPhoto = document.getElementById('memberPhoto');
+    
+    // Setup drag and drop for products
+    if (productDropZone && productImages) {
+        setupDragDrop(productDropZone, productImages, 'product');
+        
+        // Click to upload
+        productDropZone.addEventListener('click', () => productImages.click());
+    }
+    
+    // Setup drag and drop for members
+    if (memberDropZone && memberPhoto) {
+        setupDragDrop(memberDropZone, memberPhoto, 'member');
+        
+        // Click to upload
+        memberDropZone.addEventListener('click', () => memberPhoto.click());
+    }
 }
 
 // Setup drag and drop functionality
@@ -59,60 +97,97 @@ function preventDefaults(e) {
 
 // Handle file uploads
 function handleFiles(files, mode) {
-    ([...files]).forEach(file => uploadFile(file, mode));
+    if (mode === 'member') {
+        // For member photos, only handle one file
+        if (files.length > 0) {
+            handleMemberPhoto(files[0]);
+        }
+    } else {
+        // For products, handle multiple files
+        ([...files]).forEach(file => uploadFile(file, mode));
+    }
 }
 
 // Upload file and create preview
 function uploadFile(file, mode) {
+    if (!file.type.startsWith('image/')) {
+        alert('Please upload image files only');
+        return;
+    }
+    
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = function() {
         const imageData = {
             dataUrl: reader.result,
             name: file.name,
-            size: file.size
+            size: file.size,
+            file: file // Keep reference to actual file for Firebase Storage
         };
         
-        if (mode === 'add') {
+        if (mode === 'product') {
             uploadedImages.push(imageData);
-            displayPreviews(uploadedImages, 'previewContainer', 'add');
-        } else {
-            editImages.push(imageData);
-            displayPreviews(editImages, 'editPreviewContainer', 'edit');
+            displayProductPreviews();
         }
     };
 }
 
-// Display image previews
-function displayPreviews(images, containerId, mode) {
-    const container = document.getElementById(containerId);
+// Handle member photo upload
+function handleMemberPhoto(file) {
+    if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file');
+        return;
+    }
+    
+    memberPhotoFile = file;
+    
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = function() {
+        const preview = document.getElementById('memberPhotoPreview');
+        preview.innerHTML = `
+            <div class="image-preview" style="max-width: 200px;">
+                <img src="${reader.result}" alt="Member photo" style="width: 100%; height: auto; border-radius: 8px;">
+                <button class="remove-btn" onclick="removeMemberPhoto()" style="position: absolute; top: -5px; right: -5px; background: var(--mc-red); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;">×</button>
+            </div>
+        `;
+    };
+}
+
+// Display product image previews
+function displayProductPreviews() {
+    const container = document.getElementById('imagePreview');
     container.innerHTML = '';
     
-    images.forEach((image, index) => {
+    uploadedImages.forEach((image, index) => {
         const preview = document.createElement('div');
         preview.className = 'image-preview';
+        preview.style = 'position: relative; width: 100px; height: 100px; display: inline-block; margin: 5px;';
         preview.innerHTML = `
-            <img src="${image.dataUrl}" alt="${image.name}">
-            <button class="remove-btn" onclick="removeImage(${index}, '${mode}')">&times;</button>
+            <img src="${image.dataUrl}" alt="${image.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+            <button class="remove-btn" onclick="removeProductImage(${index})" style="position: absolute; top: -5px; right: -5px; background: var(--mc-red); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;">×</button>
         `;
         container.appendChild(preview);
     });
 }
 
-// Remove image from preview
-function removeImage(index, mode) {
-    if (mode === 'add') {
-        uploadedImages.splice(index, 1);
-        displayPreviews(uploadedImages, 'previewContainer', 'add');
-    } else {
-        editImages.splice(index, 1);
-        displayPreviews(editImages, 'editPreviewContainer', 'edit');
-    }
+// Remove product image
+function removeProductImage(index) {
+    uploadedImages.splice(index, 1);
+    displayProductPreviews();
+}
+
+// Remove member photo
+function removeMemberPhoto() {
+    memberPhotoFile = null;
+    document.getElementById('memberPhotoPreview').innerHTML = '';
 }
 
 // Update sizes based on category
 function updateSizes(category, containerId) {
     const container = document.getElementById(containerId);
+    if (!container) return;
+    
     const sizes = getSizesForCategory(category);
     
     container.innerHTML = sizes.map(size => `
@@ -136,154 +211,78 @@ function getSizesForCategory(category) {
 }
 
 // Category change handlers
-document.getElementById('productCategory').addEventListener('change', (e) => {
-    updateSizes(e.target.value, 'sizesContainer');
-});
-
-document.getElementById('editProductCategory').addEventListener('change', (e) => {
-    updateSizes(e.target.value, 'editSizesContainer');
-});
-
-// Modal functions
-function openEditModal(productId) {
-    document.getElementById('editModal').style.display = 'block';
-    loadProductForEdit(productId);
-}
-
-function closeEditModal() {
-    document.getElementById('editModal').style.display = 'none';
-    editImages = [];
-    document.getElementById('editPreviewContainer').innerHTML = '';
-}
-
-// Load product data for editing
-async function loadProductForEdit(productId) {
-    try {
-        const doc = await firebase.firestore().collection('products').doc(productId).get();
-        if (doc.exists) {
-            const product = doc.data();
-            document.getElementById('editProductId').value = productId;
-            document.getElementById('editProductName').value = product.nameIs || '';
-            document.getElementById('editProductNameEn').value = product.nameEn || '';
-            document.getElementById('editProductDescription').value = product.description || '';
-            document.getElementById('editProductCategory').value = product.category || '';
-            document.getElementById('editProductPrice').value = product.price || '';
-            document.getElementById('editMembersOnly').checked = product.membersOnly || false;
-            
-            // Update sizes
-            updateSizes(product.category, 'editSizesContainer');
-            
-            // Load existing images
-            if (product.images && product.images.length > 0) {
-                editImages = product.images;
-                displayPreviews(editImages, 'editPreviewContainer', 'edit');
-            }
-            
-            // Check available sizes
-            if (product.availableSizes) {
-                const checkboxes = document.querySelectorAll('#editSizesContainer input[type="checkbox"]');
-                checkboxes.forEach(cb => {
-                    cb.checked = product.availableSizes.includes(cb.value);
-                });
-            }
-        }
-    } catch (error) {
-        console.error('Error loading product:', error);
-        alert('Error loading product data');
+document.addEventListener('DOMContentLoaded', () => {
+    const productCategorySelect = document.getElementById('productCategory');
+    if (productCategorySelect) {
+        productCategorySelect.addEventListener('change', (e) => {
+            updateSizes(e.target.value, 'sizesContainer');
+        });
     }
-}
-
-// Make functions globally available
-window.removeImage = removeImage;
-window.openEditModal = openEditModal;
-window.closeEditModal = closeEditModal;
+});
 
 // Add product form handler
-document.getElementById('addProductForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+    const addProductForm = document.getElementById('addProductForm');
+    if (addProductForm) {
+        addProductForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-    // Get selected sizes
-    const selectedSizes = [];
-    document.querySelectorAll('#sizesContainer input[type="checkbox"]:checked').forEach(cb => {
-        selectedSizes.push(cb.value);
-    });
+            // Get selected sizes
+            const selectedSizes = [];
+            document.querySelectorAll('#sizesContainer input[type="checkbox"]:checked').forEach(cb => {
+                selectedSizes.push(cb.value);
+            });
 
-    const productData = {
-        nameIs: document.getElementById('productName').value,
-        nameEn: document.getElementById('productNameEn').value,
-        description: document.getElementById('productDescription').value,
-        category: document.getElementById('productCategory').value,
-        price: parseFloat(document.getElementById('productPrice').value),
-        images: uploadedImages,
-        availableSizes: selectedSizes,
-        membersOnly: document.getElementById('membersOnly').checked,
-        isNew: true,
-        isPopular: false,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
+            if (uploadedImages.length === 0) {
+                alert('Please upload at least one product image');
+                return;
+            }
 
-    try {
-        await firebase.firestore().collection('products').add(productData);
-        alert('Product added successfully!');
-        e.target.reset();
-        uploadedImages = [];
-        document.getElementById('previewContainer').innerHTML = '';
-        loadProducts();
-    } catch (error) {
-        console.error('Error adding product:', error);
-        alert('Error adding product. Please try again.');
-    }
-});
+            const productData = {
+                nameIs: document.getElementById('productNameIs').value,
+                nameEn: document.getElementById('productNameEn').value,
+                description: document.getElementById('productDescription').value,
+                category: document.getElementById('productCategory').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                images: uploadedImages.map(img => ({ dataUrl: img.dataUrl, name: img.name })),
+                availableSizes: selectedSizes,
+                membersOnly: document.getElementById('productMembersOnly').value === 'true',
+                isNew: true,
+                isPopular: false,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
 
-// Edit product form handler
-document.getElementById('editProductForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const productId = document.getElementById('editProductId').value;
-    
-    // Get selected sizes
-    const selectedSizes = [];
-    document.querySelectorAll('#editSizesContainer input[type="checkbox"]:checked').forEach(cb => {
-        selectedSizes.push(cb.value);
-    });
-
-    const productData = {
-        nameIs: document.getElementById('editProductName').value,
-        nameEn: document.getElementById('editProductNameEn').value,
-        description: document.getElementById('editProductDescription').value,
-        category: document.getElementById('editProductCategory').value,
-        price: parseFloat(document.getElementById('editProductPrice').value),
-        images: editImages,
-        availableSizes: selectedSizes,
-        membersOnly: document.getElementById('editMembersOnly').checked,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    try {
-        await firebase.firestore().collection('products').doc(productId).update(productData);
-        alert('Product updated successfully!');
-        closeEditModal();
-        loadProducts();
-    } catch (error) {
-        console.error('Error updating product:', error);
-        alert('Error updating product. Please try again.');
+            try {
+                await firebase.firestore().collection('products').add(productData);
+                alert('Product added successfully!');
+                e.target.reset();
+                uploadedImages = [];
+                document.getElementById('imagePreview').innerHTML = '';
+                loadProducts();
+            } catch (error) {
+                console.error('Error adding product:', error);
+                alert('Error adding product. Please try again.');
+            }
+        });
     }
 });
 
 // Load products for management
 async function loadProducts() {
-    const productsList = document.getElementById('productsList');
-    productsList.innerHTML = '<p>Loading products...</p>';
+    const productsGrid = document.getElementById('productsGrid');
+    if (!productsGrid) return;
+    
+    productsGrid.innerHTML = '<p>Loading products...</p>';
 
     try {
         const snapshot = await firebase.firestore().collection('products').orderBy('createdAt', 'desc').get();
 
         if (snapshot.empty) {
-            productsList.innerHTML = '<p>No products found.</p>';
+            productsGrid.innerHTML = '<p>No products found.</p>';
             return;
         }
 
-        productsList.innerHTML = snapshot.docs.map(doc => {
+        productsGrid.innerHTML = snapshot.docs.map(doc => {
             const product = doc.data();
             const firstImage = product.images && product.images.length > 0 ? product.images[0].dataUrl : '';
             return `
@@ -296,16 +295,13 @@ async function loadProducts() {
                     <p><strong>Sizes:</strong> ${product.availableSizes ? product.availableSizes.join(', ') : 'N/A'}</p>
                     <p><strong>Members Only:</strong> ${product.membersOnly ? 'Yes' : 'No'}</p>
                     <div style="margin-top: 15px;">
-                        <button class="admin-btn edit" onclick="openEditModal('${doc.id}')">
+                        <button class="admin-btn edit" onclick="alert('Edit functionality coming soon!')">
                             Edit
                         </button>
                         <button class="admin-btn secondary" onclick="togglePopular('${doc.id}', ${!product.isPopular})">
                             ${product.isPopular ? 'Remove Popular' : 'Mark Popular'}
                         </button>
-                        <button class="admin-btn secondary" onclick="toggleNew('${doc.id}', ${!product.isNew})">
-                            ${product.isNew ? 'Remove New' : 'Mark New'}
-                        </button>
-                        <button class="admin-btn" style="background: #990000;" onclick="deleteProduct('${doc.id}')">
+                        <button class="admin-btn delete" onclick="deleteProduct('${doc.id}')">
                             Delete
                         </button>
                     </div>
@@ -314,7 +310,7 @@ async function loadProducts() {
         }).join('');
     } catch (error) {
         console.error('Error loading products:', error);
-        productsList.innerHTML = '<p>Error loading products.</p>';
+        productsGrid.innerHTML = '<p>Error loading products.</p>';
     }
 }
 
@@ -323,19 +319,6 @@ async function togglePopular(productId, isPopular) {
     try {
         await firebase.firestore().collection('products').doc(productId).update({
             isPopular: isPopular
-        });
-        loadProducts();
-    } catch (error) {
-        console.error('Error updating product:', error);
-        alert('Error updating product.');
-    }
-}
-
-// Toggle product new status
-async function toggleNew(productId, isNew) {
-    try {
-        await firebase.firestore().collection('products').doc(productId).update({
-            isNew: isNew
         });
         loadProducts();
     } catch (error) {
@@ -357,9 +340,11 @@ async function deleteProduct(productId) {
     }
 }
 
-// Load member requests
+// Load member requests (users who requested membership)
 async function loadMemberRequests() {
     const memberRequests = document.getElementById('memberRequests');
+    if (!memberRequests) return;
+    
     memberRequests.innerHTML = '<p>Loading member requests...</p>';
 
     try {
@@ -375,7 +360,7 @@ async function loadMemberRequests() {
         memberRequests.innerHTML = snapshot.docs.map(doc => {
             const user = doc.data();
             return `
-                <div class="member-request">
+                <div class="admin-card">
                     <h4>${user.fullName}</h4>
                     <p><strong>Email:</strong> ${user.email}</p>
                     <p><strong>Address:</strong> ${user.address}, ${user.city} ${user.postalCode}</p>
@@ -394,6 +379,93 @@ async function loadMemberRequests() {
     } catch (error) {
         console.error('Error loading member requests:', error);
         memberRequests.innerHTML = '<p>Error loading member requests.</p>';
+    }
+}
+
+// Load current members (users with membership)
+async function loadCurrentMembers() {
+    const currentMembers = document.getElementById('currentMembers');
+    if (!currentMembers) return;
+    
+    currentMembers.innerHTML = '<p>Loading members...</p>';
+
+    try {
+        const snapshot = await firebase.firestore().collection('users')
+            .where('isMember', '==', true)
+            .orderBy('memberApprovedAt', 'desc')
+            .get();
+
+        if (snapshot.empty) {
+            currentMembers.innerHTML = '<p>No members found.</p>';
+            return;
+        }
+
+        currentMembers.innerHTML = snapshot.docs.map(doc => {
+            const member = doc.data();
+            return `
+                <div class="admin-card">
+                    <h4>${member.fullName}</h4>
+                    <p><strong>Email:</strong> ${member.email}</p>
+                    <p><strong>Role:</strong> ${member.role || 'Member'}</p>
+                    <p><strong>Member Since:</strong> ${member.memberApprovedAt ? new Date(member.memberApprovedAt.toDate()).toLocaleDateString() : 'Unknown'}</p>
+                    ${member.role !== 'admin' ? `
+                        <div style="margin-top: 15px;">
+                            <button class="admin-btn secondary" onclick="removeMembership('${doc.id}')">
+                                Remove Membership
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading members:', error);
+        currentMembers.innerHTML = '<p>Error loading members.</p>';
+    }
+}
+
+// Load display members (for About page)
+async function loadDisplayMembers() {
+    const displayMembersList = document.getElementById('displayMembersList');
+    if (!displayMembersList) return;
+    
+    displayMembersList.innerHTML = '<p>Loading display members...</p>';
+    
+    try {
+        const snapshot = await firebase.firestore()
+            .collection('displayMembers')
+            .where('isActive', '==', true)
+            .orderBy('displayOrder', 'asc')
+            .get();
+        
+        if (snapshot.empty) {
+            displayMembersList.innerHTML = '<p>No display members found. Add members to show on the About page!</p>';
+            return;
+        }
+        
+        displayMembersList.innerHTML = '';
+        snapshot.forEach(doc => {
+            const member = doc.data();
+            const memberCard = document.createElement('div');
+            memberCard.className = 'member-card';
+            memberCard.innerHTML = `
+                <img src="${member.photoUrl || 'Images/placeholder-member.jpg'}" alt="${member.name}" class="member-photo-small">
+                <div class="member-info">
+                    <h4>${member.name}</h4>
+                    ${member.role ? `<p style="color: var(--mc-red);">${member.role}</p>` : ''}
+                    <p>Member since ${new Date(member.joinDate.seconds * 1000).getFullYear()}</p>
+                    <p>Display Order: ${member.displayOrder}</p>
+                </div>
+                <div class="member-actions">
+                    <button class="admin-btn edit" onclick="editDisplayMember('${doc.id}')">Edit</button>
+                    <button class="admin-btn delete" onclick="deleteDisplayMember('${doc.id}')">Delete</button>
+                </div>
+            `;
+            displayMembersList.appendChild(memberCard);
+        });
+    } catch (error) {
+        console.error('Error loading display members:', error);
+        displayMembersList.innerHTML = '<p>Error loading display members.</p>';
     }
 }
 
@@ -431,48 +503,8 @@ async function rejectMember(userId) {
     }
 }
 
-// Load current members
-async function loadCurrentMembers() {
-    const currentMembers = document.getElementById('currentMembers');
-    currentMembers.innerHTML = '<p>Loading members...</p>';
-
-    try {
-        const snapshot = await firebase.firestore().collection('users')
-            .where('isMember', '==', true)
-            .orderBy('memberApprovedAt', 'desc')
-            .get();
-
-        if (snapshot.empty) {
-            currentMembers.innerHTML = '<p>No members found.</p>';
-            return;
-        }
-
-        currentMembers.innerHTML = snapshot.docs.map(doc => {
-            const member = doc.data();
-            return `
-                <div class="admin-card">
-                    <h4>${member.fullName}</h4>
-                    <p><strong>Email:</strong> ${member.email}</p>
-                    <p><strong>Role:</strong> ${member.role || 'Member'}</p>
-                    <p><strong>Member Since:</strong> ${member.memberApprovedAt ? new Date(member.memberApprovedAt.toDate()).toLocaleDateString() : 'Unknown'}</p>
-                    ${member.role !== 'admin' ? `
-                        <div style="margin-top: 15px;">
-                            <button class="admin-btn secondary" onclick="removeMember('${doc.id}')">
-                                Remove Membership
-                            </button>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }).join('');
-    } catch (error) {
-        console.error('Error loading members:', error);
-        currentMembers.innerHTML = '<p>Error loading members.</p>';
-    }
-}
-
-// Remove member status
-async function removeMember(userId) {
+// Remove membership status
+async function removeMembership(userId) {
     if (!confirm('Are you sure you want to remove this member?')) return;
 
     try {
@@ -488,166 +520,248 @@ async function removeMember(userId) {
     }
 }
 
-// Logout button
-document.getElementById('logoutBtn').addEventListener('click', (e) => {
-    e.preventDefault();
-    firebase.auth().signOut().then(() => {
-        // Redirect to login page after logout
-        window.location.href = 'login.html';
-    }).catch((error) => {
-        console.error('Error signing out:', error);
-        alert('Error signing out. Please try again.');
-    });
+// Add display member form handler
+document.addEventListener('DOMContentLoaded', () => {
+    const addDisplayMemberForm = document.getElementById('addDisplayMemberForm');
+    if (addDisplayMemberForm) {
+        addDisplayMemberForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const memberData = {
+                name: document.getElementById('displayMemberName').value,
+                role: document.getElementById('displayMemberRole').value || '',
+                joinDate: firebase.firestore.Timestamp.fromDate(new Date(document.getElementById('displayMemberJoinDate').value)),
+                isActive: true,
+                displayOrder: Date.now(),
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            try {
+                // Add member to displayMembers collection
+                const docRef = await firebase.firestore().collection('displayMembers').add(memberData);
+                
+                // Upload photo if provided
+                if (memberPhotoFile) {
+                    const storage = firebase.storage();
+                    const storageRef = storage.ref(`displayMembers/${docRef.id}/${memberPhotoFile.name}`);
+                    
+                    const uploadTask = await storageRef.put(memberPhotoFile);
+                    const photoUrl = await uploadTask.ref.getDownloadURL();
+                    
+                    // Update member with photo URL
+                    await firebase.firestore().collection('displayMembers').doc(docRef.id).update({
+                        photoUrl: photoUrl
+                    });
+                }
+                
+                alert('Display member added successfully!');
+                e.target.reset();
+                removeMemberPhoto();
+                loadDisplayMembers();
+                
+            } catch (error) {
+                console.error('Error adding display member:', error);
+                alert('Error adding display member. Please try again.');
+            }
+        });
+    }
 });
 
-// Load orders
-async function loadOrders() {
-    const ordersList = document.getElementById('ordersList');
-    ordersList.innerHTML = '<p>Loading orders...</p>';
+// Delete display member
+async function deleteDisplayMember(memberId) {
+    if (!confirm('Are you sure you want to delete this display member?')) return;
     
     try {
-        const snapshot = await firebase.firestore()
+        // Soft delete - just mark as inactive
+        await firebase.firestore().collection('displayMembers').doc(memberId).update({
+            isActive: false,
+            deletedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        alert('Display member removed successfully.');
+        loadDisplayMembers();
+    } catch (error) {
+        console.error('Error deleting display member:', error);
+        alert('Error deleting display member.');
+    }
+}
+
+// Edit display member (placeholder for now)
+function editDisplayMember(memberId) {
+    alert('Edit functionality coming soon!');
+    // TODO: Implement edit modal
+}
+
+// Load orders for admin panel
+async function loadOrders() {
+    // Load pending orders
+    const pendingOrdersBody = document.getElementById('pendingOrdersBody');
+    // Load completed orders
+    const completedOrdersBody = document.getElementById('completedOrdersBody');
+    
+    try {
+        const ordersSnapshot = await firebase.firestore()
             .collection('orders')
             .orderBy('createdAt', 'desc')
-            .limit(20)
             .get();
-            
-        if (snapshot.empty) {
-            ordersList.innerHTML = '<p>No orders yet.</p>';
-            return;
+        
+        const pendingOrders = [];
+        const completedOrders = [];
+        
+        ordersSnapshot.forEach(doc => {
+            const order = { id: doc.id, ...doc.data() };
+            if (order.status === 'completed') {
+                completedOrders.push(order);
+            } else {
+                pendingOrders.push(order);
+            }
+        });
+        
+        // Display pending orders
+        if (pendingOrdersBody) {
+            displayOrdersInTable(pendingOrders, pendingOrdersBody, true);
         }
         
-        let hasNewOrders = false;
+        // Display completed orders
+        if (completedOrdersBody) {
+            displayOrdersInTable(completedOrders, completedOrdersBody, false);
+        }
         
-        ordersList.innerHTML = snapshot.docs.map(doc => {
-            const order = doc.data();
-            const orderId = doc.id;
-            const orderDate = order.createdAt ? new Date(order.createdAt.toDate()).toLocaleString() : 'Unknown';
-            const isNew = !order.adminNotified;
-            
-            if (isNew) hasNewOrders = true;
-            
-            return `
-                <div class="order-card ${isNew ? 'new-order' : ''}" id="order-${orderId}">
-                    <div class="order-header">
-                        <div>
-                            <div class="order-number">Order #${orderId.substr(-8).toUpperCase()}</div>
-                            <div style="color: var(--gray); font-size: 14px;">${orderDate}</div>
-                        </div>
-                        <div class="order-status ${order.status}">${order.status}</div>
-                    </div>
-                    
-                    <div class="order-customer">
-                        <strong>${order.userName}</strong><br>
-                        ${order.userEmail}<br>
-                        ${order.userAddress ? `${order.userAddress}, ${order.userCity} ${order.userPostalCode}` : 'No address provided'}
-                    </div>
-                    
-                    <div class="order-items">
-                        ${order.items.map(item => `
-                            <div class="order-item">
-                                <span>${item.productName} (${item.size}) x${item.quantity}</span>
-                                <span>${formatPrice(item.subtotal)} ISK</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    
-                    <div class="order-total">
-                        Total: ${formatPrice(order.totalAmount)} ISK
-                    </div>
-                    
-                    <div class="order-actions">
-                        ${isNew ? `<button class="admin-btn" onclick="markOrderAsRead('${orderId}')">Mark as Read</button>` : ''}
-                        <button class="admin-btn ${order.status === 'pending' ? '' : 'secondary'}" 
-                                onclick="updateOrderStatus('${orderId}', 'processing')"
-                                ${order.status === 'completed' ? 'disabled' : ''}>
-                            Processing
-                        </button>
-                        <button class="admin-btn ${order.status === 'completed' ? '' : 'secondary'}" 
-                                onclick="updateOrderStatus('${orderId}', 'completed')">
-                            Completed
-                        </button>
-                        <button class="admin-btn" style="background: var(--crimson);" 
-                                onclick="sendOrderEmail('${orderId}')">
-                            Send Email Summary
-                        </button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        
-        // Show/hide new order badge
-        const badge = document.getElementById('newOrderBadge');
-        if (badge) {
-            badge.style.display = hasNewOrders ? 'inline' : 'none';
+        // Update stats
+        const pendingOrdersCount = document.getElementById('pendingOrders');
+        if (pendingOrdersCount) {
+            pendingOrdersCount.textContent = pendingOrders.length;
         }
         
     } catch (error) {
         console.error('Error loading orders:', error);
-        ordersList.innerHTML = '<p>Error loading orders.</p>';
     }
 }
 
-// Mark order as read by admin
-async function markOrderAsRead(orderId) {
-    try {
-        await firebase.firestore().collection('orders').doc(orderId).update({
-            adminNotified: true
-        });
-        loadOrders();
-    } catch (error) {
-        console.error('Error marking order as read:', error);
+// Display orders in table format
+function displayOrdersInTable(orders, tbody, showActions) {
+    if (orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No orders found</td></tr>';
+        return;
     }
-}
-
-// Update order status
-async function updateOrderStatus(orderId, newStatus) {
-    try {
-        await firebase.firestore().collection('orders').doc(orderId).update({
-            status: newStatus,
-            [`${newStatus}At`]: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        loadOrders();
-    } catch (error) {
-        console.error('Error updating order status:', error);
-        alert('Error updating order status');
-    }
-}
-
-// Send order email summary (placeholder)
-async function sendOrderEmail(orderId) {
-    try {
-        const orderDoc = await firebase.firestore().collection('orders').doc(orderId).get();
-        const order = orderDoc.data();
+    
+    tbody.innerHTML = orders.map(order => {
+        const orderDate = order.createdAt ? new Date(order.createdAt.toDate()).toLocaleDateString('is-IS') : 'Unknown';
+        const items = order.items.map(item => `${item.productName} (${item.size}) x${item.quantity}`).join('<br>');
         
-        // Create email content
-        const emailContent = `
-            New Order Received!
-            
-            Order ID: ${orderId.substr(-8).toUpperCase()}
-            Customer: ${order.userName}
-            Email: ${order.userEmail}
-            Address: ${order.userAddress}, ${order.userCity} ${order.userPostalCode}
-            
-            Items:
-            ${order.items.map(item => 
-                `- ${item.productName} (Size: ${item.size}) x${item.quantity} = ${formatPrice(item.subtotal)} ISK`
-            ).join('\n')}
-            
-            Total: ${formatPrice(order.totalAmount)} ISK
-            
-            Status: ${order.status}
+        return `
+            <tr>
+                <td>#${order.id.substr(-8).toUpperCase()}</td>
+                <td>${order.userName || 'Unknown'}</td>
+                <td>${items}</td>
+                <td>${formatPrice(order.totalAmount)} ISK</td>
+                <td>${orderDate}</td>
+                <td><span class="order-status ${order.status}">${order.status}</span></td>
+                ${showActions ? `
+                    <td>
+                        <button class="admin-btn" onclick="completeOrder('${order.id}')">Complete</button>
+                    </td>
+                ` : `<td>${order.completedAt ? new Date(order.completedAt.toDate()).toLocaleDateString('is-IS') : '-'}</td>`}
+            </tr>
         `;
+    }).join('');
+}
+
+// Complete order
+async function completeOrder(orderId) {
+    if (!confirm('Mark this order as completed?')) return;
+    
+    try {
+        await firebase.firestore().collection('orders').doc(orderId).update({
+            status: 'completed',
+            completedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
         
-        // In a real implementation, this would send an actual email
-        console.log('Email would be sent to admin email:', emailContent);
+        alert('Order marked as completed!');
+        loadOrders();
+        loadDashboardStats();
+    } catch (error) {
+        console.error('Error completing order:', error);
+        alert('Error completing order.');
+    }
+}
+
+// Export orders to CSV
+async function exportOrders(type) {
+    try {
+        let query = firebase.firestore().collection('orders');
         
-        // For now, show the content in an alert
-        alert(`Email summary would be sent to admin email\n\n${emailContent}`);
+        // Apply filters based on type
+        if (type === 'pending') {
+            query = query.where('status', 'in', ['pending', 'processing']);
+        } else if (type === 'completed') {
+            query = query.where('status', '==', 'completed');
+        }
+        
+        // Apply date filters if provided
+        const startDate = document.getElementById('exportStartDate')?.value;
+        const endDate = document.getElementById('exportEndDate')?.value;
+        
+        if (startDate) {
+            query = query.where('createdAt', '>=', new Date(startDate));
+        }
+        if (endDate) {
+            const endDateTime = new Date(endDate);
+            endDateTime.setHours(23, 59, 59, 999);
+            query = query.where('createdAt', '<=', endDateTime);
+        }
+        
+        const snapshot = await query.orderBy('createdAt', 'desc').get();
+        
+        if (snapshot.empty) {
+            alert('No orders found for the selected criteria.');
+            return;
+        }
+        
+        // Create CSV content
+        const headers = ['Order ID', 'Date', 'Customer Name', 'Email', 'Address', 'City', 'Postal Code', 'Items', 'Total (ISK)', 'Status'];
+        const rows = [headers];
+        
+        snapshot.forEach(doc => {
+            const order = doc.data();
+            const orderDate = order.createdAt ? new Date(order.createdAt.toDate()).toLocaleString('is-IS') : '';
+            const items = order.items.map(item => `${item.productName} (${item.size}) x${item.quantity}`).join('; ');
+            
+            rows.push([
+                doc.id.substr(-8).toUpperCase(),
+                orderDate,
+                order.userName || '',
+                order.userEmail || '',
+                order.userAddress || '',
+                order.userCity || '',
+                order.userPostalCode || '',
+                items,
+                order.totalAmount || 0,
+                order.status || 'pending'
+            ]);
+        });
+        
+        // Convert to CSV string
+        const csvContent = rows.map(row => 
+            row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+        ).join('\n');
+        
+        // Download CSV file
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', `orders_${type}_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
         
     } catch (error) {
-        console.error('Error sending order email:', error);
-        alert('Error sending email summary');
+        console.error('Error exporting orders:', error);
+        alert('Error exporting orders. Please try again.');
     }
 }
 
@@ -656,162 +770,75 @@ function formatPrice(price) {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
+// Switch tabs
+function switchTab(tab) {
+    // Update tab buttons
+    document.querySelectorAll('#productsSection .tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Update tab content
+    document.querySelectorAll('#productsSection .tab-content').forEach(content => content.classList.remove('active'));
+    document.getElementById(tab + 'Tab').classList.add('active');
+}
+
+function switchMemberTab(tab) {
+    // Update tab buttons
+    document.querySelectorAll('#membersSection .tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Update tab content
+    document.querySelectorAll('#membersSection .tab-content').forEach(content => content.classList.remove('active'));
+    document.getElementById(tab + 'Tab').classList.add('active');
+    
+    // Load appropriate data
+    if (tab === 'approveMembers') {
+        loadMemberRequests();
+        loadCurrentMembers();
+    } else if (tab === 'displayMembers') {
+        loadDisplayMembers();
+    }
+}
+
+function switchOrderTab(status) {
+    // Update tab buttons
+    document.querySelectorAll('#ordersSection .tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Update tab content
+    document.querySelectorAll('#ordersSection .tab-content').forEach(content => content.classList.remove('active'));
+    document.getElementById(status + 'OrdersTab').classList.add('active');
+}
+
 // Make functions globally available
-window.markOrderAsRead = markOrderAsRead;
-window.updateOrderStatus = updateOrderStatus;
-window.sendOrderEmail = sendOrderEmail;
-
-// Check for new orders periodically
-function checkForNewOrders() {
-    firebase.firestore()
-        .collection('orders')
-        .where('adminNotified', '==', false)
-        .onSnapshot((snapshot) => {
-            if (!snapshot.empty) {
-                const badge = document.getElementById('newOrderBadge');
-                if (badge) {
-                    badge.style.display = 'inline';
-                }
-                // Reload orders to show the new ones
-                loadOrders();
-            }
-        });
-}
-
-// Load current admins
-async function loadCurrentAdmins() {
-    const currentAdmins = document.getElementById('currentAdmins');
-    currentAdmins.innerHTML = '<p>Loading admins...</p>';
-
-    try {
-        const snapshot = await firebase.firestore().collection('users')
-            .where('role', '==', 'admin')
-            .get();
-
-        if (snapshot.empty) {
-            currentAdmins.innerHTML = '<p>No admins found.</p>';
-            return;
-        }
-
-        currentAdmins.innerHTML = snapshot.docs.map(doc => {
-            const admin = doc.data();
-            const currentUser = firebase.auth().currentUser;
-            const isCurrentUser = currentUser && currentUser.uid === doc.id;
-            
-            return `
-                <div class="admin-card">
-                    <h4>${admin.fullName || 'Admin'}</h4>
-                    <p><strong>Email:</strong> ${admin.email}</p>
-                    <p><strong>Admin Since:</strong> ${admin.adminGrantedAt ? new Date(admin.adminGrantedAt.toDate()).toLocaleDateString() : 'Original Admin'}</p>
-                    ${!isCurrentUser ? `
-                        <div style="margin-top: 15px;">
-                            <button class="admin-btn secondary" onclick="removeAdmin('${doc.id}', '${admin.email}')">
-                                Remove Admin Access
-                            </button>
-                        </div>
-                    ` : '<p style="color: var(--gray); font-style: italic;">Current User</p>'}
-                </div>
-            `;
-        }).join('');
-    } catch (error) {
-        console.error('Error loading admins:', error);
-        currentAdmins.innerHTML = '<p>Error loading admins.</p>';
-    }
-}
-
-// Grant admin access
-document.getElementById('grantAdminForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('adminEmail').value.trim();
-    const messageDiv = document.getElementById('adminGrantMessage');
-    
-    try {
-        // Find user by email
-        const usersSnapshot = await firebase.firestore().collection('users')
-            .where('email', '==', email)
-            .limit(1)
-            .get();
-        
-        if (usersSnapshot.empty) {
-            messageDiv.className = 'error-message';
-            messageDiv.style.display = 'block';
-            messageDiv.textContent = 'No user found with this email address.';
-            return;
-        }
-        
-        const userDoc = usersSnapshot.docs[0];
-        const userData = userDoc.data();
-        
-        if (userData.role === 'admin') {
-            messageDiv.className = 'error-message';
-            messageDiv.style.display = 'block';
-            messageDiv.textContent = 'This user is already an admin.';
-            return;
-        }
-        
-        // Update user role to admin
-        await firebase.firestore().collection('users').doc(userDoc.id).update({
-            role: 'admin',
-            adminGrantedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            adminGrantedBy: firebase.auth().currentUser.uid
-        });
-        
-        messageDiv.className = 'success-message';
-        messageDiv.style.display = 'block';
-        messageDiv.textContent = `Admin access granted to ${userData.fullName || email}.`;
-        
-        // Clear form
-        document.getElementById('grantAdminForm').reset();
-        
-        // Reload admin list
-        loadCurrentAdmins();
-        
-        // Hide message after 5 seconds
-        setTimeout(() => {
-            messageDiv.style.display = 'none';
-        }, 5000);
-        
-    } catch (error) {
-        console.error('Error granting admin access:', error);
-        messageDiv.className = 'error-message';
-        messageDiv.style.display = 'block';
-        messageDiv.textContent = 'Error granting admin access. Please try again.';
-    }
-});
-
-// Remove admin access
-async function removeAdmin(userId, userEmail) {
-    if (!confirm(`Are you sure you want to remove admin access from ${userEmail}?`)) return;
-    
-    try {
-        await firebase.firestore().collection('users').doc(userId).update({
-            role: 'customer',
-            adminRemovedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            adminRemovedBy: firebase.auth().currentUser.uid
-        });
-        
-        alert('Admin access removed successfully.');
-        loadCurrentAdmins();
-    } catch (error) {
-        console.error('Error removing admin:', error);
-        alert('Error removing admin access.');
-    }
-}
-
-// Make removeAdmin globally available
-window.removeAdmin = removeAdmin;
+window.loadDashboardStats = loadDashboardStats;
+window.removeProductImage = removeProductImage;
+window.removeMemberPhoto = removeMemberPhoto;
+window.togglePopular = togglePopular;
+window.deleteProduct = deleteProduct;
+window.loadProducts = loadProducts;
+window.loadMemberRequests = loadMemberRequests;
+window.loadCurrentMembers = loadCurrentMembers;
+window.loadDisplayMembers = loadDisplayMembers;
+window.approveMember = approveMember;
+window.rejectMember = rejectMember;
+window.removeMembership = removeMembership;
+window.deleteDisplayMember = deleteDisplayMember;
+window.editDisplayMember = editDisplayMember;
+window.loadOrders = loadOrders;
+window.completeOrder = completeOrder;
+window.exportOrders = exportOrders;
+window.switchTab = switchTab;
+window.switchMemberTab = switchMemberTab;
+window.switchOrderTab = switchOrderTab;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     initializeDragDrop();
-    loadProducts();
-    loadMemberRequests();
-    loadCurrentMembers();
-    loadCurrentAdmins();
-    loadOrders();
-    checkForNewOrders();
     
-    // Initialize category with default sizes
-    updateSizes('tshirt', 'sizesContainer');
+    // Only load if we're on the admin page
+    if (window.location.pathname.includes('admin.html')) {
+        // The loadDashboardStats is called from admin.html after auth check
+        // Initialize tabs with default sizes if elements exist
+        updateSizes('tshirt', 'sizesContainer');
+    }
 });
