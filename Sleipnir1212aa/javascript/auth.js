@@ -176,6 +176,12 @@ firebase.auth().onAuthStateChanged(async (user) => {
                 return;
             }
 
+            // Hide header language toggle when user is logged in
+            const headerLangToggle = document.querySelector('nav > .language-toggle');
+            if (headerLangToggle) {
+                headerLangToggle.style.display = 'none';
+            }
+
             // Create user menu
             if (memberPortal) {
                 const userName = userData?.fullName || user.email.split('@')[0];
@@ -191,6 +197,12 @@ firebase.auth().onAuthStateChanged(async (user) => {
                             ${isAdmin ? '<a href="admin.html"><span class="is">Stjórnborð</span><span class="en">Admin Panel</span></a>' : '<a href="orders.html"><span class="is">Mínar Pantanir</span><span class="en">My Orders</span></a>'}
                             <a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a>
                             <a href="#" onclick="logout()" class="logout-btn"><span class="is">Útskrá</span><span class="en">Logout</span></a>
+                            <div class="language-toggle-container">
+                                <button class="lang-btn" onclick="toggleLanguage()">
+                                    <span class="is">EN</span>
+                                    <span class="en">IS</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -208,6 +220,12 @@ firebase.auth().onAuthStateChanged(async (user) => {
         }
     } else {
         // User is signed out
+        // Show header language toggle again
+        const headerLangToggle = document.querySelector('nav > .language-toggle');
+        if (headerLangToggle) {
+            headerLangToggle.style.display = 'block';
+        }
+        
         if (memberPortal) {
             memberPortal.innerHTML = `
                 <a href="login.html" class="member-btn" id="authButton">
