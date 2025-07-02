@@ -1314,11 +1314,13 @@
     }
 
     .auth-submit-btn {
+        position: relative;
         padding: 18px;
         background: var(--mc-red);
         color: var(--white);
         border: none;
         font-family: 'Cinzel', serif;
+        overflow: hidden;
         font-size: 18px;
         font-weight: 600;
         text-transform: uppercase;
@@ -1396,6 +1398,68 @@
         background: rgba(0,255,0,0.1);
         border: 1px solid #00ff00;
         color: #00ff00;
+    }
+
+    /* Loading states */
+    .auth-submit-btn.loading {
+        pointer-events: none;
+        opacity: 0.8;
+    }
+
+    .auth-submit-btn .btn-text,
+    .auth-submit-btn .btn-loading {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: var(--white);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Field validation styles */
+    .auth-form input.invalid {
+        border-color: var(--mc-red);
+        background: rgba(255,0,0,0.05);
+    }
+
+    .field-error {
+        color: var(--mc-red);
+        font-size: 12px;
+        margin-top: 5px;
+        text-transform: none;
+        letter-spacing: normal;
+    }
+
+    /* Safari-specific fixes */
+    @supports (-webkit-appearance: none) {
+        .auth-submit-btn {
+            -webkit-appearance: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .auth-form input {
+            -webkit-appearance: none;
+        }
+    }
+
+    /* Improved button active state */
+    .auth-submit-btn:active {
+        transform: scale(0.98);
+    }
+
+    .auth-submit-btn:disabled {
+        cursor: not-allowed;
     }
 
     /* User name display in header */

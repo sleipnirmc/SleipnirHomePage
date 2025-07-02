@@ -60,9 +60,16 @@
                         <input type="password" id="password" required>
                     </div>
 
-                    <button type="submit" class="auth-submit-btn">
-                        <span class="is">Innskrá</span>
-                        <span class="en">Sign In</span>
+                    <button type="submit" class="auth-submit-btn" id="submitButton">
+                        <span class="btn-text">
+                            <span class="is">Innskrá</span>
+                            <span class="en">Sign In</span>
+                        </span>
+                        <span class="btn-loading" style="display: none;">
+                            <span class="spinner"></span>
+                            <span class="is">Vinsamlegast bíðið...</span>
+                            <span class="en">Please wait...</span>
+                        </span>
                     </button>
                 </form>
 
@@ -139,74 +146,158 @@
             authLinks.insertBefore(adminMessage, authLinks.firstChild);
         }
 
-        // Login form handler
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        // Login form handler with improved Safari compatibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            const submitButton = document.getElementById('submitButton');
             const errorMessage = document.getElementById('errorMessage');
-
-            try {
-                const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
-                const user = userCredential.user;
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            // Email validation on blur
+            emailInput.addEventListener('blur', function() {
+                if (this.value && !this.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                    this.classList.add('invalid');
+                } else {
+                    this.classList.remove('invalid');
+                }
+            });
+            
+            // Form submission
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 
-                // Ensure user profile exists in Firestore
-                const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
                 
-                if (!userDoc.exists) {
-                    // Create profile for users who exist in Auth but not Firestore
-                    await firebase.firestore().collection('users').doc(user.uid).set({
-                        email: user.email,
-                        fullName: user.displayName || user.email.split('@')[0],
-                        role: 'customer',
-                        isMember: false,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        emailVerified: user.emailVerified
-                    });
+                // Reset error message
+                errorMessage.style.display = 'none';
+                
+                // Validate inputs
+                if (!email || !password) {
+                    errorMessage.style.display = 'block';
+                    errorMessage.textContent = 'Please enter both email and password';
+                    return;
                 }
                 
-                // Redirect appropriately - auth.js will handle email verification
-                if (redirectTo === 'admin') {
-                    // Check if user is admin before redirecting
+                // Show loading state
+                submitButton.disabled = true;
+                submitButton.classList.add('loading');
+                document.querySelector('.btn-text').style.display = 'none';
+                document.querySelector('.btn-loading').style.display = 'inline-flex';
+                
+                try {
+                    // Sign in with Firebase
+                    const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                    const user = userCredential.user;
+                    
+                    // Check if user profile exists in Firestore
                     const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-                    if (userDoc.exists && userDoc.data().role === 'admin') {
+                    
+                    if (!userDoc.exists) {
+                        // User has Firebase Auth but no Firestore profile
+                        // Don't auto-create - they should register properly
+                        throw {
+                            code: 'auth/no-profile',
+                            message: 'User profile not found. Please register first.'
+                        };
+                    }
+                    
+                    // Handle admin redirect
+                    if (redirectTo === 'admin') {
+                        const userData = userDoc.data();
+                        if (userData.role !== 'admin') {
+                            errorMessage.style.display = 'block';
+                            errorMessage.innerHTML = `
+                                <span class="is">Aðgangur hafnaður. Stjórnendaréttindi krafist.</span>
+                                <span class="en">Access denied. Admin privileges required.</span>
+                            `;
+                            await firebase.auth().signOut();
+                            
+                            // Reset button state
+                            submitButton.disabled = false;
+                            submitButton.classList.remove('loading');
+                            document.querySelector('.btn-text').style.display = 'inline-flex';
+                            document.querySelector('.btn-loading').style.display = 'none';
+                            return;
+                        }
+                        
+                        // Redirect to admin
                         window.location.href = 'admin.html';
                     } else {
-                        errorMessage.style.display = 'block';
-                        errorMessage.innerHTML = `
-                            <span class="is">Aðgangur hafnaður. Stjórnendaréttindi krafist.</span>
-                            <span class="en">Access denied. Admin privileges required.</span>
-                        `;
-                        firebase.auth().signOut();
-                        return;
+                        // Redirect to homepage or original destination
+                        const intended = sessionStorage.getItem('intendedDestination');
+                        if (intended) {
+                            sessionStorage.removeItem('intendedDestination');
+                            window.location.href = intended;
+                        } else {
+                            window.location.href = 'index.html';
+                        }
                     }
-                } else {
-                    // Redirect to homepage after successful login
-                    window.location.href = 'index.html';
+                    
+                } catch (error) {
+                    console.error('Login error:', error);
+                    
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('loading');
+                    document.querySelector('.btn-text').style.display = 'inline-flex';
+                    document.querySelector('.btn-loading').style.display = 'none';
+                    
+                    // Show error message
+                    errorMessage.style.display = 'block';
+                    
+                    // Provide user-friendly error messages
+                    switch (error.code) {
+                        case 'auth/user-not-found':
+                            errorMessage.innerHTML = `
+                                <span class="is">Ekkert notandareikningur fannst með þessu netfangi. Vinsamlegast skráðu þig fyrst.</span>
+                                <span class="en">No account found with this email. Please register first.</span>
+                            `;
+                            break;
+                        case 'auth/wrong-password':
+                        case 'auth/invalid-credential':
+                            errorMessage.innerHTML = `
+                                <span class="is">Rangt lykilorð. Vinsamlegast reyndu aftur.</span>
+                                <span class="en">Incorrect password. Please try again.</span>
+                            `;
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage.innerHTML = `
+                                <span class="is">Vinsamlegast sláðu inn gilt netfang.</span>
+                                <span class="en">Please enter a valid email address.</span>
+                            `;
+                            break;
+                        case 'auth/user-disabled':
+                            errorMessage.innerHTML = `
+                                <span class="is">Þessi reikningur hefur verið gerður óvirkur. Vinsamlegast hafðu samband við þjónustuver.</span>
+                                <span class="en">This account has been disabled. Please contact support.</span>
+                            `;
+                            break;
+                        case 'auth/network-request-failed':
+                            errorMessage.innerHTML = `
+                                <span class="is">Nettenging mistókst. Vinsamlegast reyndu aftur.</span>
+                                <span class="en">Network error. Please try again.</span>
+                            `;
+                            break;
+                        case 'auth/too-many-requests':
+                            errorMessage.innerHTML = `
+                                <span class="is">Of margar tilraunir. Vinsamlegast reyndu aftur síðar.</span>
+                                <span class="en">Too many attempts. Please try again later.</span>
+                            `;
+                            break;
+                        case 'auth/no-profile':
+                            errorMessage.innerHTML = `
+                                <span class="is">Notandaprófíll fannst ekki. Vinsamlegast skráðu þig fyrst.</span>
+                                <span class="en">User profile not found. Please register first.</span>
+                            `;
+                            break;
+                        default:
+                            errorMessage.textContent = error.message || 'Login failed. Please try again.';
+                    }
                 }
-            } catch (error) {
-                errorMessage.style.display = 'block';
-                
-                // Provide better error messages
-                if (error.code === 'auth/configuration-not-found') {
-                    errorMessage.innerHTML = `
-                        <strong>Authentication Not Configured</strong><br>
-                        Firebase Authentication needs to be enabled in the Firebase Console.<br>
-                        Please contact the administrator.
-                    `;
-                } else if (error.code === 'auth/user-not-found') {
-                    errorMessage.textContent = 'No account found with this email. Please register first.';
-                } else if (error.code === 'auth/wrong-password') {
-                    errorMessage.textContent = 'Incorrect password. Please try again.';
-                } else if (error.code === 'auth/invalid-email') {
-                    errorMessage.textContent = 'Please enter a valid email address.';
-                } else if (error.code === 'auth/user-disabled') {
-                    errorMessage.textContent = 'This account has been disabled. Please contact support.';
-                } else {
-                    errorMessage.textContent = error.message;
-                }
-            }
+            });
         });
     </script>
 </body>
