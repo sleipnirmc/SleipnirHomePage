@@ -709,6 +709,7 @@ async function loadDisplayMembers() {
                 <div class="member-info">
                     <h4>${member.name}</h4>
                     ${member.role ? `<p style="color: var(--mc-red);">${member.role}</p>` : ''}
+                    ${member.motorcycleType ? `<p style="color: var(--gray);">🏍️ ${member.motorcycleType}</p>` : ''}
                     <p>Member since ${new Date(member.joinDate.seconds * 1000).getFullYear()}</p>
                     <p>Display Order: ${member.displayOrder}</p>
                 </div>
@@ -786,6 +787,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const memberData = {
                 name: document.getElementById('displayMemberName').value,
                 role: document.getElementById('displayMemberRole').value || '',
+                motorcycleType: document.getElementById('displayMemberMotorcycleType').value || '',
                 joinDate: firebase.firestore.Timestamp.fromDate(new Date(document.getElementById('displayMemberJoinDate').value)),
                 isActive: true,
                 displayOrder: Date.now(),
@@ -853,6 +855,7 @@ async function editDisplayMember(memberId) {
         document.getElementById('editMemberId').value = memberId;
         document.getElementById('editMemberName').value = currentEditMember.name || '';
         document.getElementById('editMemberRole').value = currentEditMember.role || '';
+        document.getElementById('editMemberMotorcycleType').value = currentEditMember.motorcycleType || '';
         
         // Convert timestamp to date string for input
         if (currentEditMember.joinDate) {
@@ -1407,6 +1410,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const updateData = {
                     name: document.getElementById('editMemberName').value,
                     role: document.getElementById('editMemberRole').value || '',
+                    motorcycleType: document.getElementById('editMemberMotorcycleType').value || '',
                     joinDate: firebase.firestore.Timestamp.fromDate(new Date(document.getElementById('editMemberJoinDate').value)),
                     displayOrder: parseInt(document.getElementById('editMemberDisplayOrder').value) || Date.now(),
                     isActive: document.getElementById('editMemberStatus').value === 'true',

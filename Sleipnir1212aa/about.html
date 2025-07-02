@@ -405,6 +405,7 @@
                 <div class="member-info">
                     <h3 class="member-name">${member.name}</h3>
                     ${member.role ? `<p class="member-role">${member.role}</p>` : ''}
+                    ${member.motorcycleType ? `<p class="member-motorcycle" style="color: var(--mc-red); font-weight: 500; margin: 5px 0;">${member.motorcycleType}</p>` : ''}
                     <p class="member-date">
                         <span class="is">Meðlimur síðan ${year}</span>
                         <span class="en">Member since ${year}</span>
