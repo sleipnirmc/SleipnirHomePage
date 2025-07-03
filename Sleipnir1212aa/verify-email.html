@@ -226,10 +226,7 @@
             }
 
             try {
-                await user.sendEmailVerification({
-                    url: window.location.origin + '/shop.html',
-                    handleCodeInApp: false
-                });
+                await user.sendEmailVerification();
 
                 // Show success message
                 statusMessage.className = 'status-message success';
