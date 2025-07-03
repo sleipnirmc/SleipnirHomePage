@@ -300,6 +300,15 @@
                                 <small>Admin: Enable Email/Password in Firebase Console → Authentication → Sign-in method</small>
                             `;
                             break;
+                        case 'auth/requests-from-referer-https://sleipnirmc.com-are-blocked.':
+                        case 'auth/requests-from-referer-http://sleipnirmc.com-are-blocked.':
+                            errorMessage.innerHTML = `
+                                <span class="is">Þessi vefsíða er ekki með heimild til að nota Firebase. Vinsamlegast hafðu samband við stjórnanda.</span>
+                                <span class="en">This domain is not authorized to use Firebase. Please contact the administrator.</span>
+                                <br><br>
+                                <small>Admin: Add sleipnirmc.com to API key restrictions in Google Cloud Console</small>
+                            `;
+                            break;
                         default:
                             errorMessage.textContent = error.message || 'Login failed. Please try again.';
                     }
