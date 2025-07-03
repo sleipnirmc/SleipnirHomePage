@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Debug</title>
+</head>
+<body>
+    <h1>Firebase Configuration Debug</h1>
+    <pre id="output"></pre>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(msg) {
+            output.textContent += msg + '\n';
+            console.log(msg);
+        }
+        
+        // Test with your current API key
+        const firebaseConfig = {
+            apiKey: "AIzaSyBG-p9dRs4V40uiJV_xJk-yPlgM5i_uhu0",
+            authDomain: "gervilausnir.firebaseapp.com",
+            projectId: "gervilausnir",
+            storageBucket: "gervilausnir.firebasestorage.app",
+            messagingSenderId: "812038651978",
+            appId: "1:812038651978:web:efd41e0bb996d0445b26b3",
+            measurementId: "G-9VYW2BNRST"
+        };
+        
+        log('Testing Firebase configuration...');
+        log('API Key: ' + firebaseConfig.apiKey);
+        log('Project: ' + firebaseConfig.projectId);
+        
+        try {
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            log('✓ Firebase initialized successfully');
+            
+            // Test auth
+            const auth = firebase.auth();
+            log('✓ Auth service created');
+            
+            // Test auth settings
+            auth.useDeviceLanguage();
+            log('✓ Auth language set');
+            
+            // Test Firestore
+            const db = firebase.firestore();
+            log('✓ Firestore initialized');
+            
+            // Test a simple auth operation
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    log('✓ User is signed in: ' + user.email);
+                } else {
+                    log('✓ Auth state listener working - No user signed in');
+                }
+            });
+            
+            // Try to get auth settings
+            auth.fetchSignInMethodsForEmail('test@example.com')
+                .then(() => {
+                    log('✓ Auth API is accessible');
+                })
+                .catch((error) => {
+                    log('✗ Auth API Error: ' + error.code + ' - ' + error.message);
+                });
+                
+        } catch (error) {
+            log('✗ Error: ' + error.message);
+            log('Full error: ' + JSON.stringify(error, null, 2));
+        }
+        
+        // Test with old API key for comparison
+        setTimeout(() => {
+            log('\n--- Testing with original API key ---');
+            const oldConfig = {
+                ...firebaseConfig,
+                apiKey: "AIzaSyCgtVtb6GarjkcENuditycF-FjlGFmgQWM"
+            };
+            
+            try {
+                const app2 = firebase.initializeApp(oldConfig, 'oldKey');
+                log('✓ Old key initialized');
+                
+                app2.auth().fetchSignInMethodsForEmail('test@example.com')
+                    .then(() => {
+                        log('✓ Old key Auth API works');
+                    })
+                    .catch((error) => {
+                        log('✗ Old key Auth API Error: ' + error.code);
+                    });
+            } catch (error) {
+                log('✗ Old key error: ' + error.message);
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
