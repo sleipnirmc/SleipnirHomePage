@@ -162,21 +162,187 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="javascript/firebase-config.js"></script>
+    <script src="javascript/firebase-auth-helper.js"></script>
     <script src="javascript/auth.js"></script>
     <script src="javascript/language.js"></script>
-    <script type="module">
-        // Import auth service functions
-        import { 
-            createUserAccount, 
-            validateUserData, 
-            checkUserExists, 
-            AuthError 
-        } from './javascript/auth-service.js';
-        import { 
-            sendVerificationEmailWithRetry,
-            checkAndSendVerificationReminder 
-        } from './javascript/email-verification.js';
-        import { cleanupOrphanedAccount } from './javascript/auth-service.js';
+    <script>
+        // Registration functionality without ES6 modules
+        
+        // Get current language helper
+        function getCurrentLanguage() {
+            return localStorage.getItem('selectedLanguage') || 'is';
+        }
+        
+        // Helper function to validate user data
+        function validateUserDataLocal(userData) {
+            const errors = [];
+            const lang = getCurrentLanguage();
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(userData.email)) {
+                errors.push({
+                    field: 'email',
+                    message: lang === 'is' ? 'Ógilt netfang' : 'Invalid email'
+                });
+            }
+            
+            // Password validation
+            if (userData.password.length < 6) {
+                errors.push({
+                    field: 'password',
+                    message: lang === 'is' ? 'Lykilorð verður að vera a.m.k. 6 stafir' : 'Password must be at least 6 characters'
+                });
+            }
+            
+            // Required fields
+            const requiredFields = ['fullName', 'address', 'city', 'postalCode'];
+            requiredFields.forEach(field => {
+                if (!userData[field] || userData[field].trim() === '') {
+                    errors.push({
+                        field: field,
+                        message: lang === 'is' ? `${field} er nauðsynlegt` : `${field} is required`
+                    });
+                }
+            });
+            
+            // Postal code validation (Iceland - 3 digits)
+            if (!/^\d{3}$/.test(userData.postalCode)) {
+                errors.push({
+                    field: 'postalCode',
+                    message: lang === 'is' ? 'Póstnúmer verður að vera 3 tölustafir' : 'Postal code must be 3 digits'
+                });
+            }
+            
+            return {
+                isValid: errors.length === 0,
+                errors: errors
+            };
+        }
+        
+        // Create user account function
+        async function createUserAccountLocal(email, password, userData) {
+            try {
+                // Create Firebase Auth account
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                try {
+                    // Create Firestore profile
+                    await firebase.firestore().collection('users').doc(user.uid).set({
+                        fullName: userData.fullName,
+                        email: userData.email,
+                        address: userData.address,
+                        city: userData.city,
+                        postalCode: userData.postalCode,
+                        role: 'customer',
+                        isMember: false,
+                        memberRequestPending: userData.requestMembership || false,
+                        emailVerified: false,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    return { success: true, user: user };
+                    
+                } catch (firestoreError) {
+                    // If Firestore fails, delete the auth account
+                    console.error('Firestore error:', firestoreError);
+                    await user.delete();
+                    throw firestoreError;
+                }
+                
+            } catch (error) {
+                console.error('Auth error:', error);
+                return { success: false, error: error };
+            }
+        }
+        
+        // Send verification email with retry
+        async function sendVerificationEmailLocal(user, options = {}) {
+            const maxAttempts = options.maxAttempts || 3;
+            const lang = options.lang || 'is';
+            
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                try {
+                    await user.sendEmailVerification({
+                        url: `${window.location.origin}/auth-action.html?lang=${lang}`
+                    });
+                    
+                    // Track email sending
+                    await firebase.firestore().collection('emailTracking').doc(user.uid).set({
+                        email: user.email,
+                        lastSent: firebase.firestore.FieldValue.serverTimestamp(),
+                        sentCount: firebase.firestore.FieldValue.increment(1),
+                        status: 'sent',
+                        type: 'verification'
+                    }, { merge: true });
+                    
+                    return { success: true, attempts: attempt };
+                    
+                } catch (error) {
+                    console.error(`Email send attempt ${attempt} failed:`, error);
+                    
+                    if (attempt < maxAttempts) {
+                        // Wait before retry (exponential backoff)
+                        await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+                    } else {
+                        return { success: false, error: error, attempts: attempt };
+                    }
+                }
+            }
+        }
+        
+        // Check if user exists
+        async function checkUserExistsLocal(email) {
+            try {
+                const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
+                return methods.length > 0;
+            } catch (error) {
+                // If enumeration protection is on, this might fail
+                console.error('Check user exists error:', error);
+                return false;
+            }
+        }
+        
+        // Get auth error message
+        function getAuthErrorMessage(error, lang = 'is') {
+            const errorMessages = {
+                'auth/email-already-in-use': {
+                    is: 'Þetta netfang er þegar skráð',
+                    en: 'This email is already registered'
+                },
+                'auth/invalid-email': {
+                    is: 'Ógilt netfang',
+                    en: 'Invalid email address'
+                },
+                'auth/operation-not-allowed': {
+                    is: 'Skráning er ekki leyfð',
+                    en: 'Registration is not allowed'
+                },
+                'auth/weak-password': {
+                    is: 'Lykilorð er of veikt',
+                    en: 'Password is too weak'
+                },
+                'auth/network-request-failed': {
+                    is: 'Nettenging mistókst',
+                    en: 'Network connection failed'
+                },
+                'auth/too-many-requests': {
+                    is: 'Of margar tilraunir. Reyndu aftur síðar.',
+                    en: 'Too many attempts. Please try again later.'
+                }
+            };
+            
+            const message = errorMessages[error.code];
+            if (message) {
+                return message[lang];
+            }
+            
+            // Default message
+            return lang === 'is' 
+                ? `Villa: ${error.message}` 
+                : `Error: ${error.message}`;
+        }
         
         // Form validation and submission handler
         document.addEventListener('DOMContentLoaded', function() {
@@ -215,10 +381,10 @@
                     // Check if email already exists
                     emailTimeout = setTimeout(async () => {
                         showFieldLoading(this, true);
-                        const exists = await checkUserExists(email);
+                        const exists = await checkUserExistsLocal(email);
                         showFieldLoading(this, false);
                         
-                        if (exists.exists) {
+                        if (exists) {
                             this.classList.add('invalid');
                             showFieldError(this, getCurrentLanguage() === 'is'
                                 ? 'Þetta netfang er þegar skráð'
@@ -367,7 +533,7 @@
                 }
                 
                 // Validate user data
-                const validation = validateUserData(userData);
+                const validation = validateUserDataLocal(userData);
                 if (!validation.isValid) {
                     errorMessage.style.display = 'block';
                     errorMessage.innerHTML = validation.errors
@@ -387,26 +553,26 @@
                 const loadingText = document.querySelector('.btn-loading span:last-child');
                 
                 try {
-                    // Create account using auth service
+                    // Create account using helper function
                     loadingText.innerHTML = lang === 'is' 
                         ? 'Bý til aðgang...' 
                         : 'Creating account...';
                     
-                    const result = await createUserAccount(
+                    const result = await firebaseAuthHelper.createUserWithProfile(
                         userData.email, 
                         userData.password, 
                         userData
                     );
                     
                     if (result.success) {
-                        // Send verification email with retry
+                        // Send verification email
                         loadingText.innerHTML = lang === 'is'
                             ? 'Sendi staðfestingarpóst...'
                             : 'Sending verification email...';
                         
-                        const emailResult = await sendVerificationEmailWithRetry(result.user, {
+                        const emailResult = await firebaseAuthHelper.sendVerificationEmailSafe(result.user, {
                             lang: lang,
-                            maxAttempts: 3
+                            maxAttempts: 1  // Don't retry too much to avoid rate limits
                         });
                         
                         // Show success message
@@ -443,6 +609,24 @@
                 } catch (error) {
                     console.error('Registration error:', error);
                     
+                    // Handle rate limiting first
+                    if (firebaseAuthHelper.isRateLimitError(error) || error.isRateLimit) {
+                        errorMessage.style.display = 'block';
+                        errorMessage.innerHTML = `
+                            <div style="padding: 15px; background: rgba(255,100,0,0.1); border: 1px solid #ff6600; border-radius: 5px;">
+                                <strong>⚠️ ${lang === 'is' ? 'Of margar tilraunir' : 'Too many attempts'}</strong><br><br>
+                                ${lang === 'is' 
+                                    ? 'Firebase hefur tímabundið takmarkað aðgang frá þessu tæki vegna of margra tilrauna.'
+                                    : 'Firebase has temporarily limited access from this device due to too many attempts.'}<br><br>
+                                <strong>${lang === 'is' ? 'Hvað á að gera:' : 'What to do:'}</strong><br>
+                                1. ${lang === 'is' ? 'Bíðið í 5-10 mínútur' : 'Wait 5-10 minutes'}<br>
+                                2. ${lang === 'is' ? 'Prófaðu að hreinsa vafragögn' : 'Try clearing browser data'}<br>
+                                3. ${lang === 'is' ? 'Eða notaðu annan vafra/tæki' : 'Or use a different browser/device'}
+                            </div>
+                        `;
+                        return;
+                    }
+                    
                     // Handle email-already-exists with cleanup attempt
                     if (error.code === 'auth/email-already-in-use' || 
                         (error.error && error.error === 'auth/email-already-in-use')) {
@@ -451,8 +635,8 @@
                             ? 'Athuga fyrri skráningu...'
                             : 'Checking previous registration...';
                         
-                        // Check if account needs cleanup
-                        const cleanupResult = await cleanupOrphanedAccount(userData.email);
+                        // Note: Cleanup of orphaned accounts would require admin SDK
+                        // For now, just inform the user
                         
                         errorMessage.style.display = 'block';
                         errorMessage.innerHTML = `
@@ -471,9 +655,9 @@
                             </a>
                         `;
                     } else {
-                        // Show error message
+                        // Show error message using helper
                         errorMessage.style.display = 'block';
-                        errorMessage.innerHTML = AuthError.getUserMessage(error, lang);
+                        errorMessage.innerHTML = firebaseAuthHelper.getFirebaseErrorMessage(error, lang);
                     }
                     
                 } finally {

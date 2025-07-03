@@ -874,12 +874,14 @@ if (typeof document !== 'undefined') {
     document.head.appendChild(styleSheet.firstElementChild);
 }
 
-// Export functions for module usage
-export {
-    checkProtectedRoute,
-    checkMemberStatus,
-    checkAdminStatus,
-    refreshUserData,
-    getUserData,
-    logout
-};
+// Make functions available globally for non-module usage
+if (typeof window !== 'undefined') {
+    window.authFunctions = {
+        checkProtectedRoute,
+        checkMemberStatus,
+        checkAdminStatus,
+        refreshUserData,
+        getUserData,
+        logout
+    };
+}
