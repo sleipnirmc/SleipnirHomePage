@@ -948,7 +948,7 @@ async function loadOrders() {
 // Display orders in table format
 function displayOrdersInTable(orders, tbody, showActions) {
     if (orders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No orders found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No orders found</td></tr>';
         return;
     }
     
@@ -967,8 +967,14 @@ function displayOrdersInTable(orders, tbody, showActions) {
                 ${showActions ? `
                     <td>
                         <button class="admin-btn" onclick="completeOrder('${order.id}')">Complete</button>
+                        <button class="admin-btn delete" onclick="deleteOrder('${order.id}')" style="margin-left: 5px;">Delete</button>
                     </td>
-                ` : `<td>${order.completedAt ? new Date(order.completedAt.toDate()).toLocaleDateString('is-IS') : '-'}</td>`}
+                ` : `
+                    <td>${order.completedAt ? new Date(order.completedAt.toDate()).toLocaleDateString('is-IS') : '-'}</td>
+                    <td>
+                        <button class="admin-btn delete" onclick="deleteOrder('${order.id}')">Delete</button>
+                    </td>
+                `}
             </tr>
         `;
     }).join('');
@@ -990,6 +996,22 @@ async function completeOrder(orderId) {
     } catch (error) {
         console.error('Error completing order:', error);
         alert('Error completing order.');
+    }
+}
+
+// Delete order
+async function deleteOrder(orderId) {
+    if (!confirm('Are you sure you want to delete this order? This action cannot be undone.')) return;
+    
+    try {
+        await firebase.firestore().collection('orders').doc(orderId).delete();
+        
+        alert('Order deleted successfully!');
+        loadOrders();
+        loadDashboardStats();
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        alert('Error deleting order.');
     }
 }
 
@@ -1100,6 +1122,7 @@ function switchMemberTab(tab) {
     // Load appropriate data
     if (tab === 'approveMembers') {
         loadMemberRequests();
+    } else if (tab === 'currentMembers') {
         loadCurrentMembers();
     } else if (tab === 'displayMembers') {
         loadDisplayMembers();

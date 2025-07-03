@@ -576,6 +576,7 @@
             
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="switchMemberTab('approveMembers')">Member Requests</button>
+                <button class="tab-btn" onclick="switchMemberTab('currentMembers')">Current Members</button>
                 <button class="tab-btn" onclick="switchMemberTab('displayMembers')">Display Members</button>
             </div>
             
@@ -586,9 +587,12 @@
                 <div id="memberRequests">
                     <!-- Member requests will be loaded here -->
                 </div>
-                
-                <h3 style="margin-top: 40px;">Current Members</h3>
-                <p style="color: var(--gray); margin-bottom: 20px;">Users with active membership status</p>
+            </div>
+            
+            <!-- Current Members Tab -->
+            <div class="tab-content" id="currentMembersTab">
+                <h3>Current Members</h3>
+                <p style="color: var(--gray); margin-bottom: 20px;">Users with active membership status. You can revoke their member access here.</p>
                 <div id="currentMembers">
                     <!-- Current members will be loaded here -->
                 </div>
@@ -678,6 +682,7 @@
                             <th>Total</th>
                             <th>Date</th>
                             <th>Completed</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="completedOrdersBody">
@@ -969,8 +974,6 @@
                 case 'members':
                     // Load the default tab (member requests)
                     loadMemberRequests();
-                    loadCurrentMembers();
-                    loadDisplayMembers();
                     break;
                 case 'orders':
                     loadOrders();
