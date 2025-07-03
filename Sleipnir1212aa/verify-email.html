@@ -226,7 +226,38 @@
             }
 
             try {
-                await user.sendEmailVerification();
+                console.log('=== EMAIL VERIFICATION ATTEMPT ===');
+                console.log('User:', user.email);
+                console.log('UID:', user.uid);
+                console.log('Email Verified Status:', user.emailVerified);
+                console.log('Auth Domain:', window.location.origin);
+                console.log('Timestamp:', new Date().toISOString());
+                
+                // Use the actionCodeSettings from firebase-config.js
+                const actionCodeSettings = {
+                    url: window.location.origin + '/auth-action.html',
+                    handleCodeInApp: true
+                };
+                console.log('Action Code Settings:', actionCodeSettings);
+                
+                await user.sendEmailVerification(actionCodeSettings);
+                
+                console.log('=== EMAIL SENT SUCCESSFULLY ===');
+                console.log('Check spam folder if not in inbox');
+                
+                // Log to Firestore for tracking
+                try {
+                    await firebase.firestore().collection('email_logs').add({
+                        type: 'client_verification_sent',
+                        uid: user.uid,
+                        email: user.email,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        origin: window.location.origin,
+                        userAgent: navigator.userAgent
+                    });
+                } catch (logError) {
+                    console.error('Failed to log to Firestore:', logError);
+                }
 
                 // Show success message
                 statusMessage.className = 'status-message success';
@@ -260,14 +291,61 @@
                 }, 1000);
 
             } catch (error) {
+                console.error('=== EMAIL VERIFICATION FAILED ===');
+                console.error('Error Code:', error.code);
+                console.error('Error Message:', error.message);
+                console.error('Full Error:', error);
+                
+                // Log failure to Firestore
+                try {
+                    await firebase.firestore().collection('email_logs').add({
+                        type: 'client_verification_failed',
+                        uid: user.uid,
+                        email: user.email,
+                        errorCode: error.code,
+                        errorMessage: error.message,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        origin: window.location.origin
+                    });
+                } catch (logError) {
+                    console.error('Failed to log error to Firestore:', logError);
+                }
+                
                 statusMessage.className = 'status-message error';
                 statusMessage.style.display = 'block';
                 
                 if (error.code === 'auth/too-many-requests') {
                     statusMessage.innerHTML = `
-                        <span class="is">Of margar beiðnir. Vinsamlegast bíddu.</span>
-                        <span class="en">Too many requests. Please wait.</span>
+                        <span class="is">Firebase hefur lokað tímabundið fyrir beiðnir frá þessu tæki vegna óvenjulegrar notkunar. Vinsamlegast reyndu aftur eftir nokkrar mínútur.</span>
+                        <span class="en">Firebase has temporarily blocked requests from this device due to unusual activity. Please try again in a few minutes.</span>
                     `;
+                    // Disable button for 5 minutes
+                    countdown = 300;
+                    button.disabled = true;
+                    
+                    if (countdownTimer) {
+                        clearInterval(countdownTimer);
+                    }
+                    
+                    countdownTimer = setInterval(() => {
+                        countdown--;
+                        if (countdown > 0) {
+                            const minutes = Math.floor(countdown / 60);
+                            const seconds = countdown % 60;
+                            countdownDiv.innerHTML = `
+                                <span class="is">Reyndu aftur eftir ${minutes}:${seconds.toString().padStart(2, '0')}</span>
+                                <span class="en">Try again in ${minutes}:${seconds.toString().padStart(2, '0')}</span>
+                            `;
+                        } else {
+                            clearInterval(countdownTimer);
+                            button.disabled = false;
+                            countdownDiv.innerHTML = '';
+                            statusMessage.innerHTML = `
+                                <span class="is">Þú getur nú reynt aftur</span>
+                                <span class="en">You can try again now</span>
+                            `;
+                        }
+                    }, 1000);
                 } else {
                     statusMessage.innerHTML = `
                         <span class="is">Villa: ${error.message}</span>
