@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC Reykjavík - Verslun</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Shop Page Specific Styles */
+        .shop-hero {
+            margin-top: 80px;
+            height: 300px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.8)),
+                        radial-gradient(circle at center, rgba(207, 35, 66, 0.1), transparent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .shop-title {
+            font-family: 'Cinzel', serif;
+            font-size: 48px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        /* Category Filter */
+        .category-filter {
+            padding: 40px 0;
+            background: rgba(26,26,26,0.5);
+            border-top: 1px solid rgba(207, 35, 66, 0.2);
+            border-bottom: 1px solid rgba(207, 35, 66, 0.2);
+        }
+
+        .filter-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .filter-title {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--mc-red);
+        }
+
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 30px;
+            background: transparent;
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Iceland', cursive;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--mc-red);
+            color: var(--mc-red);
+        }
+
+        .filter-btn.active {
+            background: var(--mc-red);
+            border-color: var(--mc-red);
+            color: var(--white);
+        }
+
+        /* Shop Products */
+        .shop-products {
+            padding: 60px 40px;
+        }
+
+        .products-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .shop-product-card {
+            position: relative;
+        }
+
+        /* Pagination Styles */
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 60px;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            padding: 10px 20px;
+            background: var(--norse-black);
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Iceland', cursive;
+            font-size: 16px;
+            min-width: 45px;
+        }
+
+        .pagination-btn:hover:not(.disabled) {
+            background: var(--mc-red);
+            border-color: var(--mc-red);
+            transform: translateY(-2px);
+        }
+
+        .pagination-btn.active {
+            background: var(--mc-red);
+            border-color: var(--mc-red);
+            font-weight: bold;
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-dots {
+            padding: 10px;
+            color: var(--gray);
+        }
+
+        .pagination-info {
+            margin-left: 20px;
+            color: var(--gray);
+            font-size: 14px;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        @media (max-width: 768px) {
+            .pagination-controls {
+                font-size: 14px;
+            }
+            
+            .pagination-btn {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            .pagination-info {
+                width: 100%;
+                text-align: center;
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+
+        /* Product Image Gallery */
+        .product-image-gallery {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            background: var(--norse-black);
+        }
+
+        .gallery-images {
+            display: flex;
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+
+        .gallery-image {
+            min-width: 100%;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Gallery Navigation */
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 15px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 2;
+        }
+
+        .gallery-nav:hover {
+            background: rgba(207, 35, 66, 0.8);
+            border-color: var(--mc-red);
+        }
+
+        .gallery-prev {
+            left: 10px;
+        }
+
+        .gallery-next {
+            right: 10px;
+        }
+
+        /* Gallery Dots */
+        .gallery-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .gallery-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gallery-dot:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .gallery-dot.active {
+            background: var(--mc-red);
+            transform: scale(1.2);
+        }
+
+        /* Modal Image Thumbnails */
+        .image-thumbnails {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            overflow-x: auto;
+            padding: 5px 0;
+        }
+
+        .image-thumbnails::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .image-thumbnails::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .image-thumbnails::-webkit-scrollbar-thumb {
+            background: var(--mc-red);
+            border-radius: 3px;
+        }
+
+        .image-thumbnails .thumbnail {
+            min-width: 80px;
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            opacity: 0.7;
+        }
+
+        .image-thumbnails .thumbnail:hover {
+            opacity: 1;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .image-thumbnails .thumbnail.active {
+            opacity: 1;
+            border-color: var(--mc-red);
+        }
+
+        /* Cart Sidebar */
+        .cart-sidebar {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100%;
+            background: rgba(10,10,10,0.95);
+            border-left: 2px solid var(--mc-red);
+            z-index: 2000;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(207, 35, 66, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-header h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            color: var(--mc-red);
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .cart-item {
+            background: rgba(26,26,26,0.8);
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(207, 35, 66, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-item-info h4 {
+            font-family: 'Cinzel', serif;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-info p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cart-item-actions button {
+            width: 30px;
+            height: 30px;
+            background: var(--mc-red);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cart-item-actions .remove-btn {
+            background: var(--dark-red);
+        }
+
+        .cart-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(207, 35, 66, 0.2);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--mc-red);
+            color: white;
+            border: none;
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checkout-btn:hover:not(:disabled) {
+            background: var(--dark-red);
+        }
+
+        .checkout-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Floating Cart Button */
+        .floating-cart-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--mc-red);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(207, 35, 66, 0.4);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .floating-cart-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(207, 35, 66, 0.6);
+        }
+
+        .cart-icon {
+            font-size: 24px;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--pure-black);
+            color: var(--white);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 50%;
+            border: 2px solid var(--mc-red);
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(207, 35, 66, 0.1);
+            border-top-color: var(--mc-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 60px;
+            color: var(--gray);
+            font-size: 18px;
+        }
+
+        /* Product Card Gallery Styles */
+        .product-image-gallery {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--norse-black), var(--midnight-black));
+        }
+
+        .gallery-images {
+            display: flex;
+            transition: transform 0.4s ease;
+            height: 100%;
+        }
+
+        .gallery-image {
+            min-width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.7);
+            color: var(--white);
+            border: 1px solid var(--mc-red);
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+            opacity: 0;
+        }
+
+        .product-card:hover .gallery-nav {
+            opacity: 1;
+        }
+
+        .gallery-nav:hover {
+            background: var(--mc-red);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .gallery-prev {
+            left: 10px;
+        }
+
+        .gallery-next {
+            right: 10px;
+        }
+
+        .gallery-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .gallery-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gallery-dot.active {
+            background: var(--mc-red);
+            transform: scale(1.2);
+        }
+
+        /* Updated Product Card */
+        .shop-product-card {
+            background: linear-gradient(135deg, rgba(26,26,26,0.9), rgba(10,10,10,0.9));
+            border: 1px solid rgba(207, 35, 66, 0.1);
+            overflow: hidden;
+            transition: all 0.4s;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .shop-product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(207, 35, 66, 0.3);
+            border-color: var(--mc-red);
+        }
+
+        .product-badges {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .product-badge {
+            padding: 8px 20px;
+            background: var(--mc-red);
+            color: var(--white);
+            font-family: 'Iceland', cursive;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+        }
+
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cart-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+
+            .filter-buttons {
+                gap: 10px;
+            }
+
+            .filter-btn {
+                padding: 8px 20px;
+                font-size: 14px;
+            }
+
+            .product-image-gallery {
+                height: 300px;
+            }
+
+            .gallery-nav {
+                opacity: 1;
+                padding: 8px 12px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <span class="logo-text">SLEIPNIR MC</span>
+                <span class="location">REYKJAVÍK</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><span class="is">Heim</span><span class="en">Home</span></a></li>
+                <li><a href="shop.html" class="active"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
+                <li><a href="about.html"><span class="is">Hópurinn</span><span class="en">About Us</span></a></li>
+                <li><a href="contact.html"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
+            </ul>
+            <div class="member-portal">
+                <!-- Auth state will be loaded by auth.js -->
+            </div>
+            <div class="language-toggle">
+                <button class="lang-btn" onclick="toggleLanguage()">
+                    <span class="is">EN</span>
+                    <span class="en">IS</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Shop Hero -->
+    <section class="shop-hero">
+        <div class="hero-overlay"></div>
+        <h1 class="shop-title">
+            <span class="is">Verslun Sleipnis</span>
+            <span class="en">Sleipnir Store</span>
+        </h1>
+    </section>
+
+    <!-- Category Filter -->
+    <section class="category-filter">
+        <div class="filter-container">
+            <h2 class="filter-title">
+                <span class="is">Flokkar</span>
+                <span class="en">Categories</span>
+            </h2>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">
+                    <span class="is">Allt</span>
+                    <span class="en">All</span>
+                </button>
+                <button class="filter-btn" data-category="tshirt">
+                    <span class="is">Bolir</span>
+                    <span class="en">T-Shirts</span>
+                </button>
+                <button class="filter-btn" data-category="jeans">
+                    <span class="is">Buxur</span>
+                    <span class="en">Jeans/Trousers</span>
+                </button>
+                <button class="filter-btn" data-category="jacket">
+                    <span class="is">Jakkar</span>
+                    <span class="en">Jackets</span>
+                </button>
+                <button class="filter-btn" data-category="hoodie">
+                    <span class="is">Hettupeysur</span>
+                    <span class="en">Hoodies</span>
+                </button>
+                <button class="filter-btn" data-category="other">
+                    <span class="is">Annað</span>
+                    <span class="en">Other</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Grid -->
+    <section class="shop-products">
+        <div class="products-container">
+            <div class="product-grid" id="productGrid">
+                <!-- Products will be loaded dynamically from Firebase -->
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p><span class="is">Hleður vörur...</span><span class="en">Loading products...</span></p>
+                </div>
+            </div>
+            <div class="pagination-controls" id="paginationControls">
+                <!-- Pagination will be added dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3><span class="is">Karfa</span><span class="en">Cart</span></h3>
+            <button class="close-cart" id="closeCart">✕</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be added dynamically -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span><span class="is">Samtals:</span><span class="en">Total:</span></span>
+                <span id="cartTotal">0 ISK</span>
+            </div>
+            <button class="checkout-btn" id="checkoutBtn">
+                <span class="is">Ganga frá kaupum</span>
+                <span class="en">Checkout</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Cart Button -->
+    <button class="floating-cart-btn" id="cartBtn">
+        <span class="cart-icon">🛒</span>
+        <span class="cart-count" id="cartCount">0</span>
+    </button>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="product-modal">
+        <div class="product-modal-content">
+            <span class="modal-close" onclick="closeProductModal()">&times;</span>
+            <div class="modal-body">
+                <div class="modal-images">
+                    <img id="modalMainImage" class="main-image" src="" alt="">
+                    <div class="image-thumbnails" id="modalThumbnails">
+                        <!-- Thumbnails will be populated dynamically -->
+                    </div>
+                </div>
+                <div class="modal-info">
+                    <h2 id="modalProductName">
+                        <span class="is"></span>
+                        <span class="en"></span>
+                    </h2>
+                    <p class="modal-price" id="modalPrice"></p>
+                    <p class="modal-description" id="modalDescription"></p>
+                    
+                    <div class="modal-sizes">
+                        <h3>
+                            <span class="is">Veldu stærð</span>
+                            <span class="en">Select Size</span>
+                        </h3>
+                        <div class="modal-size-options" id="modalSizes">
+                            <!-- Sizes will be populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <button class="modal-add-to-cart" id="modalAddToCart">
+                        <span class="is">Bæta í körfu</span>
+                        <span class="en">Add to Cart</span>
+                    </button>
+                    
+                    <div class="product-features">
+                        <h3>
+                            <span class="is">Eiginleikar</span>
+                            <span class="en">Features</span>
+                        </h3>
+                        <ul class="feature-list">
+                            <li>
+                                <span class="is">Hágæða efni</span>
+                                <span class="en">Premium quality materials</span>
+                            </li>
+                            <li>
+                                <span class="is">Handunnið með ást</span>
+                                <span class="en">Handcrafted with care</span>
+                            </li>
+                            <li>
+                                <span class="is">Opinber Sleipnir MC vara</span>
+                                <span class="en">Official Sleipnir MC merchandise</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Sleipnir MC Reykjavík</h4>
+                <p>
+                    <span class="is">Ríðum í gegnum ljósanótt síðan 2015</span>
+                    <span class="en">Riding through ljósanótt since 2015</span>
+                </p>
+            </div>
+            <div class="social-links">
+                <a href="https://www.facebook.com/sleipnirmcreykjavik" target="_blank" rel="noopener noreferrer" aria-label="Facebook">⟨f⟩</a>
+                <a href="#" aria-label="Instagram">⟨ᛁ⟩</a>
+                <a href="mailto:sleipnirmcreykjavik@gmail.com" aria-label="Email">⟨@⟩</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Sleipnir MC Reykjavík. Allur réttur áskilinn.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="javascript/firebase-config.js"></script>
+    <script src="javascript/auth.js"></script>
+    <script src="javascript/language.js"></script>
+    <script src="javascript/shop.js"></script>
+</body>
+</html>

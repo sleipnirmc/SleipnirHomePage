@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC - Authentication</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .action-container {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95));
+            border: 2px solid var(--mc-red);
+            padding: 50px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .action-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+        }
+
+        .action-title {
+            font-family: 'Cinzel', serif;
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .action-message {
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--gray);
+            margin-bottom: 30px;
+        }
+
+        .action-button {
+            padding: 15px 40px;
+            background: var(--mc-red);
+            color: white;
+            border: none;
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-button:hover {
+            background: var(--dark-red);
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--mc-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <span class="norse-text">ᛋᛚᛖᛁᛈᚾᛁᚱ</span>
+                <span class="logo-text">SLEIPNIR MC</span>
+                <span class="location">REYKJAVÍK</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><span class="is">Heim</span><span class="en">Home</span></a></li>
+                <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
+                <li><a href="contact.html"><span class="is">Samband</span><span class="en">Contact</span></a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Action Handler Section -->
+    <section class="action-container">
+        <div class="action-card" id="actionCard">
+            <div class="loading"></div>
+            <h1 class="action-title">
+                <span class="is">Augnablik...</span>
+                <span class="en">Just a moment...</span>
+            </h1>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Sleipnir MC Reykjavík</h4>
+                <p>Riding through ljósanótt since 2015</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="javascript/firebase-config.js"></script>
+    <script>
+        // Get the action code from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode');
+        const oobCode = urlParams.get('oobCode');
+        const continueUrl = urlParams.get('continueUrl');
+        const lang = urlParams.get('lang') || 'is';
+
+        const actionCard = document.getElementById('actionCard');
+
+        // Handle the action
+        async function handleAction() {
+            if (!mode || !oobCode) {
+                showError('Invalid action link');
+                return;
+            }
+
+            try {
+                switch (mode) {
+                    case 'verifyEmail':
+                        await handleVerifyEmail();
+                        break;
+                    case 'resetPassword':
+                        await handleResetPassword();
+                        break;
+                    case 'recoverEmail':
+                        await handleRecoverEmail();
+                        break;
+                    default:
+                        showError('Unknown action');
+                }
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Handle email verification
+        async function handleVerifyEmail() {
+            try {
+                await firebase.auth().applyActionCode(oobCode);
+                
+                // Update user's emailVerified status in Firestore
+                const user = firebase.auth().currentUser;
+                if (user) {
+                    await firebase.firestore().collection('users').doc(user.uid).update({
+                        emailVerified: true,
+                        emailVerifiedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                actionCard.innerHTML = `
+                    <div class="action-icon" style="color: #00ff00;">✓</div>
+                    <h1 class="action-title">
+                        <span class="is">Netfang Staðfest!</span>
+                        <span class="en">Email Verified!</span>
+                    </h1>
+                    <p class="action-message">
+                        <span class="is">Netfangið þitt hefur verið staðfest. Þú getur núna skráð þig inn og versla.</span>
+                        <span class="en">Your email has been verified. You can now sign in and start shopping.</span>
+                    </p>
+                    <div style="background: rgba(0,255,0,0.1); border: 1px solid #00ff00; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                        <p style="color: #00ff00; font-size: 18px; margin: 0;">
+                            <strong>
+                                <span class="is">Þú getur nú lokað þessari síðu og farið aftur á aðalsíðuna.</span>
+                                <span class="en">You may now close this page and return to the main site.</span>
+                            </strong>
+                        </p>
+                    </div>
+                    <a href="shop.html" class="action-button" style="background: #00ff00; color: #000;">
+                        <span class="is">Fara í Verslun</span>
+                        <span class="en">Go to Shop</span>
+                    </a>
+                `;
+            } catch (error) {
+                throw new Error('Failed to verify email. The link may have expired.');
+            }
+        }
+
+        // Handle password reset
+        async function handleResetPassword() {
+            // First verify the code is valid
+            try {
+                const email = await firebase.auth().verifyPasswordResetCode(oobCode);
+                
+                actionCard.innerHTML = `
+                    <div class="action-icon" style="color: var(--mc-red);">🔐</div>
+                    <h1 class="action-title">
+                        <span class="is">Endurstilla Lykilorð</span>
+                        <span class="en">Reset Password</span>
+                    </h1>
+                    <p class="action-message">
+                        <span class="is">Veldu nýtt lykilorð fyrir ${email}</span>
+                        <span class="en">Choose a new password for ${email}</span>
+                    </p>
+                    <form id="resetPasswordForm" class="auth-form" style="max-width: 400px; margin: 0 auto;">
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <input type="password" id="newPassword" placeholder="New Password" required minlength="6" 
+                                   style="width: 100%; padding: 15px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <input type="password" id="confirmPassword" placeholder="Confirm Password" required 
+                                   style="width: 100%; padding: 15px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                        </div>
+                        <button type="submit" class="action-button">
+                            <span class="is">Vista Lykilorð</span>
+                            <span class="en">Save Password</span>
+                        </button>
+                    </form>
+                    <div id="resetError" class="error-message" style="display: none; margin-top: 20px;"></div>
+                `;
+
+                // Handle form submission
+                document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const newPassword = document.getElementById('newPassword').value;
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+                    const resetError = document.getElementById('resetError');
+
+                    if (newPassword !== confirmPassword) {
+                        resetError.style.display = 'block';
+                        resetError.textContent = 'Passwords do not match';
+                        return;
+                    }
+
+                    try {
+                        await firebase.auth().confirmPasswordReset(oobCode, newPassword);
+                        
+                        actionCard.innerHTML = `
+                            <div class="action-icon" style="color: #00ff00;">✓</div>
+                            <h1 class="action-title">
+                                <span class="is">Lykilorð Endurstillt!</span>
+                                <span class="en">Password Reset!</span>
+                            </h1>
+                            <p class="action-message">
+                                <span class="is">Lykilorðið þitt hefur verið breytt. Þú getur núna skráð þig inn með nýja lykilorðinu.</span>
+                                <span class="en">Your password has been changed. You can now sign in with your new password.</span>
+                            </p>
+                            <a href="login.html" class="action-button">
+                                <span class="is">Innskrá</span>
+                                <span class="en">Sign In</span>
+                            </a>
+                        `;
+                    } catch (error) {
+                        resetError.style.display = 'block';
+                        resetError.textContent = error.message;
+                    }
+                });
+
+            } catch (error) {
+                throw new Error('Invalid or expired reset link.');
+            }
+        }
+
+        // Handle email recovery
+        async function handleRecoverEmail() {
+            try {
+                const info = await firebase.auth().checkActionCode(oobCode);
+                await firebase.auth().applyActionCode(oobCode);
+                
+                actionCard.innerHTML = `
+                    <div class="action-icon" style="color: #00ff00;">✓</div>
+                    <h1 class="action-title">
+                        <span class="is">Netfang Endurheimt!</span>
+                        <span class="en">Email Recovered!</span>
+                    </h1>
+                    <p class="action-message">
+                        <span class="is">Netfangið þitt hefur verið endurheimt.</span>
+                        <span class="en">Your email has been recovered.</span>
+                    </p>
+                    <a href="login.html" class="action-button">
+                        <span class="is">Innskrá</span>
+                        <span class="en">Sign In</span>
+                    </a>
+                `;
+            } catch (error) {
+                throw new Error('Failed to recover email.');
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            actionCard.innerHTML = `
+                <div class="action-icon" style="color: var(--mc-red);">⚠️</div>
+                <h1 class="action-title">
+                    <span class="is">Villa</span>
+                    <span class="en">Error</span>
+                </h1>
+                <p class="action-message" style="color: var(--mc-red);">
+                    ${message}
+                </p>
+                <a href="index.html" class="action-button">
+                    <span class="is">Fara á Forsíðu</span>
+                    <span class="en">Go to Homepage</span>
+                </a>
+            `;
+        }
+
+        // Handle the action on page load
+        handleAction();
+    </script>
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC Reykjavík - Hópurinn</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* About Us Page Specific Styles */
+        .about-hero {
+            position: relative;
+            width: 100%;
+            height: 80vh;
+            min-height: 600px;
+            overflow: hidden;
+            margin-top: 80px;
+        }
+
+        .about-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .about-hero-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            padding: 60px 0 40px;
+        }
+
+        .about-hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            text-align: center;
+        }
+
+        .about-hero h1 {
+            font-family: 'Iceland', 'Cinzel', serif;
+            font-size: 3.5rem;
+            color: var(--white);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .about-hero p {
+            font-size: 1.2rem;
+            color: var(--off-white);
+            opacity: 0.9;
+        }
+
+        /* Members Section */
+        .members-section {
+            padding: 80px 0;
+            background: var(--pure-black);
+            position: relative;
+        }
+
+        .members-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--mc-red), transparent);
+        }
+
+        .members-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-family: 'Iceland', 'Cinzel', serif;
+            font-size: 2.5rem;
+            color: var(--white);
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--mc-red);
+        }
+
+        /* Members Grid */
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .member-card {
+            background: var(--norse-black);
+            border: 1px solid rgba(207, 35, 66, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .member-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--mc-red);
+            box-shadow: 0 10px 30px rgba(207, 35, 66, 0.3);
+        }
+
+        .member-photo {
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .member-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .member-card:hover .member-photo img {
+            transform: scale(1.05);
+        }
+
+        .member-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .member-name {
+            font-family: 'Iceland', sans-serif;
+            font-size: 1.4rem;
+            color: var(--white);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .member-role {
+            color: var(--mc-red);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .member-date {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Loading skeleton */
+        .member-skeleton {
+            background: var(--norse-black);
+            border: 1px solid rgba(207, 35, 66, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .skeleton-photo {
+            width: 100%;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .skeleton-info {
+            padding: 20px;
+        }
+
+        .skeleton-text {
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .skeleton-text.small {
+            height: 16px;
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .about-hero {
+                height: 50vh;
+                min-height: 300px;
+            }
+
+            .about-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .members-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+
+            .member-photo {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <span class="logo-text">SLEIPNIR MC</span>
+                <span class="location">REYKJAVÍK</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><span class="is">Heim</span><span class="en">Home</span></a></li>
+                <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
+                <li><a href="about.html" class="active"><span class="is">Hópurinn</span><span class="en">About Us</span></a></li>
+                <li><a href="contact.html"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
+            </ul>
+            <div class="member-portal">
+                <!-- Auth state will be loaded by auth.js -->
+            </div>
+            <div class="language-toggle">
+                <button class="lang-btn" onclick="toggleLanguage()">
+                    <span class="is">EN</span>
+                    <span class="en">IS</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section with Group Photo -->
+    <section class="about-hero">
+        <img src="Images/HopMynd.png" alt="Sleipnir MC Group Photo">
+        <div class="about-hero-overlay">
+            <div class="about-hero-content">
+                <h1>
+                    <span class="is">Hópurinn</span>
+                    <span class="en">About Us</span>
+                </h1>
+                <p>
+                    <span class="is">Bræðralag á tveimur hjólum síðan 2015</span>
+                    <span class="en">Brotherhood on two wheels since 2015</span>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Members Section -->
+    <section class="members-section">
+        <div class="members-container">
+            <div class="section-header">
+                <h2>
+                    <span class="is">Meðlimir</span>
+                    <span class="en">Members</span>
+                </h2>
+            </div>
+            
+            <div class="members-grid" id="membersGrid">
+                <!-- Members will be loaded dynamically -->
+                <!-- Loading skeleton -->
+                <div class="member-skeleton">
+                    <div class="skeleton-photo"></div>
+                    <div class="skeleton-info">
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text small"></div>
+                    </div>
+                </div>
+                <div class="member-skeleton">
+                    <div class="skeleton-photo"></div>
+                    <div class="skeleton-info">
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text small"></div>
+                    </div>
+                </div>
+                <div class="member-skeleton">
+                    <div class="skeleton-photo"></div>
+                    <div class="skeleton-info">
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text small"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Sleipnir MC Reykjavík</h4>
+                <p>Brotherhood • Respect • Freedom</p>
+            </div>
+            <div class="footer-section">
+                <h4>
+                    <span class="is">Fylgdu okkur</span>
+                    <span class="en">Follow us</span>
+                </h4>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook">f</a>
+                    <a href="#" aria-label="Instagram">@</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Sleipnir MC Reykjavík. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="javascript/firebase-config.js"></script>
+    <script src="javascript/auth.js"></script>
+    <script src="javascript/language.js"></script>
+    
+    <script>
+        // Load members from Firestore
+        async function loadMembers() {
+            const membersGrid = document.getElementById('membersGrid');
+            
+            try {
+                const snapshot = await firebase.firestore()
+                    .collection('displayMembers')
+                    .where('isActive', '==', true)
+                    .orderBy('displayOrder', 'asc')
+                    .get();
+                
+                // Clear loading skeletons
+                membersGrid.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    // Show empty state - no sample members
+                    membersGrid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                            <p style="color: var(--gray); font-size: 1.1rem;">
+                                <span class="is">Engar upplýsingar um meðlimi enn.</span>
+                                <span class="en">No member information available yet.</span>
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                snapshot.forEach(doc => {
+                    const member = doc.data();
+                    const memberCard = createMemberCard(member);
+                    membersGrid.appendChild(memberCard);
+                });
+                
+            } catch (error) {
+                console.error('Error loading members:', error);
+                // Show error state
+                membersGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                        <p style="color: var(--gray); font-size: 1.1rem;">
+                            <span class="is">Villa við að hlaða meðlimum.</span>
+                            <span class="en">Error loading members.</span>
+                        </p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Create member card element
+        function createMemberCard(member) {
+            const card = document.createElement('div');
+            card.className = 'member-card';
+            
+            // Format join date
+            const joinDate = member.joinDate ? new Date(member.joinDate.seconds * 1000) : new Date();
+            const year = joinDate.getFullYear();
+            
+            card.innerHTML = `
+                <div class="member-photo">
+                    <img src="${member.photoUrl || 'Images/placeholder-member.jpg'}" 
+                         alt="${member.name}"
+                         onerror="this.src='Images/placeholder-member.jpg'">
+                </div>
+                <div class="member-info">
+                    <h3 class="member-name">${member.name}</h3>
+                    ${member.role ? `<p class="member-role">${member.role}</p>` : ''}
+                    <p class="member-date">
+                        <span class="is">Meðlimur síðan ${year}</span>
+                        <span class="en">Member since ${year}</span>
+                    </p>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMembers();
+        });
+    </script>
+</body>
+</html>

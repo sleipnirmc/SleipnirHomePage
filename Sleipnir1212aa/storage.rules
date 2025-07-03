@@ -1,0 +1,30 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow public read access to all member photos
+    match /members/{allPaths=**} {
+      allow read: if true;  // Anyone can view member photos
+      allow write: if request.auth != null && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Allow public read access to product images
+    match /products/{allPaths=**} {
+      allow read: if true;  // Anyone can view product images
+      allow write: if request.auth != null && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Allow public read access to general images (logos, banners, etc.)
+    match /images/{allPaths=**} {
+      allow read: if true;  // Anyone can view general images
+      allow write: if request.auth != null && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Default rule - no access unless specified above
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
