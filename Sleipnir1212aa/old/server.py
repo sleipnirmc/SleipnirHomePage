@@ -13,7 +13,7 @@ import threading
 import time
 
 # Configuration
-PORT = 8000
+PORT = 8080
 HOST = "localhost"
 
 class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
