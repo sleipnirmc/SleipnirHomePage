@@ -1,0 +1,35 @@
+{
+  "name": "sleipnir-mc-homepage",
+  "version": "1.0.0",
+  "description": "Official website for Sleipnir MC Reykjavík",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000",
+    "test": "echo \"No tests configured\"",
+    "install-python-server": "python3 -m pip install --user http.server || echo 'Python http.server is built-in'"
+  },
+  "dependencies": {
+    "firebase": "^9.22.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/sleipnir-homepage.git"
+  },
+  "keywords": [
+    "motorcycle-club",
+    "sleipnir",
+    "iceland",
+    "website"
+  ],
+  "author": "Sleipnir MC",
+  "license": "UNLICENSED",
+  "private": true
+}

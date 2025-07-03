@@ -1,0 +1,47 @@
+# Sleipnir MC Homepage - Project Requirements
+# ============================================
+
+# System Requirements
+# -------------------
+# - Node.js >= 16.0.0 (managed via .nvmrc)
+# - Python 3.x (for local development server)
+# - Git
+# - Modern web browser (Chrome, Firefox, Safari, Edge)
+
+# JavaScript Dependencies (via CDN in HTML files)
+# -----------------------------------------------
+# - Firebase SDK v9.22.0
+#   - firebase-app-compat
+#   - firebase-auth-compat
+#   - firebase-firestore-compat
+
+# Development Tools
+# -----------------
+# - http-server (optional, for Node.js-based local server)
+# - Python http.server module (built-in with Python 3)
+
+# Firebase Services Used
+# ----------------------
+# - Firebase Authentication
+# - Cloud Firestore
+# - Firebase Hosting (optional for deployment)
+
+# External Libraries (loaded via CDN)
+# -----------------------------------
+# - Font Awesome (for icons)
+# - Google Fonts:
+#   - Cinzel (serif)
+#   - Cormorant Garamond (serif)
+#   - Iceland (display)
+
+# Project Structure Requirements
+# ------------------------------
+# - Modern browser with ES6+ support
+# - JavaScript enabled
+# - Cookies/LocalStorage enabled for authentication
+
+# Optional Tools
+# --------------
+# - Firebase CLI (for deployment): npm install -g firebase-tools
+# - VS Code or similar IDE
+# - Browser DevTools for debugging
