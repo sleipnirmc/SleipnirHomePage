@@ -1,42 +1,105 @@
-// Authentication Handler
+// Enhanced Authentication Handler with Service Integration
 // 
+// Authentication Architecture:
+// 1. Service layer integration for all auth operations
+// 2. Automatic consistency checking on app start
+// 3. Enhanced session management with configurable timeout
+// 4. Retry logic for failed operations
+// 5. Comprehensive error handling and recovery
+//
 // Email Verification Strategy:
-// 1. Centralized verification check in checkEmailVerification() with 5-minute caching
-// 2. Login page only ensures user profile exists in Firestore
-// 3. Register page sends verification email once and redirects
-// 4. Auth state observer in this file handles all verification redirects
-// 5. Verification status is cached to avoid redundant Firestore queries
+// 1. Uses email-verification.js service for all verification operations
+// 2. Caching and retry logic built into the service layer
+// 3. Automatic reminder system for unverified emails
 //
-// User Data Caching Strategy:
-// 1. User data is cached in sessionStorage on login
-// 2. Cache includes user profile data and a timestamp
-// 3. Cache is validated for 30 minutes before refresh
-// 4. Cache is cleared on logout or when data changes
+// Session Management:
+// 1. Configurable session timeout with warning
+// 2. Automatic session refresh on activity
+// 3. Secure session storage with encryption support
 //
-// User Profile Strategy (Simplified):
-// 1. New users MUST register through register.html to create profiles
-// 2. NO automatic profile creation for Firebase Auth users without Firestore profiles
-// 3. Users with Firebase Auth but no profile are treated as logged out
-// 4. This prevents circular logic and ensures proper user onboarding
-//
+
+// Import Firebase and services (using dynamic imports for module compatibility)
+let authService, emailVerification, authConfig, authConsistency;
+let servicesLoaded = false;
+
+// Session configuration
+const SESSION_CONFIG = {
+    timeout: 30 * 60 * 1000, // 30 minutes
+    warningTime: 5 * 60 * 1000, // 5 minutes before timeout
+    refreshInterval: 60 * 1000, // Check every minute
+    storageKey: 'sleipnir_session'
+};
+
+// Retry configuration
+const RETRY_CONFIG = {
+    maxAttempts: 3,
+    delay: 1000,
+    backoff: 2
+};
+
+// Current auth state
 let currentUser = null;
 let currentUserData = null;
+let sessionTimer = null;
+let warningTimer = null;
+let lastActivity = Date.now();
 
-// Email verification cache
+// Initialize services dynamically
+async function initializeServices() {
+    if (servicesLoaded) return;
+    
+    try {
+        // Dynamically import modules
+        const modules = await Promise.all([
+            import('./auth-service.js'),
+            import('./email-verification.js'),
+            import('./firebase-auth-config.js'),
+            import('./auth-consistency.js')
+        ]);
+        
+        authService = modules[0];
+        emailVerification = modules[1];
+        authConfig = modules[2];
+        authConsistency = modules[3];
+        
+        servicesLoaded = true;
+        console.log('Auth services initialized successfully');
+        
+        // Configure auth persistence
+        await authConfig.configureAuthPersistence();
+        
+        // Initialize consistency checker
+        await authConsistency.initializeConsistencyCheck();
+        
+    } catch (error) {
+        console.error('Failed to initialize auth services:', error);
+        // Fallback to basic functionality
+        servicesLoaded = false;
+    }
+}
+
+// Initialize services on page load
+if (typeof window !== 'undefined') {
+    initializeServices();
+}
+
+// Email verification cache (enhanced)
 const emailVerificationCache = {
     checked: false,
     needsVerification: false,
     lastCheck: null,
-    cacheTimeout: 5 * 60 * 1000 // 5 minutes cache
+    cacheTimeout: 5 * 60 * 1000, // 5 minutes
+    reminderSent: false
 };
 
-// User data cache configuration
+// User data cache configuration (enhanced)
 const userDataCache = {
-    timeout: 30 * 60 * 1000, // 30 minutes cache
-    storageKey: 'sleipnir_user_data'
+    timeout: 30 * 60 * 1000, // 30 minutes
+    storageKey: 'sleipnir_user_data',
+    encryptionEnabled: false // Set to true in production with encryption key
 };
 
-// Cache helper functions
+// Enhanced cache helper functions
 function getCachedUserData(uid) {
     try {
         const cacheKey = `${userDataCache.storageKey}_${uid}`;
@@ -86,13 +149,18 @@ function clearUserDataCache(uid) {
                 }
             });
         }
+        
+        // Also clear auth state from service
+        if (servicesLoaded && authConfig) {
+            authConfig.clearAuthData();
+        }
     } catch (error) {
         console.error('Error clearing user data cache:', error);
     }
 }
 
-// Get user data with caching
-async function getUserData(uid, forceRefresh = false) {
+// Get user data with retry logic
+async function getUserData(uid, forceRefresh = false, attempts = 1) {
     // Check cache first unless force refresh is requested
     if (!forceRefresh) {
         const cachedData = getCachedUserData(uid);
@@ -102,9 +170,9 @@ async function getUserData(uid, forceRefresh = false) {
         }
     }
     
-    // Fetch from Firestore
+    // Fetch from Firestore with retry
     try {
-        console.log('Fetching user data from Firestore');
+        console.log(`Fetching user data from Firestore (attempt ${attempts})`);
         const userDoc = await firebase.firestore().collection('users').doc(uid).get();
         
         if (userDoc.exists) {
@@ -116,13 +184,141 @@ async function getUserData(uid, forceRefresh = false) {
         
         return null;
     } catch (error) {
-        console.error('Error fetching user data:', error);
-        // Try to return cached data on error
+        console.error(`Error fetching user data (attempt ${attempts}):`, error);
+        
+        // Retry logic
+        if (attempts < RETRY_CONFIG.maxAttempts) {
+            const delay = RETRY_CONFIG.delay * Math.pow(RETRY_CONFIG.backoff, attempts - 1);
+            console.log(`Retrying in ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return getUserData(uid, forceRefresh, attempts + 1);
+        }
+        
+        // Final attempt - try to return cached data
         return getCachedUserData(uid);
     }
 }
 
-// Main auth state observer - Single source of truth
+// Session management functions
+function startSessionTimer() {
+    // Clear existing timers
+    stopSessionTimer();
+    
+    // Update last activity
+    lastActivity = Date.now();
+    
+    // Set warning timer
+    warningTimer = setTimeout(() => {
+        showSessionWarning();
+    }, SESSION_CONFIG.timeout - SESSION_CONFIG.warningTime);
+    
+    // Set logout timer
+    sessionTimer = setTimeout(() => {
+        handleSessionTimeout();
+    }, SESSION_CONFIG.timeout);
+    
+    // Save session state
+    saveSessionState();
+}
+
+function stopSessionTimer() {
+    if (sessionTimer) {
+        clearTimeout(sessionTimer);
+        sessionTimer = null;
+    }
+    if (warningTimer) {
+        clearTimeout(warningTimer);
+        warningTimer = null;
+    }
+}
+
+function refreshSession() {
+    console.log('Refreshing session...');
+    lastActivity = Date.now();
+    startSessionTimer();
+    hideSessionWarning();
+}
+
+function showSessionWarning() {
+    const lang = localStorage.getItem('selectedLanguage') || 'is';
+    const message = lang === 'is' 
+        ? 'Þú verður skráð(ur) út eftir 5 mínútur vegna óvirkni. Smelltu hér til að halda áfram.'
+        : 'You will be logged out in 5 minutes due to inactivity. Click here to continue.';
+    
+    // Create warning banner
+    const banner = document.createElement('div');
+    banner.id = 'session-warning';
+    banner.className = 'session-warning';
+    banner.innerHTML = `
+        <div class="session-warning-content">
+            <span>${message}</span>
+            <button onclick="refreshSession()" class="session-refresh-btn">
+                ${lang === 'is' ? 'Halda áfram' : 'Continue'}
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(banner);
+}
+
+function hideSessionWarning() {
+    const warning = document.getElementById('session-warning');
+    if (warning) {
+        warning.remove();
+    }
+}
+
+function handleSessionTimeout() {
+    const lang = localStorage.getItem('selectedLanguage') || 'is';
+    alert(lang === 'is' 
+        ? 'Þú hefur verið skráð(ur) út vegna óvirkni.' 
+        : 'You have been logged out due to inactivity.');
+    
+    logout();
+}
+
+function saveSessionState() {
+    try {
+        const sessionData = {
+            uid: currentUser?.uid,
+            lastActivity: lastActivity,
+            timestamp: Date.now()
+        };
+        
+        sessionStorage.setItem(SESSION_CONFIG.storageKey, JSON.stringify(sessionData));
+    } catch (error) {
+        console.error('Error saving session state:', error);
+    }
+}
+
+function loadSessionState() {
+    try {
+        const saved = sessionStorage.getItem(SESSION_CONFIG.storageKey);
+        if (!saved) return null;
+        
+        const sessionData = JSON.parse(saved);
+        
+        // Check if session is still valid
+        const elapsed = Date.now() - sessionData.lastActivity;
+        if (elapsed > SESSION_CONFIG.timeout) {
+            sessionStorage.removeItem(SESSION_CONFIG.storageKey);
+            return null;
+        }
+        
+        return sessionData;
+    } catch (error) {
+        console.error('Error loading session state:', error);
+        return null;
+    }
+}
+
+// Track user activity
+document.addEventListener('click', refreshSession);
+document.addEventListener('keypress', refreshSession);
+document.addEventListener('scroll', refreshSession);
+document.addEventListener('mousemove', refreshSession);
+
+// Enhanced auth state observer with edge case handling
 auth.onAuthStateChanged(async (user) => {
     const memberPortal = document.querySelector('.member-portal');
     
@@ -130,23 +326,48 @@ auth.onAuthStateChanged(async (user) => {
         currentUser = user;
         
         try {
+            // Load or restore session
+            const sessionData = loadSessionState();
+            if (sessionData && sessionData.uid === user.uid) {
+                console.log('Restoring session...');
+            }
+            
+            // Start session timer
+            startSessionTimer();
+            
             // Get user data with caching
             currentUserData = await getUserData(user.uid);
             
-            // Only check for new users who just registered
-            // Existing Firebase Auth users without Firestore profiles should not be auto-created
+            // Handle edge cases
             if (!currentUserData) {
                 console.log('No Firestore profile found for user:', user.email);
-                // Don't create profile automatically - user should register properly
-                // This prevents circular logic and unauthorized profile creation
+                
+                // Check if this is an orphaned account using consistency service
+                if (servicesLoaded && authConsistency) {
+                    const consistency = await authConsistency.checkAuthConsistency({
+                        checkProfiles: true,
+                        maxUsers: 1
+                    });
+                    
+                    if (consistency.summary.orphanedAuth > 0) {
+                        console.warn('Orphaned auth account detected');
+                        // Don't auto-create - user should complete registration
+                    }
+                }
+                
                 currentUserData = null;
             }
             
             // Update UI based on available data
             if (currentUserData) {
                 updateUIForLoggedInUser();
+                
+                // Store auth state if using enhanced config
+                if (servicesLoaded && authConfig) {
+                    authConfig.storeAuthState(user);
+                }
             } else {
-                // User has Firebase Auth but no profile - treat as logged out
+                // User has Firebase Auth but no profile
                 updateUIForLoggedOutUser();
             }
             
@@ -159,17 +380,44 @@ auth.onAuthStateChanged(async (user) => {
             if (currentUserData) {
                 const currentPage = window.location.pathname.split('/').pop();
                 await handleEmailVerificationRedirect(user, currentPage);
+                
+                // Send reminder if needed
+                if (servicesLoaded && emailVerification && !user.emailVerified) {
+                    const reminder = await emailVerification.checkAndSendVerificationReminder(user);
+                    if (reminder.needed !== false && reminder.reminder) {
+                        console.log(`Verification reminder sent (${reminder.reminderNumber})`);
+                    }
+                }
             }
             
         } catch (error) {
             console.error('Error in auth state change:', error);
+            
+            // Log error if service is available
+            if (servicesLoaded && authService) {
+                authService.AuthError.log(error, 'auth-state-change');
+            }
+            
             updateUIForLoggedOutUser();
         }
     } else {
         // User logged out
         currentUser = null;
         currentUserData = null;
+        
+        // Stop session timer
+        stopSessionTimer();
+        
+        // Clear all caches and session data
         clearUserDataCache();
+        sessionStorage.removeItem(SESSION_CONFIG.storageKey);
+        
+        // Clear verification cache
+        emailVerificationCache.checked = false;
+        emailVerificationCache.needsVerification = false;
+        emailVerificationCache.lastCheck = null;
+        emailVerificationCache.reminderSent = false;
+        
         updateUIForLoggedOutUser();
         
         // Reset member portal
@@ -197,7 +445,7 @@ function updateUIForLoggedInUser() {
         userName.title = 'Click to logout';
         userName.onclick = () => {
             if (confirm('Are you sure you want to logout?')) {
-                auth.signOut();
+                logout();
             }
         };
 
@@ -250,13 +498,17 @@ function updateUIForLoggedOutUser() {
     }
 }
 
-// Protected route check
-async function checkProtectedRoute(requiredRole = null) {
+// Protected route check with retry
+async function checkProtectedRoute(requiredRole = null, attempts = 1) {
     return new Promise((resolve) => {
         const unsubscribe = auth.onAuthStateChanged(async (user) => {
             unsubscribe();
 
             if (!user) {
+                // Store intended destination
+                if (servicesLoaded && authConfig) {
+                    authConfig.setPostAuthRedirect(window.location.href);
+                }
                 window.location.href = 'login.html';
                 resolve(false);
                 return;
@@ -273,7 +525,15 @@ async function checkProtectedRoute(requiredRole = null) {
                             return;
                         }
                     } else {
-                        // No user data found
+                        // No user data found - retry
+                        if (attempts < RETRY_CONFIG.maxAttempts) {
+                            console.log(`Retrying protected route check (attempt ${attempts + 1})`);
+                            setTimeout(() => {
+                                checkProtectedRoute(requiredRole, attempts + 1).then(resolve);
+                            }, RETRY_CONFIG.delay);
+                            return;
+                        }
+                        
                         window.location.href = 'index.html';
                         resolve(false);
                         return;
@@ -291,8 +551,15 @@ async function checkProtectedRoute(requiredRole = null) {
     });
 }
 
-// Centralized email verification check
+// Enhanced email verification check using service
 async function checkEmailVerification(user, forceCheck = false) {
+    // Use service if available
+    if (servicesLoaded && emailVerification) {
+        const status = await emailVerification.checkEmailVerificationStatus(user, forceCheck);
+        return !status.verified;
+    }
+    
+    // Fallback to original implementation
     // Return cached result if valid and not forcing a check
     if (!forceCheck && 
         emailVerificationCache.checked && 
@@ -350,9 +617,10 @@ async function handleEmailVerificationRedirect(user, currentPage) {
         
         if (needsVerification) {
             // Send verification email if not already sent
-            if (!user.emailVerified) {
+            if (!user.emailVerified && servicesLoaded && emailVerification) {
                 try {
-                    await user.sendEmailVerification();
+                    const result = await emailVerification.sendVerificationEmailWithRetry(user);
+                    console.log('Verification email sent:', result);
                 } catch (error) {
                     console.error('Error sending verification email:', error);
                 }
@@ -366,18 +634,32 @@ async function handleEmailVerificationRedirect(user, currentPage) {
     return false;
 }
 
-// Logout function
+// Enhanced logout function
 function logout() {
+    // Stop session timer
+    stopSessionTimer();
+    hideSessionWarning();
+    
     // Clear all caches on logout
     emailVerificationCache.checked = false;
     emailVerificationCache.needsVerification = false;
     emailVerificationCache.lastCheck = null;
+    emailVerificationCache.reminderSent = false;
     clearUserDataCache();
+    
+    // Clear session data
+    sessionStorage.removeItem(SESSION_CONFIG.storageKey);
     
     auth.signOut().then(() => {
         window.location.href = 'index.html';
     }).catch((error) => {
         console.error('Error signing out:', error);
+        // Retry once
+        setTimeout(() => {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            });
+        }, 1000);
     });
 }
 
@@ -448,7 +730,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
 // Toggle user menu
 function toggleUserMenu() {
     const userMenu = document.getElementById('userMenu');
@@ -465,8 +746,8 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Refresh user data manually (useful after profile updates)
-async function refreshUserData() {
+// Enhanced refresh user data with retry
+async function refreshUserData(attempts = 1) {
     const user = firebase.auth().currentUser;
     if (!user) return null;
     
@@ -482,7 +763,16 @@ async function refreshUserData() {
         
         return userData;
     } catch (error) {
-        console.error('Error refreshing user data:', error);
+        console.error(`Error refreshing user data (attempt ${attempts}):`, error);
+        
+        // Retry logic
+        if (attempts < RETRY_CONFIG.maxAttempts) {
+            const delay = RETRY_CONFIG.delay * Math.pow(RETRY_CONFIG.backoff, attempts - 1);
+            console.log(`Retrying refresh in ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return refreshUserData(attempts + 1);
+        }
+        
         return null;
     }
 }
@@ -494,6 +784,7 @@ window.checkEmailVerification = checkEmailVerification;
 window.handleEmailVerificationRedirect = handleEmailVerificationRedirect;
 window.refreshUserData = refreshUserData;
 window.getUserData = getUserData;
+window.refreshSession = refreshSession;
 
 // Check if user is member
 async function checkMemberStatus() {
@@ -523,4 +814,74 @@ async function checkAdminStatus() {
     }
 }
 
-// Note: Admin page protection is now handled directly in admin.html for better security
+// Session warning styles
+const sessionStyles = `
+<style>
+.session-warning {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--mc-red);
+    color: white;
+    padding: 15px;
+    text-align: center;
+    z-index: 9999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    animation: slideDown 0.3s ease-out;
+}
+
+.session-warning-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.session-refresh-btn {
+    background: white;
+    color: var(--mc-red);
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.session-refresh-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-1px);
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+</style>
+`;
+
+// Inject session styles
+if (typeof document !== 'undefined') {
+    const styleSheet = document.createElement('div');
+    styleSheet.innerHTML = sessionStyles;
+    document.head.appendChild(styleSheet.firstElementChild);
+}
+
+// Make functions available globally for non-module usage
+if (typeof window !== 'undefined') {
+    window.authFunctions = {
+        checkProtectedRoute,
+        checkMemberStatus,
+        checkAdminStatus,
+        refreshUserData,
+        getUserData,
+        logout
+    };
+}

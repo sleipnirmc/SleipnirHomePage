@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC - Database Setup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #cf2342;
+            padding-bottom: 10px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #cf2342;
+        }
+        button {
+            background: #cf2342;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #a01d35;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .log {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 250px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sleipnir MC Database Setup</h1>
+        
+        <div class="section">
+            <h2>Step 1: Create Admin Account</h2>
+            <p>First, create an admin account to manage the website:</p>
+            <input type="email" id="adminEmail" placeholder="Admin email" value="admin@sleipnirmc.is">
+            <input type="password" id="adminPassword" placeholder="Password (min 6 chars)" value="admin123">
+            <br>
+            <button onclick="createAdminAccount()">Create Admin Account</button>
+            <div id="adminResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>Step 2: Add Sample Products</h2>
+            <p>Add some sample products to the shop:</p>
+            <button onclick="addSampleProducts()">Add Sample Products</button>
+            <div id="productsResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>Step 3: Add Display Members</h2>
+            <p>Add some sample members for the About page:</p>
+            <button onclick="addDisplayMembers()">Add Display Members</button>
+            <div id="membersResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>Step 4: Verify Setup</h2>
+            <p>Check that everything is working:</p>
+            <button onclick="verifySetup()">Verify Database Setup</button>
+            <div id="verifyResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>Next Steps:</h2>
+            <ol>
+                <li>Login to <a href="admin.html" target="_blank">Admin Panel</a> with the admin account</li>
+                <li>Add real products and remove sample ones</li>
+                <li>Update member information with real club members</li>
+                <li>Test the shop and ordering system</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="javascript/firebase-config.js"></script>
+
+    <script>
+        // Create admin account
+        async function createAdminAccount() {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            const resultDiv = document.getElementById('adminResult');
+            
+            try {
+                // Create auth account
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // Create Firestore profile
+                await db.collection('users').doc(user.uid).set({
+                    email: email,
+                    fullName: 'Admin User',
+                    role: 'admin',
+                    isMember: true,
+                    emailVerified: true,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    address: 'Reykjavík',
+                    city: 'Reykjavík',
+                    postalCode: '101'
+                });
+                
+                resultDiv.innerHTML = `<p class="success">✓ Admin account created successfully!</p>
+                                     <p>Email: ${email}</p>
+                                     <p>Password: ${password}</p>
+                                     <p class="log">User ID: ${user.uid}</p>`;
+                
+                // Send verification email
+                await user.sendEmailVerification();
+                resultDiv.innerHTML += '<p>Verification email sent (check your inbox)</p>';
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+
+        // Add sample products
+        async function addSampleProducts() {
+            const resultDiv = document.getElementById('productsResult');
+            resultDiv.innerHTML = '<p>Adding products...</p>';
+            
+            const sampleProducts = [
+                {
+                    nameIs: 'Sleipnir MC Bolur',
+                    nameEn: 'Sleipnir MC T-Shirt',
+                    description: 'Classic black t-shirt with Sleipnir MC logo',
+                    category: 'tshirt',
+                    price: 4500,
+                    images: ['https://via.placeholder.com/400x400/000000/cf2342?text=Sleipnir+T-Shirt'],
+                    availableSizes: ['S', 'M', 'L', 'XL', 'XXL'],
+                    membersOnly: false,
+                    isNew: true,
+                    isPopular: true
+                },
+                {
+                    nameIs: 'Sleipnir MC Hettupeysur',
+                    nameEn: 'Sleipnir MC Hoodie',
+                    description: 'Warm black hoodie with embroidered logo',
+                    category: 'hoodie',
+                    price: 8500,
+                    images: ['https://via.placeholder.com/400x400/000000/cf2342?text=Sleipnir+Hoodie'],
+                    availableSizes: ['S', 'M', 'L', 'XL', 'XXL'],
+                    membersOnly: false,
+                    isNew: true,
+                    isPopular: true
+                },
+                {
+                    nameIs: 'Leðurjakki - Meðlimir Aðeins',
+                    nameEn: 'Leather Jacket - Members Only',
+                    description: 'Premium leather jacket with full back patch',
+                    category: 'jacket',
+                    price: 45000,
+                    images: ['https://via.placeholder.com/400x400/000000/cf2342?text=Members+Jacket'],
+                    availableSizes: ['M', 'L', 'XL', 'XXL'],
+                    membersOnly: true,
+                    isNew: false,
+                    isPopular: true
+                },
+                {
+                    nameIs: 'Sleipnir MC Merki',
+                    nameEn: 'Sleipnir MC Patch',
+                    description: 'Embroidered patch with club logo',
+                    category: 'other',
+                    price: 2500,
+                    images: ['https://via.placeholder.com/400x400/000000/cf2342?text=MC+Patch'],
+                    availableSizes: ['One Size'],
+                    membersOnly: false,
+                    isNew: false,
+                    isPopular: true
+                }
+            ];
+            
+            try {
+                let addedCount = 0;
+                for (const product of sampleProducts) {
+                    await db.collection('products').add({
+                        ...product,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    addedCount++;
+                }
+                
+                resultDiv.innerHTML = `<p class="success">✓ Added ${addedCount} sample products successfully!</p>`;
+                
+                // Show product names
+                const productList = sampleProducts.map(p => `• ${p.nameEn} (${p.price} ISK)`).join('<br>');
+                resultDiv.innerHTML += `<div class="log">${productList}</div>`;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+
+        // Add display members
+        async function addDisplayMembers() {
+            const resultDiv = document.getElementById('membersResult');
+            resultDiv.innerHTML = '<p>Adding display members...</p>';
+            
+            const sampleMembers = [
+                {
+                    name: 'Ragnar Lothbrok',
+                    role: 'President',
+                    motorcycleType: 'Harley Davidson Road King',
+                    joinDate: new Date('2015-05-15'),
+                    photoUrl: 'https://via.placeholder.com/300x300/000000/cf2342?text=President',
+                    isActive: true,
+                    displayOrder: 1
+                },
+                {
+                    name: 'Bjorn Ironside',
+                    role: 'Vice President',
+                    motorcycleType: 'Harley Davidson Street Glide',
+                    joinDate: new Date('2015-05-15'),
+                    photoUrl: 'https://via.placeholder.com/300x300/000000/cf2342?text=VP',
+                    isActive: true,
+                    displayOrder: 2
+                },
+                {
+                    name: 'Floki Vilgerðarson',
+                    role: 'Secretary',
+                    motorcycleType: 'Indian Chief Dark Horse',
+                    joinDate: new Date('2016-03-20'),
+                    photoUrl: 'https://via.placeholder.com/300x300/000000/cf2342?text=Secretary',
+                    isActive: true,
+                    displayOrder: 3
+                },
+                {
+                    name: 'Lagertha Shieldmaiden',
+                    role: 'Treasurer',
+                    motorcycleType: 'Harley Davidson Softail',
+                    joinDate: new Date('2017-07-10'),
+                    photoUrl: 'https://via.placeholder.com/300x300/000000/cf2342?text=Treasurer',
+                    isActive: true,
+                    displayOrder: 4
+                }
+            ];
+            
+            try {
+                let addedCount = 0;
+                for (const member of sampleMembers) {
+                    await db.collection('displayMembers').add({
+                        ...member,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    addedCount++;
+                }
+                
+                resultDiv.innerHTML = `<p class="success">✓ Added ${addedCount} display members successfully!</p>`;
+                
+                // Show member names
+                const memberList = sampleMembers.map(m => `• ${m.name} - ${m.role}`).join('<br>');
+                resultDiv.innerHTML += `<div class="log">${memberList}</div>`;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+
+        // Verify setup
+        async function verifySetup() {
+            const resultDiv = document.getElementById('verifyResult');
+            resultDiv.innerHTML = '<p>Verifying database setup...</p>';
+            
+            try {
+                // Check products
+                const productsSnapshot = await db.collection('products').get();
+                const productCount = productsSnapshot.size;
+                
+                // Check users
+                const usersSnapshot = await db.collection('users').get();
+                const userCount = usersSnapshot.size;
+                
+                // Check display members
+                const membersSnapshot = await db.collection('displayMembers').get();
+                const memberCount = membersSnapshot.size;
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✓ Database verification complete!</p>
+                    <div class="log">
+Products: ${productCount} items
+Users: ${userCount} accounts
+Display Members: ${memberCount} members
+                    </div>
+                    <p>Your database is ready to use!</p>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -162,9 +162,188 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="javascript/firebase-config.js"></script>
+    <script src="javascript/firebase-auth-helper.js"></script>
     <script src="javascript/auth.js"></script>
     <script src="javascript/language.js"></script>
     <script>
+        // Registration functionality without ES6 modules
+        
+        // Get current language helper
+        function getCurrentLanguage() {
+            return localStorage.getItem('selectedLanguage') || 'is';
+        }
+        
+        // Helper function to validate user data
+        function validateUserDataLocal(userData) {
+            const errors = [];
+            const lang = getCurrentLanguage();
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(userData.email)) {
+                errors.push({
+                    field: 'email',
+                    message: lang === 'is' ? 'Ógilt netfang' : 'Invalid email'
+                });
+            }
+            
+            // Password validation
+            if (userData.password.length < 6) {
+                errors.push({
+                    field: 'password',
+                    message: lang === 'is' ? 'Lykilorð verður að vera a.m.k. 6 stafir' : 'Password must be at least 6 characters'
+                });
+            }
+            
+            // Required fields
+            const requiredFields = ['fullName', 'address', 'city', 'postalCode'];
+            requiredFields.forEach(field => {
+                if (!userData[field] || userData[field].trim() === '') {
+                    errors.push({
+                        field: field,
+                        message: lang === 'is' ? `${field} er nauðsynlegt` : `${field} is required`
+                    });
+                }
+            });
+            
+            // Postal code validation (Iceland - 3 digits)
+            if (!/^\d{3}$/.test(userData.postalCode)) {
+                errors.push({
+                    field: 'postalCode',
+                    message: lang === 'is' ? 'Póstnúmer verður að vera 3 tölustafir' : 'Postal code must be 3 digits'
+                });
+            }
+            
+            return {
+                isValid: errors.length === 0,
+                errors: errors
+            };
+        }
+        
+        // Create user account function
+        async function createUserAccountLocal(email, password, userData) {
+            try {
+                // Create Firebase Auth account
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                try {
+                    // Create Firestore profile
+                    await firebase.firestore().collection('users').doc(user.uid).set({
+                        fullName: userData.fullName,
+                        email: userData.email,
+                        address: userData.address,
+                        city: userData.city,
+                        postalCode: userData.postalCode,
+                        role: 'customer',
+                        isMember: false,
+                        memberRequestPending: userData.requestMembership || false,
+                        emailVerified: false,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    return { success: true, user: user };
+                    
+                } catch (firestoreError) {
+                    // If Firestore fails, delete the auth account
+                    console.error('Firestore error:', firestoreError);
+                    await user.delete();
+                    throw firestoreError;
+                }
+                
+            } catch (error) {
+                console.error('Auth error:', error);
+                return { success: false, error: error };
+            }
+        }
+        
+        // Send verification email with retry
+        async function sendVerificationEmailLocal(user, options = {}) {
+            const maxAttempts = options.maxAttempts || 3;
+            const lang = options.lang || 'is';
+            
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                try {
+                    await user.sendEmailVerification({
+                        url: `${window.location.origin}/auth-action.html?lang=${lang}`
+                    });
+                    
+                    // Track email sending
+                    await firebase.firestore().collection('emailTracking').doc(user.uid).set({
+                        email: user.email,
+                        lastSent: firebase.firestore.FieldValue.serverTimestamp(),
+                        sentCount: firebase.firestore.FieldValue.increment(1),
+                        status: 'sent',
+                        type: 'verification'
+                    }, { merge: true });
+                    
+                    return { success: true, attempts: attempt };
+                    
+                } catch (error) {
+                    console.error(`Email send attempt ${attempt} failed:`, error);
+                    
+                    if (attempt < maxAttempts) {
+                        // Wait before retry (exponential backoff)
+                        await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+                    } else {
+                        return { success: false, error: error, attempts: attempt };
+                    }
+                }
+            }
+        }
+        
+        // Check if user exists
+        async function checkUserExistsLocal(email) {
+            try {
+                const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
+                return methods.length > 0;
+            } catch (error) {
+                // If enumeration protection is on, this might fail
+                console.error('Check user exists error:', error);
+                return false;
+            }
+        }
+        
+        // Get auth error message
+        function getAuthErrorMessage(error, lang = 'is') {
+            const errorMessages = {
+                'auth/email-already-in-use': {
+                    is: 'Þetta netfang er þegar skráð',
+                    en: 'This email is already registered'
+                },
+                'auth/invalid-email': {
+                    is: 'Ógilt netfang',
+                    en: 'Invalid email address'
+                },
+                'auth/operation-not-allowed': {
+                    is: 'Skráning er ekki leyfð',
+                    en: 'Registration is not allowed'
+                },
+                'auth/weak-password': {
+                    is: 'Lykilorð er of veikt',
+                    en: 'Password is too weak'
+                },
+                'auth/network-request-failed': {
+                    is: 'Nettenging mistókst',
+                    en: 'Network connection failed'
+                },
+                'auth/too-many-requests': {
+                    is: 'Of margar tilraunir. Reyndu aftur síðar.',
+                    en: 'Too many attempts. Please try again later.'
+                }
+            };
+            
+            const message = errorMessages[error.code];
+            if (message) {
+                return message[lang];
+            }
+            
+            // Default message
+            return lang === 'is' 
+                ? `Villa: ${error.message}` 
+                : `Error: ${error.message}`;
+        }
+        
         // Form validation and submission handler
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('registerForm');
@@ -172,27 +351,59 @@
             const errorMessage = document.getElementById('errorMessage');
             const successMessage = document.getElementById('successMessage');
             
+            // Get current language
+            const getCurrentLanguage = () => localStorage.getItem('selectedLanguage') || 'is';
+            
+            // Loading state management
+            let isSubmitting = false;
+            
             // Real-time validation
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('confirmPassword');
+            const postalCodeInput = document.getElementById('postalCode');
             
-            // Email validation
-            emailInput.addEventListener('blur', function() {
-                if (!this.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+            // Email validation with debounce
+            let emailTimeout;
+            emailInput.addEventListener('blur', async function() {
+                clearTimeout(emailTimeout);
+                const email = this.value.trim();
+                
+                if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
                     this.classList.add('invalid');
-                    showFieldError(this, 'Please enter a valid email address');
+                    showFieldError(this, getCurrentLanguage() === 'is' 
+                        ? 'Vinsamlegast sláðu inn gilt netfang' 
+                        : 'Please enter a valid email address');
                 } else {
                     this.classList.remove('invalid');
                     clearFieldError(this);
+                    
+                    // Check if email already exists
+                    emailTimeout = setTimeout(async () => {
+                        showFieldLoading(this, true);
+                        const exists = await checkUserExistsLocal(email);
+                        showFieldLoading(this, false);
+                        
+                        if (exists) {
+                            this.classList.add('invalid');
+                            showFieldError(this, getCurrentLanguage() === 'is'
+                                ? 'Þetta netfang er þegar skráð'
+                                : 'This email is already registered');
+                        }
+                    }, 500);
                 }
             });
             
-            // Password validation
+            // Password validation with strength indicator
             passwordInput.addEventListener('input', function() {
+                const strength = checkPasswordStrength(this.value);
+                updatePasswordStrength(this, strength);
+                
                 if (this.value.length < 6) {
                     this.classList.add('invalid');
-                    showFieldError(this, 'Password must be at least 6 characters');
+                    showFieldError(this, getCurrentLanguage() === 'is'
+                        ? 'Lykilorð verður að vera að minnsta kosti 6 stafir'
+                        : 'Password must be at least 6 characters');
                 } else {
                     this.classList.remove('invalid');
                     clearFieldError(this);
@@ -201,7 +412,9 @@
                 // Check confirm password match
                 if (confirmPasswordInput.value && confirmPasswordInput.value !== this.value) {
                     confirmPasswordInput.classList.add('invalid');
-                    showFieldError(confirmPasswordInput, 'Passwords do not match');
+                    showFieldError(confirmPasswordInput, getCurrentLanguage() === 'is'
+                        ? 'Lykilorðin passa ekki saman'
+                        : 'Passwords do not match');
                 }
             });
             
@@ -209,13 +422,32 @@
             confirmPasswordInput.addEventListener('input', function() {
                 if (this.value !== passwordInput.value) {
                     this.classList.add('invalid');
-                    showFieldError(this, 'Passwords do not match');
+                    showFieldError(this, getCurrentLanguage() === 'is'
+                        ? 'Lykilorðin passa ekki saman'
+                        : 'Passwords do not match');
                 } else {
                     this.classList.remove('invalid');
                     clearFieldError(this);
                 }
             });
             
+            // Postal code validation (Iceland specific - 3 digits)
+            postalCodeInput.addEventListener('input', function() {
+                const value = this.value.replace(/\D/g, '').slice(0, 3);
+                this.value = value;
+                
+                if (value.length !== 3) {
+                    this.classList.add('invalid');
+                    showFieldError(this, getCurrentLanguage() === 'is'
+                        ? 'Póstnúmer verður að vera 3 tölustafir'
+                        : 'Postal code must be 3 digits');
+                } else {
+                    this.classList.remove('invalid');
+                    clearFieldError(this);
+                }
+            });
+            
+            // Helper functions
             function showFieldError(field, message) {
                 let errorEl = field.parentNode.querySelector('.field-error');
                 if (!errorEl) {
@@ -233,146 +465,208 @@
                 }
             }
             
-            // Form submission
+            function showFieldLoading(field, show) {
+                if (show) {
+                    field.classList.add('loading');
+                } else {
+                    field.classList.remove('loading');
+                }
+            }
+            
+            function checkPasswordStrength(password) {
+                let strength = 0;
+                if (password.length >= 8) strength++;
+                if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+                if (password.match(/\d/)) strength++;
+                if (password.match(/[^a-zA-Z\d]/)) strength++;
+                return strength;
+            }
+            
+            function updatePasswordStrength(field, strength) {
+                let indicator = field.parentNode.querySelector('.password-strength');
+                if (!indicator) {
+                    indicator = document.createElement('div');
+                    indicator.className = 'password-strength';
+                    field.parentNode.appendChild(indicator);
+                }
+                
+                const labels = getCurrentLanguage() === 'is' 
+                    ? ['Veikt', 'Sæmilegt', 'Gott', 'Sterkt', 'Mjög sterkt']
+                    : ['Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+                
+                indicator.className = `password-strength strength-${strength}`;
+                indicator.textContent = labels[strength] || '';
+            }
+            
+            // Form submission with enhanced error handling
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 
+                if (isSubmitting) return;
+                
                 // Get form values
-                const fullName = document.getElementById('fullName').value.trim();
-                const email = document.getElementById('email').value.trim();
-                const address = document.getElementById('address').value.trim();
-                const city = document.getElementById('city').value.trim();
-                const postalCode = document.getElementById('postalCode').value.trim();
-                const password = document.getElementById('password').value;
+                const userData = {
+                    fullName: document.getElementById('fullName').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    address: document.getElementById('address').value.trim(),
+                    city: document.getElementById('city').value.trim(),
+                    postalCode: document.getElementById('postalCode').value.trim(),
+                    password: document.getElementById('password').value,
+                    requestMembership: document.getElementById('memberRequest').checked
+                };
+                
                 const confirmPassword = document.getElementById('confirmPassword').value;
-                const memberRequest = document.getElementById('memberRequest').checked;
+                const lang = getCurrentLanguage();
                 
                 // Reset messages
                 errorMessage.style.display = 'none';
                 successMessage.style.display = 'none';
                 
-                // Validate all fields
-                if (!fullName || !email || !address || !city || !postalCode || !password) {
+                // Validate passwords match
+                if (userData.password !== confirmPassword) {
                     errorMessage.style.display = 'block';
-                    errorMessage.textContent = 'Please fill in all required fields';
+                    errorMessage.innerHTML = lang === 'is'
+                        ? 'Lykilorðin passa ekki saman'
+                        : 'Passwords do not match';
                     return;
                 }
                 
-                // Validate email format
-                if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                // Validate user data
+                const validation = validateUserDataLocal(userData);
+                if (!validation.isValid) {
                     errorMessage.style.display = 'block';
-                    errorMessage.textContent = 'Please enter a valid email address';
-                    return;
-                }
-                
-                // Validate passwords
-                if (password.length < 6) {
-                    errorMessage.style.display = 'block';
-                    errorMessage.textContent = 'Password must be at least 6 characters long';
-                    return;
-                }
-                
-                if (password !== confirmPassword) {
-                    errorMessage.style.display = 'block';
-                    errorMessage.textContent = 'Passwords do not match';
+                    errorMessage.innerHTML = validation.errors
+                        .map(err => `${err.field}: ${err.message}`)
+                        .join('<br>');
                     return;
                 }
                 
                 // Show loading state
+                isSubmitting = true;
                 submitButton.disabled = true;
                 submitButton.classList.add('loading');
                 document.querySelector('.btn-text').style.display = 'none';
                 document.querySelector('.btn-loading').style.display = 'inline-flex';
                 
+                // Update loading text
+                const loadingText = document.querySelector('.btn-loading span:last-child');
+                
                 try {
-                    // Create user with Firebase Auth
-                    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
-                    const user = userCredential.user;
+                    // Create account using helper function
+                    loadingText.innerHTML = lang === 'is' 
+                        ? 'Bý til aðgang...' 
+                        : 'Creating account...';
                     
-                    // Store user data in Firestore
-                    await firebase.firestore().collection('users').doc(user.uid).set({
-                        fullName: fullName,
-                        email: email,
-                        address: address,
-                        city: city,
-                        postalCode: postalCode,
-                        role: 'customer',
-                        isMember: false,
-                        memberRequestPending: memberRequest,
-                        emailVerified: false,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                    const result = await firebaseAuthHelper.createUserWithProfile(
+                        userData.email, 
+                        userData.password, 
+                        userData
+                    );
                     
-                    // Send verification email
-                    try {
-                        await user.sendEmailVerification({
-                            url: window.location.origin + '/shop.html',
-                            handleCodeInApp: false
+                    if (result.success) {
+                        // Send verification email
+                        loadingText.innerHTML = lang === 'is'
+                            ? 'Sendi staðfestingarpóst...'
+                            : 'Sending verification email...';
+                        
+                        const emailResult = await firebaseAuthHelper.sendVerificationEmailSafe(result.user, {
+                            lang: lang,
+                            maxAttempts: 1  // Don't retry too much to avoid rate limits
                         });
-                    } catch (emailError) {
-                        console.error('Error sending verification email:', emailError);
-                        // Continue with registration even if email fails
+                        
+                        // Show success message
+                        successMessage.style.display = 'block';
+                        successMessage.innerHTML = `
+                            <strong>${lang === 'is' ? 'Skráning tókst!' : 'Registration successful!'}</strong><br>
+                            ${lang === 'is' 
+                                ? `Við höfum sent staðfestingarpóst á ${userData.email}. Vinsamlegast staðfestu netfangið þitt til að halda áfram.`
+                                : `We've sent a verification email to ${userData.email}. Please verify your email to continue.`}
+                            ${emailResult.attempts > 1 
+                                ? `<br><small>${lang === 'is' 
+                                    ? `(Póstur sendur eftir ${emailResult.attempts} tilraunir)`
+                                    : `(Email sent after ${emailResult.attempts} attempts)`}</small>`
+                                : ''}
+                            ${userData.requestMembership 
+                                ? `<br><br>${lang === 'is'
+                                    ? 'Meðlimsbeiðni þín hefur verið send til samþykktar.'
+                                    : 'Your member request has been sent for approval.'}`
+                                : ''}
+                        `;
+                        
+                        // Clear form
+                        form.reset();
+                        
+                        // Redirect to verification page after 3 seconds
+                        setTimeout(() => {
+                            window.location.href = 'verify-email.html';
+                        }, 3000);
+                        
+                    } else {
+                        throw new Error(result.message);
                     }
-                    
-                    // Show success message
-                    successMessage.style.display = 'block';
-                    successMessage.innerHTML = `
-                        <strong><span class="is">Skráning tókst!</span><span class="en">Registration successful!</span></strong><br>
-                        <span class="is">Við höfum sent staðfestingarpóst á ${email}. Vinsamlegast staðfestu netfangið þitt til að halda áfram.</span>
-                        <span class="en">We've sent a verification email to ${email}. Please verify your email to continue.</span>
-                        ${memberRequest ? '<br><br><span class="is">Meðlimsbeiðni þín hefur verið send til samþykktar.</span><span class="en">Your member request has been sent for approval.</span>' : ''}
-                    `;
-                    
-                    // Clear form
-                    form.reset();
-                    
-                    // Redirect to verification page after 3 seconds
-                    setTimeout(() => {
-                        window.location.href = 'verify-email.html';
-                    }, 3000);
                     
                 } catch (error) {
                     console.error('Registration error:', error);
                     
+                    // Handle rate limiting first
+                    if (firebaseAuthHelper.isRateLimitError(error) || error.isRateLimit) {
+                        errorMessage.style.display = 'block';
+                        errorMessage.innerHTML = `
+                            <div style="padding: 15px; background: rgba(255,100,0,0.1); border: 1px solid #ff6600; border-radius: 5px;">
+                                <strong>⚠️ ${lang === 'is' ? 'Of margar tilraunir' : 'Too many attempts'}</strong><br><br>
+                                ${lang === 'is' 
+                                    ? 'Firebase hefur tímabundið takmarkað aðgang frá þessu tæki vegna of margra tilrauna.'
+                                    : 'Firebase has temporarily limited access from this device due to too many attempts.'}<br><br>
+                                <strong>${lang === 'is' ? 'Hvað á að gera:' : 'What to do:'}</strong><br>
+                                1. ${lang === 'is' ? 'Bíðið í 5-10 mínútur' : 'Wait 5-10 minutes'}<br>
+                                2. ${lang === 'is' ? 'Prófaðu að hreinsa vafragögn' : 'Try clearing browser data'}<br>
+                                3. ${lang === 'is' ? 'Eða notaðu annan vafra/tæki' : 'Or use a different browser/device'}
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Handle email-already-exists with cleanup attempt
+                    if (error.code === 'auth/email-already-in-use' || 
+                        (error.error && error.error === 'auth/email-already-in-use')) {
+                        
+                        loadingText.innerHTML = lang === 'is'
+                            ? 'Athuga fyrri skráningu...'
+                            : 'Checking previous registration...';
+                        
+                        // Note: Cleanup of orphaned accounts would require admin SDK
+                        // For now, just inform the user
+                        
+                        errorMessage.style.display = 'block';
+                        errorMessage.innerHTML = `
+                            ${lang === 'is'
+                                ? 'Þetta netfang er þegar skráð.'
+                                : 'This email is already registered.'}
+                            <br>
+                            <a href="login.html" class="auth-link" style="color: #cf2342; text-decoration: underline;">
+                                ${lang === 'is' ? 'Smelltu hér til að skrá þig inn' : 'Click here to sign in'}
+                            </a>
+                            ${lang === 'is'
+                                ? ' eða '
+                                : ' or '}
+                            <a href="forgot-password.html" class="auth-link" style="color: #cf2342; text-decoration: underline;">
+                                ${lang === 'is' ? 'endurstilla lykilorðið þitt' : 'reset your password'}
+                            </a>
+                        `;
+                    } else {
+                        // Show error message using helper
+                        errorMessage.style.display = 'block';
+                        errorMessage.innerHTML = firebaseAuthHelper.getFirebaseErrorMessage(error, lang);
+                    }
+                    
+                } finally {
                     // Reset button state
+                    isSubmitting = false;
                     submitButton.disabled = false;
                     submitButton.classList.remove('loading');
                     document.querySelector('.btn-text').style.display = 'inline-flex';
                     document.querySelector('.btn-loading').style.display = 'none';
-                    
-                    // Show error message
-                    errorMessage.style.display = 'block';
-                    
-                    // Provide user-friendly error messages
-                    switch (error.code) {
-                        case 'auth/email-already-in-use':
-                            errorMessage.innerHTML = `
-                                <span class="is">Þetta netfang er þegar skráð. Vinsamlegast skráðu þig inn.</span>
-                                <span class="en">This email is already registered. Please sign in instead.</span>
-                            `;
-                            break;
-                        case 'auth/weak-password':
-                            errorMessage.innerHTML = `
-                                <span class="is">Lykilorðið verður að vera að minnsta kosti 6 stafir.</span>
-                                <span class="en">Password should be at least 6 characters long.</span>
-                            `;
-                            break;
-                        case 'auth/invalid-email':
-                            errorMessage.innerHTML = `
-                                <span class="is">Vinsamlegast sláðu inn gilt netfang.</span>
-                                <span class="en">Please enter a valid email address.</span>
-                            `;
-                            break;
-                        case 'auth/network-request-failed':
-                            errorMessage.innerHTML = `
-                                <span class="is">Nettenging mistókst. Vinsamlegast reyndu aftur.</span>
-                                <span class="en">Network error. Please try again.</span>
-                            `;
-                            break;
-                        default:
-                            errorMessage.textContent = error.message || 'Registration failed. Please try again.';
-                    }
                 }
             });
         });

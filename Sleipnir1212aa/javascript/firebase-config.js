@@ -1,16 +1,15 @@
 // Firebase Configuration
-// Note: These API keys are meant to be public and are protected by Firebase Security Rules
-// Make sure to configure proper security rules in your Firebase Console
-// NEVER commit service account keys or admin SDK credentials
+
 const firebaseConfig = {
-      apiKey: "AIzaSyAsTfqo7_0xku_-7826WAQKuqzZBr4vSRY",
-      authDomain: "sleipnirmcshop.firebaseapp.com",
-      projectId: "sleipnirmcshop",
-      storageBucket: "sleipnirmcshop.firebasestorage.app",
-      messagingSenderId: "587097879417",
-      appId: "1:587097879417:web:75097887635ff0603c35a8",
-      measurementId: "G-148PQ3SX7R"
+      apiKey: "AIzaSyCgtVtb6GarjkcENuditycF-FjlGFmgQWM",
+      authDomain: "gervilausnir.firebaseapp.com",
+      projectId: "gervilausnir",
+      storageBucket: "gervilausnir.firebasestorage.app",
+      messagingSenderId: "812038651978",
+      appId: "1:812038651978:web:efd41e0bb996d0445b26b3",
+      measurementId: "G-9VYW2BNRST"
 };
+
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
