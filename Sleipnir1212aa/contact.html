@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sleipnir MC Reykjavík - Samband</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <style>
         /* Contact Page Specific Styles */
         .contact-hero {
@@ -48,14 +50,30 @@
             text-align: center;
         }
 
-        .map-placeholder {
-            background: linear-gradient(135deg, var(--norse-black), var(--midnight-black));
-            height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
+        #map {
+            height: 250px;
+            width: 100%;
+            border: 2px solid rgba(255,0,0,0.3);
+            transition: filter 0.3s ease;
+        }
+        
+        .leaflet-container {
+            background: #f0f0f0;
+            font-family: 'Cinzel', serif;
+        }
+        
+        .leaflet-popup-content-wrapper {
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            border: 2px solid var(--mc-red);
+            border-radius: 0;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+        }
+        
+        .leaflet-popup-tip {
+            background: rgba(255,255,255,0.95);
+            border-right: 2px solid var(--mc-red);
+            border-bottom: 2px solid var(--mc-red);
         }
 
         .map-overlay {
@@ -443,16 +461,7 @@
                 <span class="is">Staðsetning</span>
                 <span class="en">Location</span>
             </h3>
-            <div class="map-placeholder">
-                <div class="map-overlay"></div>
-                <div class="map-content">
-                    <span class="rune">ᛋ</span>
-                    <p style="color: var(--gray); font-size: 18px;">
-                        <span class="is">Finndu leiðina til okkar í hjarta Reykjavíkur</span>
-                        <span class="en">Find your way to us in the heart of Reykjavík</span>
-                    </p>
-                </div>
-            </div>
+            <div id="map"></div>
         </div>
     </section>
 
@@ -487,6 +496,8 @@
     <script src="javascript/firebase-config.js"></script>
     <script src="javascript/auth.js"></script>
     <script src="javascript/language.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
         // Contact form handler
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
@@ -563,6 +574,27 @@
         document.querySelectorAll('.info-item').forEach(el => {
             observer.observe(el);
         });
+        
+        // Initialize Leaflet map
+        const map = L.map('map').setView([64.037402, -21.987437], 15);
+        
+        // Add light tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }).addTo(map);
+        
+        // Custom icon for the marker
+        const sleipnirIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: "<div style='background-color:#dc143c;width:30px;height:30px;border:2px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;'>S</div>",
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+        
+        // Add marker
+        const marker = L.marker([64.037402, -21.987437], {icon: sleipnirIcon}).addTo(map);
+        marker.bindPopup('<b>Sleipnir MC Reykjavík</b><br>Hringbraut 101<br>105 Reykjavík').openPopup();
     </script>
 </body>
 </html>
