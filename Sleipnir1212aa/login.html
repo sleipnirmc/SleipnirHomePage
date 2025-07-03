@@ -292,6 +292,14 @@
                                 <span class="en">User profile not found. Please register first.</span>
                             `;
                             break;
+                        case 'auth/requests-to-this-api-identitytoolkit-method-google.cloud.identitytoolkit.v1.authenticationservice.signinwithpassword-are-blocked.':
+                            errorMessage.innerHTML = `
+                                <span class="is">Innskráning með lykilorði er ekki virk. Vinsamlegast hafðu samband við stjórnanda.</span>
+                                <span class="en">Password sign-in is disabled. Please contact the administrator.</span>
+                                <br><br>
+                                <small>Admin: Enable Email/Password in Firebase Console → Authentication → Sign-in method</small>
+                            `;
+                            break;
                         default:
                             errorMessage.textContent = error.message || 'Login failed. Please try again.';
                     }
