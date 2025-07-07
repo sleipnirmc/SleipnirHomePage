@@ -225,9 +225,6 @@
                 <li><a href="about.html"><span class="is">Hópurinn</span><span class="en">About Us</span></a></li>
                 <li><a href="contact.html" class="active"><span class="is">Samband</span><span class="en">Contact</span></a></li>
             </ul>
-            <div class="member-portal">
-                <!-- Auth state will be loaded by auth.js -->
-            </div>
             <div class="language-toggle">
                 <button class="lang-btn" onclick="toggleLanguage()">
                     <span class="is">EN</span>
@@ -491,10 +488,8 @@
 
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="javascript/firebase-config.js"></script>
-    <script src="javascript/auth.js"></script>
     <script src="javascript/language.js"></script>
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -520,11 +515,7 @@
             errorMsg.style.display = 'none';
 
             try {
-                // If user is logged in, add their user ID
-                const user = firebase.auth().currentUser;
-                if (user) {
-                    formData.userId = user.uid;
-                }
+                // User ID removed - no authentication
 
                 // Save to Firestore
                 await firebase.firestore().collection('contactMessages').add(formData);

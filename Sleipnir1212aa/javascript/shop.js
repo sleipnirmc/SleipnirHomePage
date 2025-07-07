@@ -178,30 +178,13 @@ async function addSampleProducts() {
 // Display products based on filter
 async function displayProducts() {
     const productGrid = document.getElementById('productGrid');
-    let isMember = false;
-    
-    // Check member status only if user is logged in
-    try {
-        const user = firebase.auth().currentUser;
-        if (user) {
-            isMember = await checkMemberStatus();
-        }
-    } catch (error) {
-        console.error('Error checking member status:', error);
-        isMember = false;
-    }
     
     // Filter products based on category
     let filteredProducts = currentFilter === 'all'
         ? products
         : products.filter(p => p.category === currentFilter);
     
-    // IMPORTANT: For non-members (including not logged in users), 
-    // only show non-member products
-    if (!isMember) {
-        filteredProducts = filteredProducts.filter(p => !p.membersOnly);
-    }
-    // Members can see all products (both member and non-member items)
+    // Show all products regardless of membership status (auth removed)
 
     if (filteredProducts.length === 0) {
         productGrid.innerHTML = '<div class="no-products"><p><span class="is">Engar vörur fundust í þessum flokki</span><span class="en">No products found in this category</span></p></div>';
@@ -464,17 +447,7 @@ function addProductEventListeners() {
             const sizeSelector = productCard.querySelector('.size-options');
             const selectedSize = sizeSelector.querySelector('.selected');
 
-            // Find the product to check if it's members only
-            const product = products.find(p => p.id === productId);
-            if (product && product.membersOnly) {
-                const isMember = await checkMemberStatus();
-                if (!isMember) {
-                    alert(currentLang === 'is' 
-                        ? 'Þessi vara er eingöngu fyrir meðlimi. Vinsamlegast skráðu þig inn sem meðlimur.' 
-                        : 'This product is for members only. Please login as a member.');
-                    return;
-                }
-            }
+            // Member-only check removed - all products available to all visitors
 
             if (!selectedSize) {
                 alert('Vinsamlegast veldu stærð / Please select a size');
@@ -776,16 +749,7 @@ async function openProductModal(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
     
-    // Check member status first
-    const isMember = await checkMemberStatus();
-    
-    // Prevent non-members from viewing member-only products
-    if (product.membersOnly && !isMember) {
-        alert(currentLang === 'is' 
-            ? 'Þessi vara er eingöngu fyrir meðlimi. Vinsamlegast skráðu þig inn sem meðlimur til að skoða þessa vöru.' 
-            : 'This product is available to members only. Please login as a member to view this product.');
-        return;
-    }
+    // Member-only check removed - all products available to all visitors
     
     currentModalProduct = product;
     modalSelectedSize = null;

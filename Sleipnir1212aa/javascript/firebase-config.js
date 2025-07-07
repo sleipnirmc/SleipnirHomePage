@@ -19,16 +19,6 @@ firebase.initializeApp(firebaseConfig);
 
 // Initialize Firestore
 const db = firebase.firestore();
-const auth = firebase.auth();
-
-// Set up auth settings
-auth.useDeviceLanguage();
-
-// Configure action code settings for email actions
-const actionCodeSettings = {
-    url: window.location.origin + '/auth-action.html',
-    handleCodeInApp: true
-};
 
 // Enable offline persistence with multi-tab support
 db.enablePersistence({ synchronizeTabs: true })
@@ -41,62 +31,7 @@ db.enablePersistence({ synchronizeTabs: true })
         }
     });
 
-// Helper function to check if user is admin
-async function isAdmin(uid) {
-    try {
-        const userDoc = await db.collection('users').doc(uid).get();
-        if (userDoc.exists) {
-            const userData = userDoc.data();
-            return userData.role === 'admin';
-        }
-        return false;
-    } catch (error) {
-        console.error('Error checking admin status:', error);
-        return false;
-    }
-}
-
-// Helper function to check if user is member
-async function isMember(uid) {
-    try {
-        const userDoc = await db.collection('users').doc(uid).get();
-        if (userDoc.exists) {
-            const userData = userDoc.data();
-            return userData.isMember === true;
-        }
-        return false;
-    } catch (error) {
-        console.error('Error checking member status:', error);
-        return false;
-    }
-}
-
-// Create initial admin user (run this once in console with your own credentials)
-// Example usage: createInitialAdmin('your-email@example.com', 'your-secure-password', 'Your Name')
-async function createInitialAdmin(email, password, fullName) {
-    if (!email || !password || !fullName) {
-        console.error('Please provide email, password, and full name');
-        return;
-    }
-
-    try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-
-        await db.collection('users').doc(user.uid).set({
-            fullName: fullName,
-            email: email,
-            role: 'admin',
-            isMember: true,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        console.log('Admin user created successfully');
-        console.log('IMPORTANT: Please change your password immediately after first login');
-    } catch (error) {
-        console.error('Error creating admin:', error);
-    }
-}
+// Authentication functions removed - to be added back later
 
 // Add some sample products (run this once in console)
 async function addSampleProducts() {
@@ -164,6 +99,5 @@ async function addSampleProducts() {
     }
 }
 
-// Uncomment and run these once to set up initial data
-// createInitialAdmin();
+// Uncomment and run this once to set up initial products
 // addSampleProducts();
