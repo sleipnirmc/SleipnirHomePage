@@ -9,9 +9,7 @@
     "test": "echo \"No tests configured\"",
     "install-python-server": "python3 -m pip install --user http.server || echo 'Python http.server is built-in'"
   },
-  "dependencies": {
-    "firebase": "^9.23.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "http-server": "^14.1.1"
   },
