@@ -10,7 +10,7 @@
     "install-python-server": "python3 -m pip install --user http.server || echo 'Python http.server is built-in'"
   },
   "dependencies": {
-    "firebase": "^9.22.0"
+    "firebase": "^9.23.0"
   },
   "devDependencies": {
     "http-server": "^14.1.1"
