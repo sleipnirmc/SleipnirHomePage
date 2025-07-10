@@ -4,10 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sleipnir MC Reykjavík - Samband</title>
+
+    <!-- Your CSS file would be linked here -->
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:wght@300;400;600&family=Iceland&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Header -->
+    <!-- Hero Section -->
+    <section class="hero hero-small contact-hero">
+        <div class="northern-lights"></div>
+        <div class="contact-hero-content">
+            <h1 class="contact-title">
+                <span class="is">Hafðu Samband</span>
+                <span class="en">Contact Us</span>
+            </h1>
+            <p class="contact-subtitle">
+                <span class="is">Ríðum saman í gegnum ljósanótt</span>
+                <span class="en">Ride with us through the midnight sun</span>
+            </p>
+        </div>
+    </section>
+
     <header>
         <nav>
             <div class="logo">
@@ -37,27 +62,11 @@
         </nav>
     </header>
 
-    <!-- Contact Hero -->
-    <section class="hero hero-small contact-hero">
-        <div class="hero-overlay"></div>
-        <div class="northern-lights"></div>
-        <div class="contact-hero-content">
-            <h1 class="contact-title">
-                <span class="is">Hafðu Samband</span>
-                <span class="en">Contact Us</span>
-            </h1>
-            <p class="contact-subtitle">
-                <span class="is">Ríðum saman í gegnum ljósanótt</span>
-                <span class="en">Ride with us through the midnight sun</span>
-            </p>
-        </div>
-    </section>
-
     <!-- Main Contact Section -->
-    <section class="contact-main contact-single">
-        <div class="contact-container-single">
-            <!-- Form Container -->
-            <div class="contact-card form-container">
+    <section class="contact-main">
+        <div class="contact-container">
+            <!-- Contact Form Card -->
+            <div class="contact-card">
                 <div class="card-header">
                     <span class="rune">ᛉ</span>
                     <h3>
@@ -157,15 +166,50 @@
                     </div>
                 </form>
             </div>
-        </div>
 
-        <!-- Decorative Norse Element -->
-        <div class="norse-decoration">
-            <span class="norse-symbol-large">ᚦ</span>
+            <!-- Map Card -->
+            <div class="contact-card map-container">
+                <div class="map-header">
+                    <h3>Find Our Stronghold</h3>
+                    <p>Visit the home of Sleipnir MC</p>
+                </div>
+
+                <div id="map"></div>
+
+                <div class="contact-info-grid">
+                    <div class="info-item">
+                        <span class="info-icon">📍</span>
+                        <div>
+                            <h4>Location</h4>
+                            <p>Reykjavík, Iceland</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">🕐</span>
+                        <div>
+                            <h4>Clubhouse Hours</h4>
+                            <p>By Appointment</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">📧</span>
+                        <div>
+                            <h4>Email</h4>
+                            <p>contact@sleipnirmc.is</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">⚡</span>
+                        <div>
+                            <h4>Emergency</h4>
+                            <p>Brothers Always</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-content">
             <div class="footer-section">
@@ -194,7 +238,34 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="javascript/firebase-config.js"></script>
     <script src="javascript/language.js"></script>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <script>
+        // Initialize the map with dark theme
+        const map = L.map('map').setView([64.037402, -21.987437], 13);
+
+        // Add dark tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Create custom Sleipnir icon (Norse-themed)
+        const sleipnirIcon = L.divIcon({
+            html: '<div style="background: #cf2342; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #000; box-shadow: 0 0 20px rgba(207, 35, 66, 0.8);"><span style="color: white; font-size: 20px; font-weight: bold;">S</span></div>',
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -40],
+            className: 'sleipnir-marker'
+        });
+
+        // Add marker
+        const marker = L.marker([64.037402, -21.987437], {icon: sleipnirIcon}).addTo(map);
+
+        // Add popup
+        marker.bindPopup('<b>Sleipnir MC Reykjavík</b><br>Home of the Eight-Legged Brotherhood').openPopup();
+
         // Contact form handler
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -202,7 +273,7 @@
             const button = document.getElementById('sendButton');
             const btnText = button.querySelector('.btn-text');
             const btnLoading = button.querySelector('.btn-loading');
-            
+
             const formData = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
@@ -252,13 +323,13 @@
 
             } catch (error) {
                 console.error('Error sending message:', error);
-                
+
                 // Reset button to error state
                 button.classList.remove('loading');
                 button.disabled = false;
                 btnLoading.style.display = 'none';
                 btnText.style.display = 'block';
-                
+
                 errorMsg.style.display = 'block';
 
                 // Hide error message after 5 seconds
