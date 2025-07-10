@@ -3,8 +3,427 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sleipnir MC - Admin Panel</title>
+    <title>Sleipnir MC - Admin</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Admin Layout */
+        .admin-container {
+            max-width: 1400px;
+            margin: 100px auto 40px;
+            padding: 20px;
+        }
+        
+        /* Admin Header */
+        .admin-header {
+            background: var(--norse-black);
+            border: 1px solid var(--mc-red);
+            padding: 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-title {
+            font-family: 'Iceland', 'Cinzel', serif;
+            font-size: 2.5rem;
+            color: var(--white);
+        }
+        
+        /* Options Dropdown */
+        .admin-options {
+            position: relative;
+        }
+        
+        .options-btn {
+            padding: 12px 30px;
+            background: var(--mc-red);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .options-btn:hover {
+            background: var(--mc-red-hover);
+            transform: translateY(-2px);
+        }
+        
+        .options-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: var(--norse-black);
+            border: 1px solid var(--mc-red);
+            min-width: 250px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .admin-options.active .options-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .options-dropdown a {
+            display: block;
+            padding: 15px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .options-dropdown a:last-child {
+            border-bottom: none;
+        }
+        
+        .options-dropdown a:hover {
+            background: rgba(255,0,0,0.2);
+            color: var(--mc-red);
+            padding-left: 25px;
+        }
+        
+        /* Dashboard Stats */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--norse-black);
+            border: 1px solid rgba(207, 35, 66, 0.3);
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--mc-red);
+            transform: translateY(-2px);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            color: var(--mc-red);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Admin Sections */
+        .admin-section {
+            background: rgba(26,26,26,0.9);
+            border: 1px solid var(--mc-red);
+            padding: 30px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .admin-section.active {
+            display: block;
+        }
+        
+        .section-header {
+            border-bottom: 2px solid var(--mc-red);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--white);
+            margin-bottom: 5px;
+        }
+        
+        /* Forms */
+        .admin-form {
+            display: grid;
+            gap: 15px;
+            max-width: 600px;
+        }
+        
+        .form-group {
+            display: grid;
+            gap: 5px;
+        }
+        
+        .admin-input, .admin-textarea, .admin-select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .admin-input:focus, .admin-textarea:focus, .admin-select:focus {
+            outline: none;
+            border-color: var(--mc-red);
+            background: rgba(0,0,0,0.7);
+        }
+        
+        .admin-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        /* Buttons */
+        .admin-btn {
+            padding: 12px 25px;
+            background: var(--mc-red);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+        
+        .admin-btn:hover {
+            background: var(--mc-red-hover);
+            transform: translateY(-2px);
+        }
+        
+        .admin-btn.secondary {
+            background: var(--charcoal);
+        }
+        
+        .admin-btn.edit {
+            background: var(--crimson);
+        }
+        
+        .admin-btn.delete {
+            background: var(--dark-red);
+        }
+        
+        /* Grid Layouts */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .admin-card {
+            background: rgba(10,10,10,0.8);
+            border: 1px solid rgba(255,0,0,0.2);
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .admin-card:hover {
+            border-color: var(--mc-red);
+            transform: translateY(-2px);
+        }
+        
+        .admin-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        
+        /* Orders Table */
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .orders-table th,
+        .orders-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .orders-table th {
+            background: rgba(207, 35, 66, 0.2);
+            color: var(--white);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .orders-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .order-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .order-status.pending {
+            background: rgba(255, 165, 0, 0.2);
+            color: orange;
+        }
+        
+        .order-status.completed {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+        
+        /* Tabs */
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent;
+            color: var(--gray);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .tab-btn.active {
+            color: var(--white);
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--mc-red);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* File Upload */
+        .drop-zone {
+            border: 2px dashed var(--mc-red);
+            border-radius: 5px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255,0,0,0.05);
+        }
+        
+        .drop-zone:hover {
+            background: rgba(255,0,0,0.1);
+            border-color: var(--white);
+        }
+        
+        .drop-zone.dragover {
+            background: rgba(255,0,0,0.2);
+            transform: scale(1.02);
+        }
+        
+        /* Member Card */
+        .member-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .member-card:hover {
+            border-color: var(--mc-red);
+        }
+        
+        .member-photo-small {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .member-info {
+            flex: 1;
+        }
+        
+        .member-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Size checkboxes */
+        .size-checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .size-checkbox:hover {
+            border-color: var(--mc-red);
+        }
+        
+        .size-checkbox input[type="checkbox"] {
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -32,435 +451,323 @@
         </nav>
     </header>
 
-    <!-- Admin Hero -->
-    <section class="hero hero-small admin-hero">
-        <div class="hero-overlay"></div>
-        <div class="northern-lights"></div>
-        <div class="admin-hero-content">
-            <h1 class="admin-title">
-                <span class="is">Stjórnborð</span>
-                <span class="en">Admin Dashboard</span>
-            </h1>
-            <p class="admin-subtitle">
-                <span class="is">Stjórna vörum og viðburðum</span>
-                <span class="en">Manage products and events</span>
-            </p>
-        </div>
-    </section>
-
+    <!-- Admin Container -->
     <div class="admin-container">
-        <!-- Add Product Section -->
-        <div class="admin-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="norse-knotwork left"></span>
-                    <span class="title-text">
-                        <span class="is">Bæta við Vöru</span>
-                        <span class="en">Add New Product</span>
-                    </span>
-                    <span class="norse-knotwork right"></span>
-                </h2>
+        <!-- Admin Header -->
+        <div class="admin-header">
+            <h1 class="admin-title">Admin Dashboard</h1>
+            <div class="admin-options" id="adminOptions">
+                <button class="options-btn" onclick="toggleOptions()">
+                    Options ▼
+                </button>
+                <div class="options-dropdown">
+                    <a href="#" onclick="showSection('products')">Manage Products</a>
+                    <a href="#" onclick="showSection('events')">Manage Events</a>
+                    <a href="#" onclick="showSection('orders')">View Orders</a>
+                    <a href="#" onclick="showSection('export')">Export Data</a>
+                </div>
             </div>
-
-            <form id="addProductForm" class="admin-form">
-                <div class="form-row">
+        </div>
+        
+        <!-- Dashboard Stats -->
+        <div class="dashboard-stats" id="dashboardStats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalOrders">0</div>
+                <div class="stat-label">Total Orders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingOrders">0</div>
+                <div class="stat-label">Pending Orders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalProducts">0</div>
+                <div class="stat-label">Products</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalEvents">0</div>
+                <div class="stat-label">Events</div>
+            </div>
+        </div>
+        
+        <!-- Products Section -->
+        <div class="admin-section" id="productsSection">
+            <div class="section-header">
+                <h2 class="section-title">Manage Products</h2>
+            </div>
+            
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchTab('addProduct')">Add Product</button>
+                <button class="tab-btn" onclick="switchTab('viewProducts')">View Products</button>
+            </div>
+            
+            <!-- Add Product Tab -->
+            <div class="tab-content active" id="addProductTab">
+                <form class="admin-form" id="addProductForm">
                     <div class="form-group">
-                        <label for="productName">
-                            <span class="is">Nafn Vöru (Íslenska)</span>
-                            <span class="en">Product Name (Icelandic)</span>
-                        </label>
-                        <input type="text" id="productName" required>
+                        <label>Product Name (Icelandic)</label>
+                        <input type="text" class="admin-input" id="productNameIs" required>
                     </div>
                     <div class="form-group">
-                        <label for="productNameEn">
-                            <span class="is">Nafn Vöru (Enska)</span>
-                            <span class="en">Product Name (English)</span>
-                        </label>
-                        <input type="text" id="productNameEn" required>
+                        <label>Product Name (English)</label>
+                        <input type="text" class="admin-input" id="productNameEn" required>
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="productDescription">
-                        <span class="is">Lýsing</span>
-                        <span class="en">Description</span>
-                    </label>
-                    <textarea id="productDescription" required></textarea>
-                </div>
-                
-                <div class="form-row">
                     <div class="form-group">
-                        <label for="productCategory">
-                            <span class="is">Flokkur</span>
-                            <span class="en">Category</span>
-                        </label>
-                        <select id="productCategory" required>
-                            <option value="">
-                                <span class="is">Veldu flokk</span>
-                                <span class="en">Select Category</span>
-                            </option>
-                            <option value="tshirt">
-                                <span class="is">Bolir</span>
-                                <span class="en">T-Shirts</span>
-                            </option>
-                            <option value="jeans">
-                                <span class="is">Buxur</span>
-                                <span class="en">Jeans/Trousers</span>
-                            </option>
-                            <option value="jacket">
-                                <span class="is">Jakkar</span>
-                                <span class="en">Jackets</span>
-                            </option>
-                            <option value="hoodie">
-                                <span class="is">Hettupeysur</span>
-                                <span class="en">Hoodies</span>
-                            </option>
-                            <option value="other">
-                                <span class="is">Annað</span>
-                                <span class="en">Other</span>
-                            </option>
+                        <label>Description</label>
+                        <textarea class="admin-textarea" id="productDescription" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select class="admin-select" id="productCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="tshirt">T-Shirt</option>
+                            <option value="hoodie">Hoodie</option>
+                            <option value="jacket">Jacket</option>
+                            <option value="jeans">Jeans</option>
+                            <option value="other">Other</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="productPrice">
-                            <span class="is">Verð (ISK)</span>
-                            <span class="en">Price (ISK)</span>
-                        </label>
-                        <input type="number" id="productPrice" required>
+                        <label>Price (ISK)</label>
+                        <input type="number" class="admin-input" id="productPrice" required>
                     </div>
-                </div>
-                
-                <!-- Drag and Drop Image Upload -->
-                <div class="form-group">
-                    <label>
-                        <span class="is">Myndir af Vöru</span>
-                        <span class="en">Product Images</span>
-                    </label>
-                    <div class="drop-zone" id="dropZone">
-                        <input type="file" id="fileInput" multiple accept="image/*">
-                        <div class="drop-zone-text">
-                            <div class="drop-zone-icon">ᛟ</div>
-                            <p>
-                                <span class="is">Dragðu myndir hingað eða smelltu til að velja</span>
-                                <span class="en">Drag & drop images here or click to browse</span>
-                            </p>
-                            <p class="drop-zone-note">
-                                <span class="is">Styður: JPG, PNG, GIF</span>
-                                <span class="en">Supports: JPG, PNG, GIF</span>
-                            </p>
+                    <div class="form-group">
+                        <label>Available Sizes</label>
+                        <div id="sizesContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Members Only</label>
+                        <select class="admin-select" id="productMembersOnly">
+                            <option value="false">No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Product Images</label>
+                        <div class="drop-zone" id="productDropZone">
+                            <p>Drag & drop images here or click to upload</p>
+                            <input type="file" id="productImages" multiple accept="image/*" style="display: none;">
                         </div>
+                        <div id="imagePreview" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
                     </div>
-                    <div class="preview-container" id="previewContainer"></div>
-                </div>
-
-                <!-- Available Sizes -->
-                <div class="form-group">
-                    <label>
-                        <span class="is">Fáanlegar Stærðir</span>
-                        <span class="en">Available Sizes</span>
-                    </label>
-                    <div class="sizes-container" id="sizesContainer">
-                        <!-- Sizes will be populated based on category -->
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="members-only-container">
-                        <label for="membersOnly">
-                            <span class="members-only-icon">ᛋ</span>
-                            <input type="checkbox" id="membersOnly">
-                            <span class="is">Eingöngu Meðlimir</span>
-                            <span class="en">Members Only</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn btn-primary btn-full">
-                    <span class="is">Bæta við Vöru</span>
-                    <span class="en">Add Product</span>
-                </button>
-            </form>
-        </div>
-
-        <!-- Products List Section -->
-        <div class="admin-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="norse-knotwork left"></span>
-                    <span class="title-text">
-                        <span class="is">Stjórna Vörum</span>
-                        <span class="en">Manage Products</span>
-                    </span>
-                    <span class="norse-knotwork right"></span>
-                </h2>
-            </div>
-            <div id="productsList" class="admin-grid">
-                <!-- Products will be loaded here -->
-            </div>
-        </div>
-
-        <!-- Events Section (New) -->
-        <div class="admin-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="norse-knotwork left"></span>
-                    <span class="title-text">
-                        <span class="is">Stjórna Viðburðum</span>
-                        <span class="en">Manage Events</span>
-                    </span>
-                    <span class="norse-knotwork right"></span>
-                </h2>
+                    <button type="submit" class="admin-btn">Add Product</button>
+                </form>
             </div>
             
-            <!-- Add Event Form -->
-            <form id="addEventForm" class="admin-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="eventName">
-                            <span class="is">Nafn Viðburðar (Íslenska)</span>
-                            <span class="en">Event Name (Icelandic)</span>
-                        </label>
-                        <input type="text" id="eventName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="eventNameEn">
-                            <span class="is">Nafn Viðburðar (Enska)</span>
-                            <span class="en">Event Name (English)</span>
-                        </label>
-                        <input type="text" id="eventNameEn" required>
-                    </div>
+            <!-- View Products Tab -->
+            <div class="tab-content" id="viewProductsTab">
+                <div class="admin-grid" id="productsGrid">
+                    <!-- Products will be loaded here -->
                 </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="eventDate">
-                            <span class="is">Dagsetning</span>
-                            <span class="en">Date</span>
-                        </label>
-                        <input type="datetime-local" id="eventDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="eventLocation">
-                            <span class="is">Staðsetning</span>
-                            <span class="en">Location</span>
-                        </label>
-                        <input type="text" id="eventLocation" required>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="eventDescription">
-                        <span class="is">Lýsing</span>
-                        <span class="en">Description</span>
-                    </label>
-                    <textarea id="eventDescription" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="eventCategory">
-                        <span class="is">Tegund Viðburðar</span>
-                        <span class="en">Event Type</span>
-                    </label>
-                    <select id="eventCategory" required>
-                        <option value="">
-                            <span class="is">Veldu tegund</span>
-                            <span class="en">Select Type</span>
-                        </option>
-                        <option value="ride">
-                            <span class="is">Ferð</span>
-                            <span class="en">Ride</span>
-                        </option>
-                        <option value="meeting">
-                            <span class="is">Fundur</span>
-                            <span class="en">Meeting</span>
-                        </option>
-                        <option value="social">
-                            <span class="is">Félagslegur</span>
-                            <span class="en">Social</span>
-                        </option>
-                        <option value="charity">
-                            <span class="is">Góðgerðar</span>
-                            <span class="en">Charity</span>
-                        </option>
-                        <option value="maintenance">
-                            <span class="is">Viðhald</span>
-                            <span class="en">Maintenance</span>
-                        </option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="btn btn-primary btn-full">
-                    <span class="is">Bæta við Viðburð</span>
-                    <span class="en">Add Event</span>
-                </button>
-            </form>
-            
-            <!-- Events List -->
-            <div id="eventsList" class="admin-grid mt-40">
-                <!-- Events will be loaded here -->
             </div>
         </div>
-
+        
+        <!-- Events Section -->
+        <div class="admin-section" id="eventsSection">
+            <div class="section-header">
+                <h2 class="section-title">Manage Events</h2>
+            </div>
+            
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchEventTab('addEvent')">Add Event</button>
+                <button class="tab-btn" onclick="switchEventTab('viewEvents')">View Events</button>
+            </div>
+            
+            <!-- Add Event Tab -->
+            <div class="tab-content active" id="addEventTab">
+                <form class="admin-form" id="addEventForm">
+                    <div class="form-group">
+                        <label>Event Name (Icelandic)</label>
+                        <input type="text" class="admin-input" id="eventNameIs" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Event Name (English)</label>
+                        <input type="text" class="admin-input" id="eventNameEn" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea class="admin-textarea" id="eventDescription" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Date & Time</label>
+                        <input type="datetime-local" class="admin-input" id="eventDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" class="admin-input" id="eventLocation" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Event Type</label>
+                        <select class="admin-select" id="eventCategory" required>
+                            <option value="">Select Type</option>
+                            <option value="ride">Ride</option>
+                            <option value="meeting">Meeting</option>
+                            <option value="social">Social</option>
+                            <option value="charity">Charity</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="admin-btn">Add Event</button>
+                </form>
+            </div>
+            
+            <!-- View Events Tab -->
+            <div class="tab-content" id="viewEventsTab">
+                <div class="admin-grid" id="eventsGrid">
+                    <!-- Events will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
         <!-- Orders Section -->
-        <div class="admin-section">
+        <div class="admin-section" id="ordersSection">
             <div class="section-header">
-                <h2 class="section-title">
-                    <span class="norse-knotwork left"></span>
-                    <span class="title-text">
-                        <span class="is">Nýlegar Pantanir</span>
-                        <span class="en">Recent Orders</span>
-                    </span>
-                    <span class="norse-knotwork right"></span>
-                    <span id="newOrderBadge" class="new-order-badge" style="display:none;">
-                        <span class="is">Nýtt!</span>
-                        <span class="en">New!</span>
-                    </span>
-                </h2>
+                <h2 class="section-title">Manage Orders</h2>
             </div>
-            <div id="ordersList">
-                <!-- Orders will be loaded here -->
+            
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchOrderTab('pending')">Pending Orders</button>
+                <button class="tab-btn" onclick="switchOrderTab('completed')">Completed Orders</button>
+            </div>
+            
+            <!-- Orders Tables -->
+            <div class="tab-content active" id="pendingOrdersTab">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingOrdersBody">
+                        <!-- Orders will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="tab-content" id="completedOrdersTab">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Date</th>
+                            <th>Completed</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completedOrdersBody">
+                        <!-- Orders will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Export Section -->
+        <div class="admin-section" id="exportSection">
+            <div class="section-header">
+                <h2 class="section-title">Export Data</h2>
+            </div>
+            
+            <div class="form-group">
+                <label>Date Range</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="date" class="admin-input" id="exportStartDate">
+                    <span style="align-self: center;">to</span>
+                    <input type="date" class="admin-input" id="exportEndDate">
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="admin-btn" onclick="exportOrders('all')">Export All Orders</button>
+                <button class="admin-btn secondary" onclick="exportOrders('pending')">Export Pending Orders</button>
+                <button class="admin-btn secondary" onclick="exportOrders('completed')">Export Completed Orders</button>
             </div>
         </div>
     </div>
 
     <!-- Edit Product Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeEditModal()">&times;</span>
-            <h2>
-                <span class="is">Breyta Vöru</span>
-                <span class="en">Edit Product</span>
-            </h2>
+    <div id="editProductModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--norse-black); border: 2px solid var(--mc-red); padding: 30px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--white); margin: 0;">Edit Product</h2>
+                <button onclick="closeEditModal()" style="background: none; border: none; color: var(--white); font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            
             <form id="editProductForm" class="admin-form">
                 <input type="hidden" id="editProductId">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editProductName">
-                            <span class="is">Nafn Vöru (Íslenska)</span>
-                            <span class="en">Product Name (Icelandic)</span>
-                        </label>
-                        <input type="text" id="editProductName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editProductNameEn">
-                            <span class="is">Nafn Vöru (Enska)</span>
-                            <span class="en">Product Name (English)</span>
-                        </label>
-                        <input type="text" id="editProductNameEn" required>
-                    </div>
-                </div>
+                
                 <div class="form-group">
-                    <label for="editProductDescription">
-                        <span class="is">Lýsing</span>
-                        <span class="en">Description</span>
-                    </label>
-                    <textarea id="editProductDescription" required></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editProductCategory">
-                            <span class="is">Flokkur</span>
-                            <span class="en">Category</span>
-                        </label>
-                        <select id="editProductCategory" required>
-                            <option value="tshirt">
-                                <span class="is">Bolir</span>
-                                <span class="en">T-Shirts</span>
-                            </option>
-                            <option value="jeans">
-                                <span class="is">Buxur</span>
-                                <span class="en">Jeans/Trousers</span>
-                            </option>
-                            <option value="jacket">
-                                <span class="is">Jakkar</span>
-                                <span class="en">Jackets</span>
-                            </option>
-                            <option value="hoodie">
-                                <span class="is">Hettupeysur</span>
-                                <span class="en">Hoodies</span>
-                            </option>
-                            <option value="other">
-                                <span class="is">Annað</span>
-                                <span class="en">Other</span>
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editProductPrice">
-                            <span class="is">Verð (ISK)</span>
-                            <span class="en">Price (ISK)</span>
-                        </label>
-                        <input type="number" id="editProductPrice" required>
-                    </div>
+                    <label>Product Name (Icelandic)</label>
+                    <input type="text" class="admin-input" id="editProductNameIs" required>
                 </div>
                 
-                <!-- Image Upload for Edit -->
                 <div class="form-group">
-                    <label>
-                        <span class="is">Myndir af Vöru</span>
-                        <span class="en">Product Images</span>
-                    </label>
-                    <div class="drop-zone" id="editDropZone">
-                        <input type="file" id="editFileInput" multiple accept="image/*">
-                        <div class="drop-zone-text">
-                            <div class="drop-zone-icon">ᛟ</div>
-                            <p>
-                                <span class="is">Dragðu nýjar myndir hingað</span>
-                                <span class="en">Drag & drop new images</span>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="preview-container" id="editPreviewContainer"></div>
-                </div>
-
-                <!-- Available Sizes -->
-                <div class="form-group">
-                    <label>
-                        <span class="is">Fáanlegar Stærðir</span>
-                        <span class="en">Available Sizes</span>
-                    </label>
-                    <div class="sizes-container" id="editSizesContainer">
-                        <!-- Sizes will be populated based on category -->
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="members-only-container">
-                        <label for="editMembersOnly">
-                            <span class="members-only-icon">ᛋ</span>
-                            <input type="checkbox" id="editMembersOnly">
-                            <span class="is">Eingöngu Meðlimir</span>
-                            <span class="en">Members Only</span>
-                        </label>
-                    </div>
+                    <label>Product Name (English)</label>
+                    <input type="text" class="admin-input" id="editProductNameEn" required>
                 </div>
                 
-                <div class="modal-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="is">Uppfæra Vöru</span>
-                        <span class="en">Update Product</span>
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
-                        <span class="is">Hætta við</span>
-                        <span class="en">Cancel</span>
-                    </button>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="admin-textarea" id="editProductDescription" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Category</label>
+                    <select class="admin-select" id="editProductCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="tshirt">T-Shirt</option>
+                        <option value="hoodie">Hoodie</option>
+                        <option value="jacket">Jacket</option>
+                        <option value="jeans">Jeans</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Price (ISK)</label>
+                    <input type="number" class="admin-input" id="editProductPrice" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Available Sizes</label>
+                    <div id="editSizesContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Members Only</label>
+                    <select class="admin-select" id="editProductMembersOnly">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Current Images</label>
+                    <div id="editCurrentImages" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Add New Images</label>
+                    <div class="drop-zone" id="editProductDropZone">
+                        <p>Drag & drop images here or click to upload</p>
+                        <input type="file" id="editProductImages" multiple accept="image/*" style="display: none;">
+                    </div>
+                    <div id="editImagePreview" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="admin-btn">Save Changes</button>
+                    <button type="button" class="admin-btn secondary" onclick="closeEditModal()">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4>Sleipnir MC Reykjavík - Admin</h4>
-                <p>
-                    <span class="is">Stjórnborð fyrir klúbbinn</span>
-                    <span class="en">Administration dashboard</span>
-                </p>
-            </div>
-        </div>
-    </footer>
 
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -468,5 +775,107 @@
     <script src="javascript/firebase-config.js"></script>
     <script src="javascript/language.js"></script>
     <script src="javascript/admin.js"></script>
+    
+    <script>
+        // Show admin panel immediately without auth check
+        document.body.style.display = 'block';
+        
+        // Load dashboard stats on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardStats();
+        });
+        
+        // Toggle options dropdown
+        function toggleOptions() {
+            const options = document.getElementById('adminOptions');
+            options.classList.toggle('active');
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const options = document.getElementById('adminOptions');
+            if (!options.contains(e.target)) {
+                options.classList.remove('active');
+            }
+        });
+        
+        // Show section
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(section + 'Section').classList.add('active');
+            
+            // Close dropdown
+            document.getElementById('adminOptions').classList.remove('active');
+            
+            // Load section data
+            switch(section) {
+                case 'products':
+                    loadProducts();
+                    break;
+                case 'events':
+                    loadEvents();
+                    break;
+                case 'orders':
+                    loadOrders();
+                    break;
+            }
+        }
+        
+        // Switch tabs
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('#productsSection .tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('#productsSection .tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.add('active');
+        }
+        
+        function switchEventTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('#eventsSection .tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('#eventsSection .tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.add('active');
+        }
+        
+        function switchOrderTab(status) {
+            // Update tab buttons
+            document.querySelectorAll('#ordersSection .tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('#ordersSection .tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(status + 'OrdersTab').classList.add('active');
+        }
+        
+        // Load dashboard stats
+        async function loadDashboardStats() {
+            try {
+                // Get orders count
+                const ordersSnapshot = await firebase.firestore().collection('orders').get();
+                const pendingOrders = ordersSnapshot.docs.filter(doc => doc.data().status !== 'completed').length;
+                
+                document.getElementById('totalOrders').textContent = ordersSnapshot.size;
+                document.getElementById('pendingOrders').textContent = pendingOrders;
+                
+                // Get products count
+                const productsSnapshot = await firebase.firestore().collection('products').get();
+                document.getElementById('totalProducts').textContent = productsSnapshot.size;
+                
+                // Get events count
+                const eventsSnapshot = await firebase.firestore().collection('events').get();
+                document.getElementById('totalEvents').textContent = eventsSnapshot.size;
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+    </script>
 </body>
 </html>
