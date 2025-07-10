@@ -162,6 +162,19 @@ async function addSampleProducts() {
             isPopular: true,
             images: [],
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        },
+        {
+            nameIs: 'Úlfheðnar Jakki',
+            nameEn: 'Wolf Warrior Jacket',
+            description: 'Armor for the coldest nights',
+            category: 'jacket',
+            price: 15999,
+            availableSizes: ['S', 'M', 'L', 'XL', 'XXL'],
+            membersOnly: true,
+            isNew: true,
+            isPopular: false,
+            images: [],
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
         }
     ];
 
@@ -560,17 +573,6 @@ function saveCartToLocalStorage() {
     // In production, you would implement this differently
 }
 
-// Category filter functionality
-document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        currentFilter = this.dataset.category;
-        currentPage = 1; // Reset to first page when filtering
-        displayProducts();
-    });
-});
-
 // Cart sidebar functionality
 document.getElementById('cartBtn').addEventListener('click', () => {
     document.getElementById('cartSidebar').classList.add('open');
@@ -967,6 +969,17 @@ window.changePage = changePage;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    // Set up category filter functionality
+    document.querySelectorAll('.filter-buttons .btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-buttons .btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentFilter = this.dataset.category;
+            currentPage = 1; // Reset to first page when filtering
+            displayProducts();
+        });
+    });
+    
     // Wait a moment for Firebase to initialize
     setTimeout(() => {
         loadProducts();
