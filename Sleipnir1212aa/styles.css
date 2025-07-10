@@ -567,6 +567,25 @@ nav {
     align-items: center;
 }
 
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: var(--transition-base);
+    cursor: pointer;
+}
+
+.logo-link:hover {
+    transform: translateY(-2px);
+}
+
+.logo-link:hover .logo-text {
+    color: var(--mc-red-hover);
+    text-shadow: 0 0 20px rgba(207, 35, 66, 0.5);
+}
+
 .norse-text {
     font-family: 'Iceland', cursive;
     font-size: 14px;
@@ -581,6 +600,7 @@ nav {
     color: var(--mc-red);
     letter-spacing: 4px;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    transition: var(--transition-base);
 }
 
 .location {
