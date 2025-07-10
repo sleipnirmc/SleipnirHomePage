@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC - Admin Panel</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html" class="logo-link">
+                    <span class="logo-text">SLEIPNIR MC</span>
+                    <span class="location">ADMIN</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><span class="is">Heim</span><span class="en">Home</span></a></li>
+                <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
+                <li><a href="about.html"><span class="is">Hópurinn</span><span class="en">Members</span></a></li>
+                <li><a href="contact.html"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
+                <li><a href="admin.html" class="active"><span class="is">ADMIN</span><span class="en">ADMIN</span></a></li>
+            </ul>
+            <div class="language-toggle">
+                <button class="btn btn-dark btn-sm" onclick="toggleLanguage()">
+                    <span class="is">EN</span>
+                    <span class="en">IS</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Admin Hero -->
+    <section class="hero hero-small admin-hero">
+        <div class="hero-overlay"></div>
+        <div class="northern-lights"></div>
+        <div class="admin-hero-content">
+            <h1 class="admin-title">
+                <span class="is">Stjórnborð</span>
+                <span class="en">Admin Dashboard</span>
+            </h1>
+            <p class="admin-subtitle">
+                <span class="is">Stjórna vörum og viðburðum</span>
+                <span class="en">Manage products and events</span>
+            </p>
+        </div>
+    </section>
+
+    <div class="admin-container">
+        <!-- Add Product Section -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="norse-knotwork left"></span>
+                    <span class="title-text">
+                        <span class="is">Bæta við Vöru</span>
+                        <span class="en">Add New Product</span>
+                    </span>
+                    <span class="norse-knotwork right"></span>
+                </h2>
+            </div>
+
+            <form id="addProductForm" class="admin-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productName">
+                            <span class="is">Nafn Vöru (Íslenska)</span>
+                            <span class="en">Product Name (Icelandic)</span>
+                        </label>
+                        <input type="text" id="productName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productNameEn">
+                            <span class="is">Nafn Vöru (Enska)</span>
+                            <span class="en">Product Name (English)</span>
+                        </label>
+                        <input type="text" id="productNameEn" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productDescription">
+                        <span class="is">Lýsing</span>
+                        <span class="en">Description</span>
+                    </label>
+                    <textarea id="productDescription" required></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productCategory">
+                            <span class="is">Flokkur</span>
+                            <span class="en">Category</span>
+                        </label>
+                        <select id="productCategory" required>
+                            <option value="">
+                                <span class="is">Veldu flokk</span>
+                                <span class="en">Select Category</span>
+                            </option>
+                            <option value="tshirt">
+                                <span class="is">Bolir</span>
+                                <span class="en">T-Shirts</span>
+                            </option>
+                            <option value="jeans">
+                                <span class="is">Buxur</span>
+                                <span class="en">Jeans/Trousers</span>
+                            </option>
+                            <option value="jacket">
+                                <span class="is">Jakkar</span>
+                                <span class="en">Jackets</span>
+                            </option>
+                            <option value="hoodie">
+                                <span class="is">Hettupeysur</span>
+                                <span class="en">Hoodies</span>
+                            </option>
+                            <option value="other">
+                                <span class="is">Annað</span>
+                                <span class="en">Other</span>
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productPrice">
+                            <span class="is">Verð (ISK)</span>
+                            <span class="en">Price (ISK)</span>
+                        </label>
+                        <input type="number" id="productPrice" required>
+                    </div>
+                </div>
+                
+                <!-- Drag and Drop Image Upload -->
+                <div class="form-group">
+                    <label>
+                        <span class="is">Myndir af Vöru</span>
+                        <span class="en">Product Images</span>
+                    </label>
+                    <div class="drop-zone" id="dropZone">
+                        <input type="file" id="fileInput" multiple accept="image/*">
+                        <div class="drop-zone-text">
+                            <div class="drop-zone-icon">ᛟ</div>
+                            <p>
+                                <span class="is">Dragðu myndir hingað eða smelltu til að velja</span>
+                                <span class="en">Drag & drop images here or click to browse</span>
+                            </p>
+                            <p class="drop-zone-note">
+                                <span class="is">Styður: JPG, PNG, GIF</span>
+                                <span class="en">Supports: JPG, PNG, GIF</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="preview-container" id="previewContainer"></div>
+                </div>
+
+                <!-- Available Sizes -->
+                <div class="form-group">
+                    <label>
+                        <span class="is">Fáanlegar Stærðir</span>
+                        <span class="en">Available Sizes</span>
+                    </label>
+                    <div class="sizes-container" id="sizesContainer">
+                        <!-- Sizes will be populated based on category -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="members-only-container">
+                        <label for="membersOnly">
+                            <span class="members-only-icon">ᛋ</span>
+                            <input type="checkbox" id="membersOnly">
+                            <span class="is">Eingöngu Meðlimir</span>
+                            <span class="en">Members Only</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">
+                    <span class="is">Bæta við Vöru</span>
+                    <span class="en">Add Product</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Products List Section -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="norse-knotwork left"></span>
+                    <span class="title-text">
+                        <span class="is">Stjórna Vörum</span>
+                        <span class="en">Manage Products</span>
+                    </span>
+                    <span class="norse-knotwork right"></span>
+                </h2>
+            </div>
+            <div id="productsList" class="admin-grid">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Events Section (New) -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="norse-knotwork left"></span>
+                    <span class="title-text">
+                        <span class="is">Stjórna Viðburðum</span>
+                        <span class="en">Manage Events</span>
+                    </span>
+                    <span class="norse-knotwork right"></span>
+                </h2>
+            </div>
+            
+            <!-- Add Event Form -->
+            <form id="addEventForm" class="admin-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="eventName">
+                            <span class="is">Nafn Viðburðar (Íslenska)</span>
+                            <span class="en">Event Name (Icelandic)</span>
+                        </label>
+                        <input type="text" id="eventName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventNameEn">
+                            <span class="is">Nafn Viðburðar (Enska)</span>
+                            <span class="en">Event Name (English)</span>
+                        </label>
+                        <input type="text" id="eventNameEn" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="eventDate">
+                            <span class="is">Dagsetning</span>
+                            <span class="en">Date</span>
+                        </label>
+                        <input type="datetime-local" id="eventDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventLocation">
+                            <span class="is">Staðsetning</span>
+                            <span class="en">Location</span>
+                        </label>
+                        <input type="text" id="eventLocation" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="eventDescription">
+                        <span class="is">Lýsing</span>
+                        <span class="en">Description</span>
+                    </label>
+                    <textarea id="eventDescription" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="eventCategory">
+                        <span class="is">Tegund Viðburðar</span>
+                        <span class="en">Event Type</span>
+                    </label>
+                    <select id="eventCategory" required>
+                        <option value="">
+                            <span class="is">Veldu tegund</span>
+                            <span class="en">Select Type</span>
+                        </option>
+                        <option value="ride">
+                            <span class="is">Ferð</span>
+                            <span class="en">Ride</span>
+                        </option>
+                        <option value="meeting">
+                            <span class="is">Fundur</span>
+                            <span class="en">Meeting</span>
+                        </option>
+                        <option value="social">
+                            <span class="is">Félagslegur</span>
+                            <span class="en">Social</span>
+                        </option>
+                        <option value="charity">
+                            <span class="is">Góðgerðar</span>
+                            <span class="en">Charity</span>
+                        </option>
+                        <option value="maintenance">
+                            <span class="is">Viðhald</span>
+                            <span class="en">Maintenance</span>
+                        </option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">
+                    <span class="is">Bæta við Viðburð</span>
+                    <span class="en">Add Event</span>
+                </button>
+            </form>
+            
+            <!-- Events List -->
+            <div id="eventsList" class="admin-grid mt-40">
+                <!-- Events will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="norse-knotwork left"></span>
+                    <span class="title-text">
+                        <span class="is">Nýlegar Pantanir</span>
+                        <span class="en">Recent Orders</span>
+                    </span>
+                    <span class="norse-knotwork right"></span>
+                    <span id="newOrderBadge" class="new-order-badge" style="display:none;">
+                        <span class="is">Nýtt!</span>
+                        <span class="en">New!</span>
+                    </span>
+                </h2>
+            </div>
+            <div id="ordersList">
+                <!-- Orders will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeEditModal()">&times;</span>
+            <h2>
+                <span class="is">Breyta Vöru</span>
+                <span class="en">Edit Product</span>
+            </h2>
+            <form id="editProductForm" class="admin-form">
+                <input type="hidden" id="editProductId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editProductName">
+                            <span class="is">Nafn Vöru (Íslenska)</span>
+                            <span class="en">Product Name (Icelandic)</span>
+                        </label>
+                        <input type="text" id="editProductName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editProductNameEn">
+                            <span class="is">Nafn Vöru (Enska)</span>
+                            <span class="en">Product Name (English)</span>
+                        </label>
+                        <input type="text" id="editProductNameEn" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editProductDescription">
+                        <span class="is">Lýsing</span>
+                        <span class="en">Description</span>
+                    </label>
+                    <textarea id="editProductDescription" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editProductCategory">
+                            <span class="is">Flokkur</span>
+                            <span class="en">Category</span>
+                        </label>
+                        <select id="editProductCategory" required>
+                            <option value="tshirt">
+                                <span class="is">Bolir</span>
+                                <span class="en">T-Shirts</span>
+                            </option>
+                            <option value="jeans">
+                                <span class="is">Buxur</span>
+                                <span class="en">Jeans/Trousers</span>
+                            </option>
+                            <option value="jacket">
+                                <span class="is">Jakkar</span>
+                                <span class="en">Jackets</span>
+                            </option>
+                            <option value="hoodie">
+                                <span class="is">Hettupeysur</span>
+                                <span class="en">Hoodies</span>
+                            </option>
+                            <option value="other">
+                                <span class="is">Annað</span>
+                                <span class="en">Other</span>
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editProductPrice">
+                            <span class="is">Verð (ISK)</span>
+                            <span class="en">Price (ISK)</span>
+                        </label>
+                        <input type="number" id="editProductPrice" required>
+                    </div>
+                </div>
+                
+                <!-- Image Upload for Edit -->
+                <div class="form-group">
+                    <label>
+                        <span class="is">Myndir af Vöru</span>
+                        <span class="en">Product Images</span>
+                    </label>
+                    <div class="drop-zone" id="editDropZone">
+                        <input type="file" id="editFileInput" multiple accept="image/*">
+                        <div class="drop-zone-text">
+                            <div class="drop-zone-icon">ᛟ</div>
+                            <p>
+                                <span class="is">Dragðu nýjar myndir hingað</span>
+                                <span class="en">Drag & drop new images</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="preview-container" id="editPreviewContainer"></div>
+                </div>
+
+                <!-- Available Sizes -->
+                <div class="form-group">
+                    <label>
+                        <span class="is">Fáanlegar Stærðir</span>
+                        <span class="en">Available Sizes</span>
+                    </label>
+                    <div class="sizes-container" id="editSizesContainer">
+                        <!-- Sizes will be populated based on category -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="members-only-container">
+                        <label for="editMembersOnly">
+                            <span class="members-only-icon">ᛋ</span>
+                            <input type="checkbox" id="editMembersOnly">
+                            <span class="is">Eingöngu Meðlimir</span>
+                            <span class="en">Members Only</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="is">Uppfæra Vöru</span>
+                        <span class="en">Update Product</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+                        <span class="is">Hætta við</span>
+                        <span class="en">Cancel</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Sleipnir MC Reykjavík - Admin</h4>
+                <p>
+                    <span class="is">Stjórnborð fyrir klúbbinn</span>
+                    <span class="en">Administration dashboard</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="javascript/firebase-config.js"></script>
+    <script src="javascript/language.js"></script>
+    <script src="javascript/admin.js"></script>
+</body>
+</html>
