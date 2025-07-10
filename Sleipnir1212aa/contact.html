@@ -7,209 +7,6 @@
     <link rel="stylesheet" href="styles.css">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <style>
-        /* Contact Page Specific Styles */
-        .contact-hero {
-            margin-top: 80px;
-            height: 400px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.8)),
-                        radial-gradient(circle at center, rgba(255,0,0,0.1), transparent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .contact-hero-content {
-            text-align: center;
-            z-index: 2;
-        }
-
-        .contact-title {
-            font-family: 'Cinzel', serif;
-            font-size: 56px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            margin-bottom: 20px;
-        }
-
-        .contact-subtitle {
-            font-size: 24px;
-            color: var(--gray);
-            font-style: italic;
-        }
-
-        /* Map Section */
-        .map-section {
-            background: rgba(26,26,26,0.5);
-            padding: 40px;
-            margin-bottom: 60px;
-            border: 1px solid rgba(255,0,0,0.1);
-            text-align: center;
-        }
-
-        #map {
-            height: 250px;
-            width: 100%;
-            border: 2px solid rgba(255,0,0,0.3);
-            transition: filter 0.3s ease;
-        }
-        
-        .leaflet-container {
-            background: #f0f0f0;
-            font-family: 'Cinzel', serif;
-        }
-        
-        .leaflet-popup-content-wrapper {
-            background: rgba(255,255,255,0.95);
-            color: #333;
-            border: 2px solid var(--mc-red);
-            border-radius: 0;
-            box-shadow: 0 3px 14px rgba(0,0,0,0.4);
-        }
-        
-        .leaflet-popup-tip {
-            background: rgba(255,255,255,0.95);
-            border-right: 2px solid var(--mc-red);
-            border-bottom: 2px solid var(--mc-red);
-        }
-
-        .map-overlay {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.4) 100%);
-        }
-
-        .map-content {
-            z-index: 2;
-            text-align: center;
-        }
-
-        .map-content .rune {
-            font-size: 72px;
-            color: var(--mc-red);
-            opacity: 0.3;
-            display: block;
-            margin-bottom: 20px;
-        }
-
-        /* Hours Section */
-        .hours-section {
-            background: rgba(26,26,26,0.8);
-            padding: 30px;
-            margin-top: 30px;
-            border: 1px solid rgba(255,0,0,0.2);
-        }
-
-        .hours-title {
-            font-family: 'Cinzel', serif;
-            font-size: 24px;
-            color: var(--mc-red);
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .hours-list {
-            list-style: none;
-        }
-
-        .hours-list li {
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            justify-content: space-between;
-            font-size: 18px;
-        }
-
-        .hours-list li:last-child {
-            border-bottom: none;
-        }
-
-        .day {
-            color: var(--white);
-            font-weight: 600;
-        }
-
-        .time {
-            color: var(--gray);
-        }
-
-        /* Social Links in Contact */
-        .contact-social {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255,0,0,0.2);
-        }
-
-        .contact-social h4 {
-            font-family: 'Cinzel', serif;
-            font-size: 20px;
-            color: var(--mc-red);
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .contact-social-links {
-            display: flex;
-            gap: 30px;
-        }
-
-        .contact-social-links a {
-            color: var(--gray);
-            font-size: 32px;
-            transition: all 0.3s;
-        }
-
-        .contact-social-links a:hover {
-            color: var(--mc-red);
-            transform: translateY(-3px) scale(1.1);
-        }
-
-        /* Form Success/Error Messages */
-        .form-message {
-            padding: 15px;
-            margin-top: 20px;
-            text-align: center;
-            font-size: 16px;
-            border-radius: 0;
-            display: none;
-        }
-
-        .form-message.success {
-            background: rgba(0,255,0,0.1);
-            border: 1px solid rgba(0,255,0,0.3);
-            color: #00ff00;
-        }
-
-        .form-message.error {
-            background: rgba(255,0,0,0.1);
-            border: 1px solid var(--mc-red);
-            color: var(--mc-red);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .contact-title {
-                font-size: 42px;
-            }
-
-            .contact-subtitle {
-                font-size: 18px;
-            }
-
-            .hours-list li {
-                font-size: 16px;
-            }
-
-            .contact-social-links {
-                justify-content: center;
-            }
-        }
-    </style>
 </head>
 <body>
     <!-- Header -->
@@ -221,12 +18,18 @@
             </div>
             <ul class="nav-links">
                 <li><a href="index.html"><span class="is">Heim</span><span class="en">Home</span></a></li>
-                <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
-                <li><a href="about.html"><span class="is">Hópurinn</span><span class="en">About Us</span></a></li>
-                <li><a href="contact.html" class="active"><span class="is">Samband</span><span class="en">Contact</span></a></li>
+                <li><a href="shop.html" ><span class="is">Verslun</span><span class="en">Shop</span></a></li>
+                <li class="nav-dropdown">
+                    <a href="#"><span class="is">Um Okkur</span><span class="en">About Us</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="about.html"><span class="is">Hópurinn</span><span class="en">Members</span></a></li>
+                        <li><a href="sagan.html"><span class="is">Sagan</span><span class="en">Story</span></a></li>
+                    </ul>
+                </li>
+                <li><a href="contact.html" class="active"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
             </ul>
             <div class="language-toggle">
-                <button class="lang-btn" onclick="toggleLanguage()">
+                <button class="btn btn-dark btn-sm" onclick="toggleLanguage()">
                     <span class="is">EN</span>
                     <span class="en">IS</span>
                 </button>
@@ -235,7 +38,7 @@
     </header>
 
     <!-- Contact Hero -->
-    <section class="contact-hero">
+    <section class="hero hero-small contact-hero">
         <div class="hero-overlay"></div>
         <div class="northern-lights"></div>
         <div class="contact-hero-content">
@@ -250,125 +53,85 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section class="contact-section">
+    <!-- Main Contact Section -->
+    <section class="contact-main">
         <div class="section-header">
             <h2 class="section-title">
                 <span class="norse-knotwork left"></span>
                 <span class="title-text">
-                    <span class="is">Finndu Okkur</span>
-                    <span class="en">Find Us</span>
+                    <span class="is">Tengdu Við Okkur</span>
+                    <span class="en">Connect With Us</span>
                 </span>
                 <span class="norse-knotwork right"></span>
             </h2>
         </div>
 
-        <div class="contact-container">
-            <!-- Contact Information -->
-            <div class="contact-info">
-                <h3>
-                    <span class="is">Upplýsingar</span>
-                    <span class="en">Information</span>
-                </h3>
-
-                <div class="info-item">
-                    <span class="info-icon">ᛏ</span>
-                    <div class="info-content">
-                        <h4>
-                            <span class="is">Heimilisfang</span>
-                            <span class="en">Address</span>
-                        </h4>
-                        <p>
-                            Sleipnir MC Reykjavík<br>
-                            Hringbraut 101<br>
-                            105 Reykjavík<br>
-                            Ísland
-                        </p>
-                    </div>
+        <div class="contact-grid">
+            <!-- Map Container -->
+            <div class="map-container">
+                <div class="map-header">
+                    <h3>
+                        <span class="is">Heimsæktu Okkur</span>
+                        <span class="en">Visit Us</span>
+                    </h3>
+                    <p>
+                        <span class="is">Hringbraut 101, 105 Reykjavík</span>
+                        <span class="en">Hringbraut 101, 105 Reykjavík</span>
+                    </p>
                 </div>
-
-                <div class="info-item">
-                    <span class="info-icon">ᚱ</span>
-                    <div class="info-content">
-                        <h4>
-                            <span class="is">Sími</span>
-                            <span class="en">Phone</span>
-                        </h4>
-                        <p>
-                            <a href="tel:+3546668123">+354 581-2345</a>
-                        </p>
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-icon">ᛖ</span>
-                    <div class="info-content">
-                        <h4>
-                            <span class="is">Netfang</span>
-                            <span class="en">Email</span>
-                        </h4>
-                        <p>
-                            <a href="mailto:sleipnirmcreykjavik@gmail.com">sleipnirmcreykjavik@gmail.com</a>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Opening Hours -->
-                <div class="hours-section">
-                    <h4 class="hours-title">
-                        <span class="is">Opnunartími</span>
-                        <span class="en">Opening Hours</span>
-                    </h4>
-                    <ul class="hours-list">
-                        <li>
-                            <span class="day">
-                                <span class="is">Mánudagur - Föstudagur</span>
-                                <span class="en">Monday - Friday</span>
-                            </span>
-                            <span class="time">10:00 - 18:00</span>
-                        </li>
-                        <li>
-                            <span class="day">
+                <div id="map"></div>
+                <div class="map-info">
+                    <div class="map-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">ᛏ</span>
+                            <h4>
+                                <span class="is">Sími</span>
+                                <span class="en">Phone</span>
+                            </h4>
+                            <p>+354 581-2345</p>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">ᚱ</span>
+                            <h4>
+                                <span class="is">Netfang</span>
+                                <span class="en">Email</span>
+                            </h4>
+                            <p>sleipnirmcreykjavik@gmail.com</p>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">ᛖ</span>
+                            <h4>
+                                <span class="is">Opið</span>
+                                <span class="en">Open</span>
+                            </h4>
+                            <p>
+                                <span class="is">Mán-Fös: 10-18</span>
+                                <span class="en">Mon-Fri: 10-18</span>
+                            </p>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">ᛋ</span>
+                            <h4>
                                 <span class="is">Laugardagur</span>
                                 <span class="en">Saturday</span>
-                            </span>
-                            <span class="time">11:00 - 16:00</span>
-                        </li>
-                        <li>
-                            <span class="day">
-                                <span class="is">Sunnudagur</span>
-                                <span class="en">Sunday</span>
-                            </span>
-                            <span class="time">
-                                <span class="is">Lokað</span>
-                                <span class="en">Closed</span>
-                            </span>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Social Media -->
-                <div class="contact-social">
-                    <h4>
-                        <span class="is">Fylgdu Okkur</span>
-                        <span class="en">Follow Us</span>
-                    </h4>
-                    <div class="contact-social-links">
-                        <a href="https://www.facebook.com/sleipnirmcreykjavik" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">⟨f⟩</a>
-                        <a href="#" aria-label="Instagram" title="Instagram">⟨ᛁ⟩</a>
-                        <a href="#" aria-label="Twitter" title="Twitter">⟨ᛏ⟩</a>
+                            </h4>
+                            <p>11:00 - 16:00</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Contact Form -->
-            <div class="contact-form-container">
-                <form class="contact-form" id="contactForm">
+            <!-- Form Container -->
+            <div class="form-container">
+                <div class="form-header">
+                    <span class="rune">ᛉ</span>
                     <h3>
                         <span class="is">Sendu Skilaboð</span>
                         <span class="en">Send Message</span>
                     </h3>
+                </div>
 
+                <form class="contact-form" id="contactForm">
                     <div class="form-group">
                         <label for="name">
                             <span class="is">Nafn</span>
@@ -434,7 +197,7 @@
                         <textarea id="message" name="message" rows="6" required></textarea>
                     </div>
 
-                    <button type="submit" class="submit-btn">
+                    <button type="submit" class="btn btn-primary btn-full">
                         <span class="is">Senda Skilaboð</span>
                         <span class="en">Send Message</span>
                     </button>
@@ -452,13 +215,9 @@
             </div>
         </div>
 
-        <!-- Map Section -->
-        <div class="map-section">
-            <h3 class="section-title" style="font-size: 32px; margin-bottom: 30px;">
-                <span class="is">Staðsetning</span>
-                <span class="en">Location</span>
-            </h3>
-            <div id="map"></div>
+        <!-- Decorative Norse Element -->
+        <div class="norse-decoration">
+            <span class="norse-symbol-large">ᚦ</span>
         </div>
     </section>
 
@@ -515,8 +274,6 @@
             errorMsg.style.display = 'none';
 
             try {
-                // User ID removed - no authentication
-
                 // Save to Firestore
                 await firebase.firestore().collection('contactMessages').add(formData);
 
@@ -562,30 +319,31 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.info-item').forEach(el => {
+        document.querySelectorAll('.map-container, .form-container').forEach(el => {
             observer.observe(el);
         });
-        
-        // Initialize Leaflet map
+
+        // Initialize Leaflet map with enhanced styling
         const map = L.map('map').setView([64.037402, -21.987437], 15);
-        
-        // Add light tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+
+        // Add dark tile layer for better theme consistency
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
             maxZoom: 19
         }).addTo(map);
-        
+
         // Custom icon for the marker
         const sleipnirIcon = L.divIcon({
             className: 'custom-div-icon',
-            html: "<div style='background-color:#dc143c;width:30px;height:30px;border:2px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;'>S</div>",
-            iconSize: [30, 30],
-            iconAnchor: [15, 15]
+            html: "<div style='background-color:#cf2342;width:40px;height:40px;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:20px;'>S</div>",
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
         });
-        
-        // Add marker
+
+        // Add marker with enhanced popup
         const marker = L.marker([64.037402, -21.987437], {icon: sleipnirIcon}).addTo(map);
-        marker.bindPopup('<b>Sleipnir MC Reykjavík</b><br>Hringbraut 101<br>105 Reykjavík').openPopup();
+        marker.bindPopup('<div style="text-align:center;font-family:Cinzel,serif;"><b style="color:#cf2342;font-size:16px;">Sleipnir MC Reykjavík</b><br><span style="font-size:14px;">Hringbraut 101<br>105 Reykjavík</span></div>').openPopup();
     </script>
 </body>
 </html>

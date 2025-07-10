@@ -243,9 +243,7 @@ async function displayProducts() {
                         </div>
                     ` : ''}
                 ` : `
-                    <div class="product-overlay">
-                        <span class="norse-symbol">${getRandomRune()}</span>
-                    </div>
+                    
                 `}
             </div>
             
@@ -320,11 +318,6 @@ function getSizeOptions(category, availableSizes) {
     }).join('');
 }
 
-// Get random Norse rune
-function getRandomRune() {
-    const runes = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛈ', 'ᛉ', 'ᛋ', 'ᛏ', 'ᛒ', 'ᛖ', 'ᛗ', 'ᛚ', 'ᛜ', 'ᛞ', 'ᛟ'];
-    return runes[Math.floor(Math.random() * runes.length)];
-}
 
 // Format price with thousand separators
 function formatPrice(price) {

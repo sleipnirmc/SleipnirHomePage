@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC Reykjavík - Sagan</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Story page styles are now in main styles.css file -->
+
+        .story-hero-content {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .story-hero h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            color: var(--white);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .story-hero .tagline {
+            font-size: 1.4rem;
+            color: var(--off-white);
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        /* Story Content Section */
+        .story-content {
+            padding: 80px 0;
+            background: var(--pure-black);
+            position: relative;
+        }
+
+        .story-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* Story Text Block for Admin Edit */
+        .story-text {
+            background: linear-gradient(135deg, rgba(26,26,26,0.5), rgba(10,10,10,0.5));
+            border: 1px solid rgba(207, 35, 66, 0.2);
+            padding: 60px;
+            position: relative;
+            min-height: 400px;
+        }
+
+        .story-text::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 4px;
+            background: var(--mc-red);
+        }
+
+        .story-text::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100px;
+            height: 4px;
+            background: var(--mc-red);
+        }
+
+        /* Typography for story content */
+        .story-text h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            color: var(--mc-red);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .story-text h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: var(--white);
+            margin: 40px 0 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .story-text p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--off-white);
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .story-text .highlight {
+            color: var(--mc-red);
+            font-weight: 600;
+        }
+
+        .story-text .quote {
+            font-size: 1.4rem;
+            font-style: italic;
+            color: var(--gray);
+            margin: 40px 0;
+            padding: 20px 0;
+            border-left: 4px solid var(--mc-red);
+            padding-left: 30px;
+        }
+
+        /* Edit Mode Styles */
+        .edit-mode .story-text {
+            border: 2px dashed var(--mc-red);
+            cursor: text;
+        }
+
+        .edit-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--mc-red);
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(207, 35, 66, 0.4);
+            z-index: 1000;
+            display: none; /* Hidden by default, shown for admins */
+        }
+
+        .edit-btn:hover {
+            background: var(--mc-red-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(207, 35, 66, 0.6);
+        }
+
+        .save-btn {
+            background: #00ff00;
+            color: var(--pure-black);
+        }
+
+        .save-btn:hover {
+            background: #00cc00;
+        }
+
+        /* Loading state */
+        .story-loading {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        .story-loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(207, 35, 66, 0.1);
+            border-top-color: var(--mc-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        /* Empty state */
+        .story-empty {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--gray);
+        }
+
+        .story-empty .rune {
+            font-size: 80px;
+            color: var(--mc-red);
+            opacity: 0.3;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        /* Timeline Section */
+        .timeline-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, rgba(26,26,26,0.3), rgba(10,10,10,0.3));
+            margin-top: 80px;
+        }
+
+        .timeline-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .timeline-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .timeline-header h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            color: var(--white);
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .timeline-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--mc-red);
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: var(--mc-red);
+            opacity: 0.3;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .timeline-item:nth-child(odd) {
+            padding-right: 50%;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) {
+            padding-left: 50%;
+            text-align: left;
+        }
+
+        .timeline-content {
+            background: rgba(26,26,26,0.8);
+            border: 1px solid rgba(207, 35, 66, 0.3);
+            padding: 30px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .timeline-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(207, 35, 66, 0.3);
+            border-color: var(--mc-red);
+        }
+
+        .timeline-year {
+            font-family: 'Iceland', cursive;
+            font-size: 2rem;
+            color: var(--mc-red);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .timeline-event {
+            font-size: 1.1rem;
+            color: var(--off-white);
+            line-height: 1.6;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            top: 20px;
+            width: 20px;
+            height: 20px;
+            background: var(--mc-red);
+            border: 4px solid var(--norse-black);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-dot {
+            right: -10px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-dot {
+            left: -10px;
+        }
+
+        /* Decorative elements */
+        .norse-decoration {
+            text-align: center;
+            margin: 80px 0;
+            position: relative;
+        }
+
+        .norse-decoration::before,
+        .norse-decoration::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 35%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--mc-red), transparent);
+        }
+
+        .norse-decoration::before {
+            left: 0;
+        }
+
+        .norse-decoration::after {
+            right: 0;
+        }
+
+        .norse-symbol-large {
+            font-size: 64px;
+            color: var(--mc-red);
+            opacity: 0.2;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .story-hero h1 {
+                font-size: 3rem;
+            }
+
+            .story-text {
+                padding: 40px 30px;
+            }
+
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-item {
+                padding-left: 80px !important;
+                padding-right: 20px !important;
+                text-align: left !important;
+            }
+
+            .timeline-dot {
+                left: 20px !important;
+                right: auto !important;
+            }
+
+            .edit-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .story-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .story-text {
+                padding: 30px 20px;
+            }
+
+            .timeline-year {
+                font-size: 1.5rem;
+            }
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <span class="logo-text">SLEIPNIR MC</span>
+                <span class="location">REYKJAVÍK</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><span class="is">Heim</span><span class="en">Home</span></a></li>
+                <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
+                <li class="nav-dropdown">
+                    <a href="#" class="active"><span class="is">Um Okkur</span><span class="en">About Us</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="about.html"><span class="is">Hópurinn</span><span class="en">Members</span></a></li>
+                        <li><a href="sagan.html" class="active"><span class="is">Sagan</span><span class="en">Story</span></a></li>
+                    </ul>
+                </li>
+                <li><a href="contact.html"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
+            </ul>
+            <div class="language-toggle">
+                <button class="btn btn-dark btn-sm" onclick="toggleLanguage()">
+                    <span class="is">EN</span>
+                    <span class="en">IS</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Story Hero -->
+    <section class="hero hero-medium story-hero">
+        <div class="hero-overlay"></div>
+        <div class="northern-lights"></div>
+        <div class="story-hero-content">
+            <h1>
+                <span class="is">Sagan Okkar</span>
+                <span class="en">Our Story</span>
+            </h1>
+            <p class="tagline">
+                <span class="is">Frá upphafi til dagsins í dag</span>
+                <span class="en">From the beginning to today</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Story Content -->
+    <section class="story-content">
+        <div class="story-container">
+            <div id="storyContent" class="story-text">
+                <!-- Story content will be loaded from Firebase -->
+                <div class="story-loading">
+                    <div class="spinner"></div>
+                    <p><span class="is">Hleður sögu...</span><span class="en">Loading story...</span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="timeline-section">
+        <div class="timeline-container">
+            <div class="timeline-header">
+                <h2>
+                    <span class="is">Tímamót</span>
+                    <span class="en">Milestones</span>
+                </h2>
+            </div>
+            <div class="timeline" id="timeline">
+                <!-- Timeline items will be loaded from Firebase or can be hardcoded -->
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2015</div>
+                        <div class="timeline-event">
+                            <span class="is">Sleipnir MC Reykjavík stofnað</span>
+                            <span class="en">Sleipnir MC Reykjavík founded</span>
+                        </div>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2018</div>
+                        <div class="timeline-event">
+                            <span class="is">Fyrsta stóra ferðin okkar um Ísland</span>
+                            <span class="en">Our first major tour around Iceland</span>
+                        </div>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2020</div>
+                        <div class="timeline-event">
+                            <span class="is">Opnuðum nýja höfuðstöðvar</span>
+                            <span class="en">Opened new headquarters</span>
+                        </div>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2025</div>
+                        <div class="timeline-event">
+                            <span class="is">10 ára afmæli</span>
+                            <span class="en">10 year anniversary</span>
+                        </div>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Decorative Norse Element -->
+    <div class="norse-decoration">
+        <span class="norse-symbol-large">ᛋ</span>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Sleipnir MC Reykjavík</h4>
+                <p>
+                    <span class="is">Ríðum í gegnum ljósanótt síðan 2015</span>
+                    <span class="en">Riding through ljósanótt since 2015</span>
+                </p>
+            </div>
+            <div class="social-links">
+                <a href="https://www.facebook.com/sleipnirmcreykjavik" target="_blank" rel="noopener noreferrer" aria-label="Facebook">⟨f⟩</a>
+                <a href="#" aria-label="Instagram">⟨ᛁ⟩</a>
+                <a href="mailto:sleipnirmcreykjavik@gmail.com" aria-label="Email">⟨@⟩</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Sleipnir MC Reykjavík.
+                    <span class="is">Allur réttur áskilinn.</span>
+                    <span class="en">All rights reserved.</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Edit Button (shown only for admins) -->
+    <button id="editBtn" class="edit-btn" onclick="toggleEditMode()">
+        <span class="is">Breyta Sögu</span>
+        <span class="en">Edit Story</span>
+    </button>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="javascript/firebase-config.js"></script>
+    <script src="javascript/language.js"></script>
+
+    <script>
+        let isEditMode = false;
+        let originalContent = '';
+
+        // Load story content from Firebase
+        async function loadStoryContent() {
+            const storyContent = document.getElementById('storyContent');
+
+            try {
+                const doc = await firebase.firestore()
+                    .collection('siteContent')
+                    .doc('story')
+                    .get();
+
+                if (doc.exists) {
+                    const data = doc.data();
+                    const content = currentLang === 'is' ? data.contentIs : data.contentEn;
+
+                    if (content) {
+                        storyContent.innerHTML = content;
+                    } else {
+                        showEmptyState();
+                    }
+                } else {
+                    showEmptyState();
+                }
+            } catch (error) {
+                console.error('Error loading story:', error);
+                storyContent.innerHTML = `
+                    <div class="story-empty">
+                        <span class="rune">ᚦ</span>
+                        <p><span class="is">Villa við að hlaða sögu.</span><span class="en">Error loading story.</span></p>
+                    </div>
+                `;
+            }
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            document.getElementById('storyContent').innerHTML = `
+                <div class="story-empty">
+                    <span class="rune">ᛉ</span>
+                    <h2><span class="is">Engin saga enn</span><span class="en">No story yet</span></h2>
+                    <p><span class="is">Sagan verður birt hér fljótlega.</span><span class="en">The story will be published here soon.</span></p>
+                </div>
+            `;
+        }
+
+        // Toggle edit mode
+        async function toggleEditMode() {
+            const storyContent = document.getElementById('storyContent');
+            const editBtn = document.getElementById('editBtn');
+
+            if (!isEditMode) {
+                // Enter edit mode
+                originalContent = storyContent.innerHTML;
+                storyContent.contentEditable = true;
+                storyContent.classList.add('edit-mode');
+                editBtn.innerHTML = '<span class="is">Vista Sögu</span><span class="en">Save Story</span>';
+                editBtn.classList.add('save-btn');
+
+                // If empty, add template
+                if (storyContent.querySelector('.story-empty')) {
+                    storyContent.innerHTML = `
+                        <h2>${currentLang === 'is' ? 'Titill Sögunnar' : 'Story Title'}</h2>
+                        <p>${currentLang === 'is' ? 'Skrifaðu sögu hópsins hér...' : 'Write the group story here...'}</p>
+                    `;
+                }
+
+                isEditMode = true;
+            } else {
+                // Save and exit edit mode
+                try {
+                    const content = storyContent.innerHTML;
+
+                    // Update the appropriate language field
+                    const updateData = {};
+                    if (currentLang === 'is') {
+                        updateData.contentIs = content;
+                    } else {
+                        updateData.contentEn = content;
+                    }
+                    updateData.lastUpdated = firebase.firestore.FieldValue.serverTimestamp();
+
+                    await firebase.firestore()
+                        .collection('siteContent')
+                        .doc('story')
+                        .set(updateData, { merge: true });
+
+                    // Exit edit mode
+                    storyContent.contentEditable = false;
+                    storyContent.classList.remove('edit-mode');
+                    editBtn.innerHTML = '<span class="is">Breyta Sögu</span><span class="en">Edit Story</span>';
+                    editBtn.classList.remove('save-btn');
+                    isEditMode = false;
+
+                    // Show success message
+                    alert(currentLang === 'is' ? 'Saga vistuð!' : 'Story saved!');
+                } catch (error) {
+                    console.error('Error saving story:', error);
+                    alert(currentLang === 'is' ? 'Villa við að vista sögu' : 'Error saving story');
+                }
+            }
+        }
+
+        // Check if user is admin and show edit button
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const userDoc = await firebase.firestore()
+                        .collection('users')
+                        .doc(user.uid)
+                        .get();
+
+                    if (userDoc.exists && userDoc.data().role === 'admin') {
+                        document.getElementById('editBtn').style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Error checking admin status:', error);
+                }
+            }
+        });
+
+        // Load content on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStoryContent();
+
+            // Add scroll animation to timeline items
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity = '1';
+                        }, index * 200);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                observer.observe(item);
+            });
+        });
+
+        // Reload content when language changes
+        const originalToggleLanguage = window.toggleLanguage;
+        window.toggleLanguage = function() {
+            originalToggleLanguage();
+            if (!isEditMode) {
+                loadStoryContent();
+            }
+        };
+    </script>
+</body>
+</html>

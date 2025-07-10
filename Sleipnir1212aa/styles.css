@@ -1,1919 +1,3342 @@
-    /* Norse-inspired Font Import */
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:wght@300;400;600&family=Iceland&display=swap');
+/* ===================================================================
+   SLEIPNIR MC REYKJAVÍK - MASTER STYLESHEET
+   =================================================================== */
 
-    /* Viking font removed - using web fonts only */
+/* ===================================================================
+   1. IMPORTS & VARIABLES
+   =================================================================== */
 
-    /* CSS Variables for MC Theme - BLACK & RED ONLY */
-    :root {
-        --pure-black: #000000;
-        --midnight-black: #0a0a0a;
-        --norse-black: #1a1a1a;
-        --charcoal: #2a2a2a;
-        --blood-red: #cc0000;
-        --mc-red: #cf2342;
-        --mc-red-hover: #e63856;
-        --dark-red: #990000;
-        --crimson: #dc143c;
-        --white: #ffffff;
-        --off-white: #f8f8f8;
-        --gray: #888888;
+/* Norse-inspired Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:wght@300;400;600&family=Iceland&display=swap');
+
+/* CSS Variables for MC Theme - BLACK & RED ONLY */
+:root {
+    --pure-black: #000000;
+    --midnight-black: #0a0a0a;
+    --norse-black: #1a1a1a;
+    --charcoal: #2a2a2a;
+    --blood-red: #cc0000;
+    --mc-red: #cf2342;
+    --mc-red-hover: #e63856;
+    --dark-red: #990000;
+    --crimson: #dc143c;
+    --white: #acabab;
+    --off-white: #b3b2b2;
+    --gray: #888888;
+    
+    /* Common Patterns */
+    --card-bg: linear-gradient(135deg, rgba(26,26,26,0.9), rgba(10,10,10,0.9));
+    --overlay-light: rgba(255,0,0,0.1);
+    --overlay-medium: rgba(255,0,0,0.2);
+    --overlay-dark: rgba(0,0,0,0.8);
+    --shadow-red: 0 10px 30px rgba(207, 35, 66, 0.3);
+    --transition-base: all 0.3s ease;
+    --border-light: 1px solid rgba(255,255,255,0.2);
+    --border-red-light: 1px solid rgba(255,0,0,0.1);
+}
+
+/* ===================================================================
+   2. GLOBAL RESET & BASE STYLES
+   =================================================================== */
+
+/* Global Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: 'Cormorant Garamond', serif;
+    background-color: var(--pure-black);
+    color: var(--white);
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Background Logo Watermark */
+body::before {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 60%;
+    background: url('Images/SleipnirLogo.png') no-repeat center center;
+    background-size: contain;
+    opacity: 0.3;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Override body background watermark for homepage */
+body.homepage::before {
+    display: none;
+}
+
+/* Safari-specific fixes */
+@supports (-webkit-appearance: none) {
+    .auth-submit-btn {
+        -webkit-appearance: none;
+        -webkit-tap-highlight-color: transparent;
     }
-
-    /* Global Reset */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+    
+    .auth-form input {
+        -webkit-appearance: none;
     }
+}
 
-    body {
-        font-family: 'Cormorant Garamond', serif;
-        background-color: var(--pure-black);
-        color: var(--white);
-        overflow-x: hidden;
-        position: relative;
+/* ===================================================================
+   3. TYPOGRAPHY
+   =================================================================== */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cinzel', serif;
+}
+
+/* ===================================================================
+   4. UTILITY CLASSES
+   =================================================================== */
+
+/* Spacing Utilities */
+.p-sm { padding: 15px; }
+.p-md { padding: 30px; }
+.p-lg { padding: 60px; }
+.p-xl { padding: 80px; }
+.py-sm { padding-top: 15px; padding-bottom: 15px; }
+.py-md { padding-top: 30px; padding-bottom: 30px; }
+.py-lg { padding-top: 60px; padding-bottom: 60px; }
+.py-xl { padding-top: 80px; padding-bottom: 80px; }
+.px-sm { padding-left: 15px; padding-right: 15px; }
+.px-md { padding-left: 30px; padding-right: 30px; }
+.px-lg { padding-left: 60px; padding-right: 60px; }
+.mt-header { margin-top: 80px; }
+.mb-sm { margin-bottom: 10px; }
+.mb-md { margin-bottom: 20px; }
+.mb-lg { margin-bottom: 40px; }
+
+/* Text Utilities */
+.text-uppercase { text-transform: uppercase; letter-spacing: 2px; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+.font-heading { font-family: 'Cinzel', serif; }
+.font-body { font-family: 'Cormorant Garamond', serif; }
+.font-accent { font-family: 'Iceland', cursive; }
+.text-sm { font-size: 14px; }
+.text-base { font-size: 16px; }
+.text-lg { font-size: 18px; }
+.text-xl { font-size: 24px; }
+.text-2xl { font-size: 36px; }
+.text-3xl { font-size: 48px; }
+.text-4xl { font-size: 56px; }
+.text-red { color: var(--mc-red); }
+.text-white { color: var(--white); }
+.text-gray { color: var(--gray); }
+
+/* Animation Utilities */
+.hover-lift { transition: var(--transition-base); }
+.hover-lift:hover { transform: translateY(-5px); }
+.hover-scale { transition: var(--transition-base); }
+.hover-scale:hover { transform: scale(1.05); }
+.transition-smooth { transition: var(--transition-base); }
+.transition-fast { transition: all 0.2s ease; }
+.transition-slow { transition: all 0.5s ease; }
+.animate-fadeIn { animation: fadeIn 1.2s ease-out; }
+.animate-fadeInUp { animation: fadeInUp 0.8s ease forwards; }
+.animate-pulse { animation: pulse 1.5s ease-in-out infinite; }
+
+/* Display Utilities */
+.d-none { display: none; }
+.d-block { display: block; }
+.d-flex { display: flex; }
+.d-grid { display: grid; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex-column { flex-direction: column; }
+.gap-sm { gap: 10px; }
+.gap-md { gap: 20px; }
+.gap-lg { gap: 40px; }
+
+/* Position Utilities */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.z-1 { z-index: 1; }
+.z-2 { z-index: 2; }
+.z-10 { z-index: 10; }
+.z-100 { z-index: 100; }
+.z-1000 { z-index: 1000; }
+
+/* Border Utilities */
+.border-light { border: var(--border-light); }
+.border-red-light { border: var(--border-red-light); }
+.border-red { border: 2px solid var(--mc-red); }
+.border-top-red { border-top: 4px solid var(--mc-red); }
+
+/* Background Utilities */
+.bg-black { background: var(--pure-black); }
+.bg-norse { background: var(--norse-black); }
+.bg-card { background: var(--card-bg); }
+.bg-overlay-light { background: var(--overlay-light); }
+.bg-overlay-dark { background: var(--overlay-dark); }
+
+/* Shadow Utilities */
+.shadow-red { box-shadow: var(--shadow-red); }
+.shadow-sm { box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.shadow-md { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+.shadow-lg { box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+
+/* Width & Height Utilities */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.min-h-screen { min-height: 100vh; }
+
+/* Overflow Utilities */
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+.overflow-x-hidden { overflow-x: hidden; }
+.overflow-y-auto { overflow-y: auto; }
+
+/* ===================================================================
+   5. COMPONENT CLASSES
+   =================================================================== */
+
+/* Base Button Styles */
+.btn {
+    display: inline-block;
+    padding: 15px 30px;
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary {
+    background: var(--mc-red);
+    color: var(--white);
+    border: 2px solid var(--mc-red);
+}
+
+.btn-primary:hover {
+    background: var(--mc-red-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-red);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--white);
+    border: 2px solid var(--white);
+}
+
+.btn-secondary:hover {
+    background: var(--mc-red);
+    border-color: var(--mc-red);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--white);
+    border: 2px solid var(--mc-red);
+}
+
+.btn-outline:hover {
+    background: var(--mc-red);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.btn-dark {
+    background: var(--norse-black);
+    color: var(--white);
+    border: 2px solid var(--mc-red);
+}
+
+.btn-dark:hover {
+    background: var(--mc-red);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-red);
+}
+
+.btn-sm {
+    padding: 8px 20px;
+    font-size: 14px;
+}
+
+.btn-lg {
+    padding: 18px 40px;
+    font-size: 18px;
+}
+
+.btn-full {
+    width: 100%;
+    text-align: center;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+    transform: none;
+}
+
+/* Card Component */
+.card {
+    background: var(--card-bg);
+    border: var(--border-red-light);
+    overflow: hidden;
+    transition: var(--transition-base);
+    position: relative;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-red);
+    border-color: var(--mc-red);
+}
+
+.card-header {
+    padding: 20px;
+    border-bottom: var(--border-red-light);
+}
+
+.card-body {
+    padding: 30px;
+}
+
+.card-footer {
+    padding: 20px;
+    border-top: var(--border-red-light);
+}
+
+/* Hero Component */
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.8));
+}
+
+.hero-full {
+    height: 100vh;
+    margin-top: 0;
+}
+
+.hero-large {
+    height: 80vh;
+    min-height: 600px;
+    margin-top: 80px;
+}
+
+.hero-medium {
+    height: 60vh;
+    min-height: 500px;
+    margin-top: 80px;
+}
+
+.hero-small {
+    height: 400px;
+    margin-top: 80px;
+}
+
+.hero-content {
+    z-index: 2;
+    animation: fadeIn 1.2s ease-out;
+}
+
+.hero-title {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.hero-subtitle {
+    font-weight: 300;
+    color: var(--gray);
+    font-style: italic;
+}
+
+/* Grid Utilities */
+.grid-auto {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid-auto-lg {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Form Components */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-label {
+    display: block;
+    font-family: 'Iceland', cursive;
+    font-size: 14px;
+    color: var(--white);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 15px;
+    background: var(--overlay-dark);
+    border: var(--border-light);
+    color: var(--white);
+    font-size: 16px;
+    font-family: 'Cormorant Garamond', serif;
+    transition: var(--transition-base);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--mc-red);
+    background: var(--overlay-light);
+    box-shadow: 0 0 20px rgba(255,0,0,0.2);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+/* Loading States */
+.skeleton {
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--overlay-light);
+    border-top-color: var(--mc-red);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+/* ===================================================================
+   6. LANGUAGE TOGGLE SYSTEM
+   =================================================================== */
+
+/* Language Toggle Styles */
+.en {
+    display: none;
+}
+
+body[data-lang="en"] .is {
+    display: none;
+}
+
+body[data-lang="en"] .en {
+    display: inline;
+}
+
+/* ===================================================================
+   5. HEADER & NAVIGATION
+   =================================================================== */
+
+/* Header Styles */
+header {
+    background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(26,26,26,0.9) 100%);
+    backdrop-filter: blur(10px);
+    padding: 20px 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 2px solid var(--dark-red);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    min-height: 60px;
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.norse-text {
+    font-family: 'Iceland', cursive;
+    font-size: 14px;
+    color: var(--mc-red);
+    letter-spacing: 2px;
+}
+
+.logo-text {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--mc-red);
+    letter-spacing: 4px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.location {
+    font-family: 'Iceland', cursive;
+    font-size: 14px;
+    color: var(--gray);
+    letter-spacing: 3px;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 40px;
+    flex-shrink: 0;
+}
+
+.nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: var(--transition-base);
+    position: relative;
+}
+
+.nav-links a:hover {
+    color: var(--mc-red);
+}
+
+.nav-links > li > a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 50%;
+    background: var(--mc-red);
+    transition: var(--transition-base);
+    transform: translateX(-50%);
+}
+
+.nav-links > li > a:hover::after,
+.nav-links > li > a.active::after {
+    width: 100%;
+}
+
+/* Dropdown Navigation */
+.nav-dropdown {
+    position: relative;
+}
+
+.nav-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(180deg, rgba(26,26,26,0.98) 0%, rgba(10,10,10,0.98) 100%);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--mc-red);
+    border-top: 4px solid var(--mc-red);
+    min-width: 250px;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition-base) ease;
+    z-index: 1100;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+
+.dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid var(--mc-red);
+}
+
+.dropdown-menu li {
+    list-style: none;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 15px 25px;
+    color: var(--white);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: var(--transition-base);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.dropdown-menu li:last-child a {
+    border-bottom: none;
+}
+
+.dropdown-menu a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 0;
+    background: var(--mc-red);
+    transition: height 0.3s;
+}
+
+.dropdown-menu a:hover {
+    background: rgba(207, 35, 66, 0.1);
+    color: var(--mc-red);
+    padding-left: 50px;
+}
+
+.dropdown-menu a:hover::before {
+    height: 100%;
+}
+
+.dropdown-menu a.active {
+    color: var(--mc-red);
+    background: rgba(207, 35, 66, 0.05);
+}
+
+/* Dropdown arrow indicator */
+.nav-dropdown > a {
+    padding-right: 20px;
+}
+
+.nav-dropdown > a::before {
+    content: '▾';
+    position: absolute;
+    right: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--gray);
+    transition: var(--transition-base);
+}
+
+.nav-dropdown:hover > a::before {
+    color: var(--mc-red);
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* Language Toggle */
+.language-toggle {
+    margin-left: 20px;
+}
+
+/* Language button now uses utility classes: .btn .btn-dark .btn-sm */
+
+/* Auth buttons */
+.auth-buttons {
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+}
+
+/* Login button now uses utility classes: .btn .btn-dark .btn-sm */
+
+/* Member portal */
+.member-portal {
+    margin-left: 20px;
+    min-width: 150px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.member-portal.loading {
+    opacity: 1;
+    pointer-events: none;
+}
+
+.member-portal.loaded {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+/* Member button now uses utility classes: .btn .btn-dark */
+
+/* User Menu */
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-menu-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 8px 15px;
+    background: rgba(255,0,0,0.1);
+    border: 1px solid var(--mc-red);
+    border-radius: 4px;
+    transition: var(--transition-base);
+}
+
+.user-menu-toggle:hover {
+    background: rgba(255,0,0,0.2);
+}
+
+.user-menu-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    margin-top: 10px;
+    background: var(--norse-black);
+    border: 1px solid var(--mc-red);
+    border-radius: 4px;
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition-base);
+    z-index: 1000;
+}
+
+.user-menu.active .user-menu-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.user-menu-dropdown a {
+    display: block;
+    padding: 12px 20px;
+    color: var(--white);
+    text-decoration: none;
+    transition: var(--transition-base);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.user-menu-dropdown a:last-child {
+    border-bottom: none;
+}
+
+.user-menu-dropdown a:hover {
+    background: rgba(255,0,0,0.2);
+    color: var(--mc-red);
+}
+
+.user-menu-dropdown .logout-btn {
+    color: var(--mc-red);
+    font-weight: bold;
+}
+
+.user-name {
+    font-family: 'Iceland', cursive;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ===================================================================
+   6. FOOTER
+   =================================================================== */
+
+footer {
+    background: linear-gradient(180deg, var(--norse-black), var(--midnight-black));
+    padding: 60px 40px 40px;
+    text-align: center;
+    border-top: 2px solid var(--dark-red);
+    position: relative;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--mc-red);
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-section h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    color: var(--mc-red);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.footer-section p {
+    color: var(--gray);
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 30px 0;
+}
+
+.social-links a {
+    color: var(--gray);
+    font-size: 28px;
+    transition: var(--transition-base);
+    display: inline-block;
+}
+
+.social-links a:hover {
+    color: var(--mc-red);
+    transform: translateY(-3px) scale(1.2);
+}
+
+.footer-bottom {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,0,0,0.1);
+}
+
+.footer-bottom p {
+    color: var(--gray);
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+/* ===================================================================
+   7. COMMON COMPONENTS
+   =================================================================== */
+
+/* Hero Components */
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+}
+
+.northern-lights {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255,0,0,0.05) 50%,
+        rgba(204,0,0,0.05) 70%,
+        transparent 100%
+    );
+    animation: aurora 20s ease-in-out infinite;
+    opacity: 0.6;
+}
+
+@keyframes aurora {
+    0%, 100% { transform: translateX(-100%) translateY(-50%); }
+    50% { transform: translateX(100%) translateY(50%); }
+}
+
+/* Buttons - REPLACED BY UTILITY CLASSES (See Section 5) */
+/* Old button styles removed - use .btn, .btn-primary, .btn-secondary instead */
+
+/* Section Headers */
+.section-header {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+.section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 48px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+}
+
+.section-subtitle {
+    font-size: 20px;
+    color: var(--gray);
+    font-style: italic;
+}
+
+/* Norse Decorative Elements */
+.norse-knotwork {
+    width: 80px;
+    height: 40px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 40"><path d="M10,20 Q20,10 30,20 T50,20 Q60,10 70,20" stroke="%23ff0000" stroke-width="2" fill="none"/><path d="M10,20 Q20,30 30,20 T50,20 Q60,30 70,20" stroke="%23ff0000" stroke-width="2" fill="none"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.norse-knotwork.right {
+    transform: scaleX(-1);
+}
+
+.norse-decoration {
+    text-align: center;
+    margin: 60px 0;
+    position: relative;
+}
+
+.norse-decoration::before,
+.norse-decoration::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 35%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--mc-red), transparent);
+}
+
+.norse-decoration::before {
+    left: 0;
+}
+
+.norse-decoration::after {
+    right: 0;
+}
+
+.norse-symbol-large {
+    font-size: 64px;
+    color: var(--mc-red);
+    opacity: 0.2;
+}
+
+/* Runes */
+.rune {
+    font-size: 48px;
+    color: var(--mc-red);
+    display: block;
+    margin-bottom: 20px;
+}
+
+/* Form Styles - DUPLICATE REMOVED - Use utility classes from Section 5 */
+
+/* Loading States */
+.loading-spinner {
+    text-align: center;
+    padding: 60px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(207, 35, 66, 0.1);
+    border-top-color: var(--mc-red);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Lazy Loading */
+.lazy-image {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.lazy-image.loaded {
+    opacity: 1;
+}
+
+/* Skeleton loader animation */
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.8; }
+}
+
+/* ===================================================================
+   8. HOMEPAGE SPECIFIC STYLES
+   =================================================================== */
+
+/* Homepage body */
+body.homepage {
+    overflow: hidden;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Homepage Hero - uses base .hero .hero-full classes */
+/* Homepage specific hero background */
+.homepage .hero {
+    background:
+        linear-gradient(180deg,
+            rgba(0,0,0,0.4) 0%,
+            rgba(0,0,0,0.6) 50%,
+            rgba(0,0,0,0.8) 100%),
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect width="1920" height="1080" fill="%23000000"/><polygon points="0,600 480,400 960,500 1440,350 1920,450 1920,1080 0,1080" fill="%231a1a1a" opacity="0.9"/><polygon points="0,700 320,600 640,650 960,550 1280,600 1600,500 1920,550 1920,1080 0,1080" fill="%230a0a0a"/></svg>');
+    background-size: cover;
+    background-position: center;
+}
+
+.hero-content {
+    z-index: 2;
+    animation: fadeIn 1.2s ease-out;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: 72px;
+    font-weight: 900;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    line-height: 1.1;
+}
+
+.norse-accent {
+    display: block;
+    font-family: 'Iceland', cursive;
+    font-size: 36px;
+    color: var(--mc-red);
+    margin-bottom: 10px;
+    letter-spacing: 8px;
+}
+
+.hero-subtitle {
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--gray);
+    margin-bottom: 40px;
+    font-style: italic;
+}
+
+.cta-group {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* Large background logo */
+.hero-logo-bg {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1200px;
+    height: 1200px;
+    background: url('Images/SleipnirLogo.png') no-repeat center center;
+    background-size: contain;
+    opacity: 0.4;
+    z-index: 1;
+}
+
+.frost-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 100"><path d="M0,50 Q480,20 960,50 T1920,50 L1920,100 L0,100 Z" fill="%23ff0000" opacity="0.05"/></svg>');
+    background-size: cover;
+}
+
+/* Homepage footer */
+.homepage footer {
+    position: absolute;
+    bottom: -100%;
+    width: 100%;
+}
+
+/* Homepage Products Section */
+.products {
+    padding: 100px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 50px;
+}
+
+/* Product card now uses utility classes: .card plus animation classes */
+.product-card {
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+.product-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.product-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--mc-red);
+    transform: scaleX(0);
+    transition: transform 0.4s;
+}
+
+.product-card:hover::before {
+    transform: scaleX(1);
+}
+
+.product-image {
+    width: 100%;
+    height: 400px;
+    background: linear-gradient(135deg, var(--norse-black), var(--midnight-black));
+    position: relative;
+    overflow: hidden;
+}
+
+.product-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 8px 20px;
+    background: var(--mc-red);
+    color: var(--white);
+    font-family: 'Iceland', cursive;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    backdrop-filter: blur(10px);
+}
+
+.product-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.4) 100%);
+}
+
+.norse-symbol {
+    font-size: 120px;
+    color: var(--dark-red);
+    opacity: 0.2;
+    transition: all 0.4s;
+}
+
+.product-card:hover .norse-symbol {
+    opacity: 0.4;
+    transform: scale(1.1);
+}
+
+.product-info {
+    padding: 35px;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.3));
+}
+
+.product-name {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--white);
+}
+
+.product-saga {
+    font-size: 16px;
+    color: var(--gray);
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+.product-price {
+    font-family: 'Iceland', cursive;
+    font-size: 32px;
+    color: var(--mc-red);
+    font-weight: 400;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+}
+
+.size-selector {
+    margin-bottom: 25px;
+}
+
+.size-label {
+    display: block;
+    font-family: 'Iceland', cursive;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--gray);
+    margin-bottom: 15px;
+}
+
+.size-options {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Size button now uses utility classes: .btn .btn-outline .btn-sm */
+.size-btn {
+    font-family: 'Iceland', cursive;
+}
+
+.size-btn.selected {
+    background: var(--mc-red);
+    border-color: var(--mc-red);
+    color: var(--white);
+}
+
+/* Add to cart button now uses utility classes: .btn .btn-primary .btn-full */
+.add-to-cart::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.add-to-cart:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Saga Section */
+.saga {
+    padding: 100px 40px;
+    background: linear-gradient(180deg, var(--midnight-black), var(--norse-black));
+    position: relative;
+    overflow: hidden;
+}
+
+.saga::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--mc-red), transparent);
+}
+
+.saga-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.saga-content {
+    margin-top: 60px;
+}
+
+.saga-intro {
+    font-size: 24px;
+    line-height: 1.8;
+    color: var(--white);
+    max-width: 800px;
+    margin: 0 auto 60px;
+    font-weight: 300;
+}
+
+.saga-values {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 50px;
+    margin-top: 60px;
+}
+
+.value-item {
+    background: rgba(26,26,26,0.5);
+    border: var(--border-red-light);
+    padding: 40px;
+    transition: all 0.4s;
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.value-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.value-item:hover {
+    background: rgba(255,0,0,0.05);
+    border-color: var(--mc-red);
+    transform: translateY(-5px);
+}
+
+.value-item h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.value-item p {
+    font-size: 18px;
+    color: var(--gray);
+    font-style: italic;
+}
+
+/* Brotherhood Section */
+.brotherhood {
+    padding: 120px 40px;
+    background:
+        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 600"><defs><pattern id="norse-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M50,10 L60,30 L50,50 L40,30 Z" fill="none" stroke="%23ff0000" stroke-width="0.5" opacity="0.3"/><circle cx="50" cy="50" r="30" fill="none" stroke="%23ff0000" stroke-width="0.5" opacity="0.2"/></pattern></defs><rect width="1920" height="600" fill="url(%23norse-pattern)"/></svg>');
+    text-align: center;
+}
+
+.brotherhood-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.brotherhood-text {
+    font-size: 22px;
+    line-height: 1.8;
+    color: var(--white);
+    margin: 30px 0 40px;
+    font-weight: 300;
+}
+
+/* Cart Notification */
+.cart-notification {
+    position: fixed;
+    top: 100px;
+    right: -400px;
+    background: linear-gradient(135deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95));
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--mc-red);
+    padding: 25px;
+    border-radius: 0;
+    z-index: 2000;
+    transition: right 0.5s ease-out;
+    max-width: 350px;
+    box-shadow: 0 10px 30px rgba(255,0,0,0.3);
+}
+
+.cart-notification.show {
+    right: 40px;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.notification-content .norse-symbol {
+    font-size: 36px;
+    color: var(--mc-red);
+}
+
+.cart-notification h3 {
+    font-family: 'Cinzel', serif;
+    color: var(--mc-red);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ===================================================================
+   9. ABOUT/MEMBERS PAGE SPECIFIC STYLES
+   =================================================================== */
+
+/* About Hero - uses base .hero .hero-large classes */
+.about-hero {
+    /* Additional styles specific to about page */
+}
+
+.about-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.about-hero-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+    padding: 60px 0 40px;
+}
+
+.about-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    text-align: center;
+}
+
+.about-hero h1 {
+    font-family: 'Iceland', 'Cinzel', serif;
+    font-size: 3.5rem;
+    color: var(--white);
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.about-hero p {
+    font-size: 1.2rem;
+    color: var(--off-white);
+    opacity: 0.9;
+}
+
+/* Members Section */
+.members-section {
+    padding: 80px 0;
+    background: var(--pure-black);
+    position: relative;
+}
+
+.members-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--mc-red), transparent);
+}
+
+.members-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.section-header h2 {
+    font-family: 'Iceland', 'Cinzel', serif;
+    font-size: 2.5rem;
+    color: var(--white);
+    margin-bottom: 10px;
+    position: relative;
+    display: inline-block;
+}
+
+.section-header h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: var(--mc-red);
+}
+
+/* Members Grid */
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.member-card {
+    background: var(--norse-black);
+    border: 1px solid rgba(207, 35, 66, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: var(--transition-base) ease;
+    cursor: pointer;
+}
+
+.member-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--mc-red);
+    box-shadow: var(--shadow-red);
+}
+
+.member-photo {
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    position: relative;
+}
+
+.member-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.member-card:hover .member-photo img {
+    transform: scale(1.05);
+}
+
+.member-info {
+    padding: 20px;
+    text-align: center;
+}
+
+.member-name {
+    font-family: 'Iceland', sans-serif;
+    font-size: 1.4rem;
+    color: var(--white);
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.member-role {
+    color: var(--mc-red);
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.member-date {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+/* Loading skeleton */
+.member-skeleton {
+    background: var(--norse-black);
+    border: 1px solid rgba(207, 35, 66, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-photo {
+    width: 100%;
+    height: 300px;
+    background: rgba(255,255,255,0.1);
+}
+
+.skeleton-info {
+    padding: 20px;
+}
+
+.skeleton-text {
+    height: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.skeleton-text.small {
+    height: 16px;
+    width: 60%;
+    margin: 0 auto;
+}
+
+/* ===================================================================
+   10. SHOP PAGE SPECIFIC STYLES
+   =================================================================== */
+
+/* Shop Hero - uses base .hero .hero-small classes */
+.shop-hero {
+    background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.8)),
+                radial-gradient(circle at center, var(--overlay-light), transparent);
+}
+
+.shop-title {
+    font-family: 'Cinzel', serif;
+    font-size: 48px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+}
+
+/* Category Filter */
+.category-filter {
+    padding: 40px 0;
+    background: rgba(26,26,26,0.5);
+    border-top: 1px solid rgba(207, 35, 66, 0.2);
+    border-bottom: 1px solid rgba(207, 35, 66, 0.2);
+}
+
+.filter-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.filter-title {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: var(--mc-red);
+}
+
+.filter-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 12px 30px;
+    background: transparent;
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: var(--transition-base);
+    font-family: 'Iceland', cursive;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.filter-btn:hover {
+    border-color: var(--mc-red);
+    color: var(--mc-red);
+}
+
+.filter-btn.active {
+    background: var(--mc-red);
+    border-color: var(--mc-red);
+    color: var(--white);
+}
+
+/* Shop Products */
+.shop-products {
+    padding: 60px 40px;
+}
+
+.products-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.shop-product-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(207, 35, 66, 0.1);
+    overflow: hidden;
+    transition: all 0.4s;
+    position: relative;
+    cursor: pointer;
+}
+
+.shop-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-red);
+    border-color: var(--mc-red);
+}
+
+.shop-product-card .product-info {
+    padding: 25px;
+    background: transparent;
+}
+
+.shop-product-card .product-name {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.shop-product-card .product-saga {
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.shop-product-card .product-price {
+    font-size: 26px;
+    margin-bottom: 20px;
+}
+
+/* Product Badges */
+.product-badges {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Product Image Gallery */
+.product-image-gallery {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--norse-black), var(--midnight-black));
+}
+
+.gallery-images {
+    display: flex;
+    transition: transform 0.4s ease;
+    height: 100%;
+}
+
+.gallery-image {
+    min-width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Gallery Navigation */
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.7);
+    color: var(--white);
+    border: 1px solid var(--mc-red);
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: var(--transition-base);
+    opacity: 0;
+}
+
+.product-card:hover .gallery-nav {
+    opacity: 1;
+}
+
+.gallery-nav:hover {
+    background: var(--mc-red);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.gallery-prev {
+    left: 10px;
+}
+
+.gallery-next {
+    right: 10px;
+}
+
+/* Gallery Dots */
+.gallery-dots {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.gallery-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.gallery-dot.active {
+    background: var(--mc-red);
+    transform: scale(1.2);
+}
+
+/* Pagination Styles */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 60px;
+    padding: 20px;
+    flex-wrap: wrap;
+}
+
+.pagination-btn {
+    padding: 10px 20px;
+    background: var(--norse-black);
+    color: var(--white);
+    border: var(--border-light);
+    cursor: pointer;
+    transition: var(--transition-base) ease;
+    font-family: 'Iceland', cursive;
+    font-size: 16px;
+    min-width: 45px;
+}
+
+.pagination-btn:hover:not(.disabled) {
+    background: var(--mc-red);
+    border-color: var(--mc-red);
+    transform: translateY(-2px);
+}
+
+.pagination-btn.active {
+    background: var(--mc-red);
+    border-color: var(--mc-red);
+    font-weight: bold;
+}
+
+.pagination-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-dots {
+    padding: 10px;
+    color: var(--gray);
+}
+
+.pagination-info {
+    margin-left: 20px;
+    color: var(--gray);
+    font-size: 14px;
+    font-family: 'Cormorant Garamond', serif;
+}
+
+/* Cart Sidebar */
+.cart-sidebar {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 400px;
+    height: 100%;
+    background: rgba(10,10,10,0.95);
+    border-left: 2px solid var(--mc-red);
+    z-index: 2000;
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-sidebar.open {
+    right: 0;
+}
+
+.cart-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(207, 35, 66, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-header h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    color: var(--mc-red);
+}
+
+.close-cart {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.cart-item {
+    background: rgba(26,26,26,0.8);
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(207, 35, 66, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-item-info h4 {
+    font-family: 'Cinzel', serif;
+    margin-bottom: 5px;
+}
+
+.cart-item-info p {
+    color: var(--gray);
+    font-size: 14px;
+}
+
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cart-item-actions button {
+    width: 30px;
+    height: 30px;
+    background: var(--mc-red);
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.cart-item-actions .remove-btn {
+    background: var(--dark-red);
+}
+
+.cart-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(207, 35, 66, 0.2);
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--mc-red);
+    color: white;
+    border: none;
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.checkout-btn:hover:not(:disabled) {
+    background: var(--dark-red);
+}
+
+.checkout-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Floating Cart Button */
+.floating-cart-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: var(--mc-red);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 20px rgba(207, 35, 66, 0.4);
+    z-index: 1000;
+    transition: var(--transition-base);
+}
+
+.floating-cart-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 30px rgba(207, 35, 66, 0.6);
+}
+
+.cart-icon {
+    font-size: 24px;
+}
+
+.cart-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--pure-black);
+    color: var(--white);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 50%;
+    border: 2px solid var(--mc-red);
+}
+
+.no-products {
+    text-align: center;
+    padding: 60px;
+    color: var(--gray);
+    font-size: 18px;
+}
+
+/* Product Modal */
+.product-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.95);
+    overflow-y: auto;
+}
+
+.product-modal-content {
+    background-color: var(--norse-black);
+    margin: 50px auto;
+    padding: 0;
+    width: 90%;
+    max-width: 1200px;
+    position: relative;
+    border: 2px solid var(--mc-red);
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: var(--mc-red);
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+    transition: var(--transition-base);
+}
+
+.modal-close:hover {
+    color: var(--white);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding: 40px;
+}
+
+.modal-images {
+    position: relative;
+}
+
+.main-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    border: 1px solid var(--mc-red);
+    margin-bottom: 20px;
+}
+
+.image-thumbnails {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    overflow-x: auto;
+    padding: 5px 0;
+}
+
+.image-thumbnails::-webkit-scrollbar {
+    height: 6px;
+}
+
+.image-thumbnails::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.image-thumbnails::-webkit-scrollbar-thumb {
+    background: var(--mc-red);
+    border-radius: 3px;
+}
+
+.image-thumbnails .thumbnail {
+    min-width: 80px;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: var(--transition-base);
+    opacity: 0.7;
+}
+
+.image-thumbnails .thumbnail:hover {
+    opacity: 1;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.image-thumbnails .thumbnail.active {
+    opacity: 1;
+    border-color: var(--mc-red);
+}
+
+.modal-info h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: var(--white);
+}
+
+.modal-price {
+    font-size: 28px;
+    color: var(--mc-red);
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.modal-description {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--gray);
+    margin-bottom: 30px;
+}
+
+.modal-sizes {
+    margin-bottom: 30px;
+}
+
+.modal-sizes h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: var(--white);
+}
+
+.modal-size-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.modal-size-btn {
+    padding: 12px 20px;
+    background: rgba(255,0,0,0.1);
+    border: 2px solid var(--mc-red);
+    color: var(--white);
+    cursor: pointer;
+    transition: var(--transition-base);
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.modal-size-btn:hover {
+    background: rgba(255,0,0,0.2);
+    transform: translateY(-2px);
+}
+
+.modal-size-btn.selected {
+    background: var(--mc-red);
+    color: var(--pure-black);
+}
+
+.modal-size-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.modal-add-to-cart {
+    width: 100%;
+    padding: 18px;
+    background: var(--mc-red);
+    color: var(--white);
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition-base);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.modal-add-to-cart:hover {
+    background: var(--mc-red-hover);
+    transform: translateY(-2px);
+}
+
+.modal-add-to-cart:disabled {
+    background: var(--charcoal);
+    cursor: not-allowed;
+}
+
+.product-features {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.product-features h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: var(--mc-red);
+}
+
+.feature-list {
+    list-style: none;
+}
+
+.feature-list li {
+    padding: 8px 0;
+    color: var(--gray);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.feature-list li:before {
+    content: 'ᛋ';
+    color: var(--mc-red);
+    font-size: 20px;
+}
+
+/* ===================================================================
+   11. CONTACT PAGE SPECIFIC STYLES
+   =================================================================== */
+
+/* Contact Hero - uses base .hero .hero-small classes */
+.contact-hero {
+    background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.8)),
+                radial-gradient(circle at center, var(--overlay-light), transparent);
+}
+
+.contact-hero-content {
+    text-align: center;
+    z-index: 2;
+}
+
+.contact-title {
+    font-family: 'Cinzel', serif;
+    font-size: 56px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+}
+
+.contact-subtitle {
+    font-size: 24px;
+    color: var(--gray);
+    font-style: italic;
+}
+
+/* Main Contact Section */
+.contact-main {
+    padding: 80px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    margin-top: 60px;
+}
+
+/* Enhanced Map Container */
+.map-container {
+    background: var(--card-bg);
+    border: 2px solid rgba(255,0,0,0.2);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.map-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--mc-red);
+    z-index: 10;
+}
+
+.map-header {
+    background: rgba(0,0,0,0.8);
+    padding: 30px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,0,0,0.2);
+}
+
+.map-header h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: var(--mc-red);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+}
+
+.map-header p {
+    color: var(--gray);
+    font-size: 16px;
+}
+
+#map {
+    height: 500px;
+    width: 100%;
+    transition: filter 0.3s ease;
+}
+
+.map-info {
+    background: rgba(0,0,0,0.8);
+    padding: 30px;
+    border-top: 1px solid rgba(255,0,0,0.2);
+}
+
+.map-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.detail-item {
+    text-align: center;
+}
+
+.detail-icon {
+    font-size: 32px;
+    color: var(--mc-red);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.detail-item h4 {
+    font-family: 'Iceland', cursive;
+    font-size: 14px;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.detail-item p {
+    color: var(--gray);
+    font-size: 14px;
+}
+
+/* Enhanced Form Container */
+.form-container {
+    background: var(--card-bg);
+    border: 2px solid rgba(255,0,0,0.2);
+    padding: 50px;
+    position: relative;
+}
+
+.form-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--mc-red);
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.form-header h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: var(--mc-red);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+}
+
+.form-header .rune {
+    font-size: 48px;
+    color: var(--mc-red);
+    opacity: 0.3;
+    display: block;
+    margin-bottom: 20px;
+}
+
+/* Contact Form */
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Submit button now uses utility classes: .btn .btn-primary .btn-full */
+
+/* Form Success/Error Messages */
+.form-message {
+    padding: 15px;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 16px;
+    border-radius: 0;
+    display: none;
+}
+
+.form-message.success {
+    background: rgba(0,255,0,0.1);
+    border: 1px solid rgba(0,255,0,0.3);
+    color: #00ff00;
+}
+
+.form-message.error {
+    background: rgba(255,0,0,0.1);
+    border: 1px solid var(--mc-red);
+    color: var(--mc-red);
+}
+
+/* ===================================================================
+   12. STORY PAGE SPECIFIC STYLES
+   =================================================================== */
+
+/* Story Hero - uses base .hero .hero-medium classes */
+.story-hero {
+    background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.8)),
+                radial-gradient(circle at center, var(--overlay-light), transparent);
+}
+
+.story-hero-content {
+    text-align: center;
+    z-index: 2;
+}
+
+.story-hero h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 4rem;
+    color: var(--white);
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+}
+
+.story-hero .tagline {
+    font-size: 1.4rem;
+    color: var(--off-white);
+    font-style: italic;
+    opacity: 0.9;
+}
+
+/* Story Content Section */
+.story-content {
+    padding: 80px 0;
+    background: var(--pure-black);
+    position: relative;
+}
+
+.story-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+/* Story Text Block for Admin Edit */
+.story-text {
+    background: linear-gradient(135deg, rgba(26,26,26,0.5), rgba(10,10,10,0.5));
+    border: 1px solid rgba(207, 35, 66, 0.2);
+    padding: 60px;
+    position: relative;
+    min-height: 400px;
+}
+
+.story-text::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 4px;
+    background: var(--mc-red);
+}
+
+.story-text::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100px;
+    height: 4px;
+    background: var(--mc-red);
+}
+
+/* Typography for story content */
+.story-text h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.2rem;
+    color: var(--mc-red);
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+.story-text h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem;
+    color: var(--white);
+    margin: 40px 0 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.story-text p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: var(--off-white);
+    margin-bottom: 20px;
+    text-align: justify;
+}
+
+.story-text .highlight {
+    color: var(--mc-red);
+    font-weight: 600;
+}
+
+.story-text .quote {
+    font-size: 1.4rem;
+    font-style: italic;
+    color: var(--gray);
+    margin: 40px 0;
+    padding: 20px 0;
+    border-left: 4px solid var(--mc-red);
+    padding-left: 30px;
+}
+
+/* Edit Mode Styles */
+.edit-mode .story-text {
+    border: 2px dashed var(--mc-red);
+    cursor: text;
+}
+
+.edit-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--mc-red);
+    color: var(--white);
+    border: none;
+    padding: 15px 30px;
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: var(--transition-base);
+    box-shadow: 0 5px 20px rgba(207, 35, 66, 0.4);
+    z-index: 1000;
+    display: none;
+}
+
+.edit-btn:hover {
+    background: var(--mc-red-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(207, 35, 66, 0.6);
+}
+
+.save-btn {
+    background: #00ff00;
+    color: var(--pure-black);
+}
+
+.save-btn:hover {
+    background: #00cc00;
+}
+
+/* Loading state */
+.story-loading {
+    text-align: center;
+    padding: 100px 20px;
+}
+
+/* Empty state */
+.story-empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--gray);
+}
+
+.story-empty .rune {
+    font-size: 80px;
+    color: var(--mc-red);
+    opacity: 0.3;
+    display: block;
+    margin-bottom: 20px;
+}
+
+/* Timeline Section */
+.timeline-section {
+    padding: 80px 0;
+    background: linear-gradient(180deg, rgba(26,26,26,0.3), rgba(10,10,10,0.3));
+    margin-top: 80px;
+}
+
+.timeline-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.timeline-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.timeline-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    color: var(--white);
+    margin-bottom: 10px;
+    position: relative;
+    display: inline-block;
+}
+
+.timeline-header h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: var(--mc-red);
+}
+
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 100%;
+    background: var(--mc-red);
+    opacity: 0.3;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 50px;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.timeline-item:nth-child(odd) {
+    padding-right: 50%;
+    text-align: right;
+}
+
+.timeline-item:nth-child(even) {
+    padding-left: 50%;
+    text-align: left;
+}
+
+.timeline-content {
+    background: rgba(26,26,26,0.8);
+    border: 1px solid rgba(207, 35, 66, 0.3);
+    padding: 30px;
+    position: relative;
+    transition: var(--transition-base);
+}
+
+.timeline-content:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-red);
+    border-color: var(--mc-red);
+}
+
+.timeline-year {
+    font-family: 'Iceland', cursive;
+    font-size: 2rem;
+    color: var(--mc-red);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.timeline-event {
+    font-size: 1.1rem;
+    color: var(--off-white);
+    line-height: 1.6;
+}
+
+.timeline-dot {
+    position: absolute;
+    top: 20px;
+    width: 20px;
+    height: 20px;
+    background: var(--mc-red);
+    border: 4px solid var(--norse-black);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.timeline-item:nth-child(odd) .timeline-dot {
+    right: -10px;
+}
+
+.timeline-item:nth-child(even) .timeline-dot {
+    left: -10px;
+}
+
+/* ===================================================================
+   13. AUTHENTICATION PAGES SPECIFIC STYLES
+   =================================================================== */
+
+/* Authentication Pages Styles */
+.auth-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    margin-top: 80px;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 500px;
+}
+
+.auth-card {
+    background: linear-gradient(135deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95));
+    border: 2px solid rgba(255,0,0,0.2);
+    padding: 50px;
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--mc-red);
+}
+
+.register-card {
+    max-width: 600px;
+}
+
+.auth-title {
+    font-family: 'Cinzel', serif;
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 40px;
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.auth-title .rune {
+    font-size: 48px;
+    color: var(--mc-red);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.auth-form .form-group label {
+    font-family: 'Iceland', cursive;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 15px;
+    background: rgba(0,0,0,0.6);
+    border: var(--border-light);
+    color: var(--white);
+    font-size: 16px;
+    font-family: 'Cormorant Garamond', serif;
+    transition: var(--transition-base);
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: var(--mc-red);
+    background: rgba(255,0,0,0.05);
+    box-shadow: 0 0 20px rgba(255,0,0,0.2);
+}
+
+.checkbox-group {
+    margin: 20px 0;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 15px;
+    background: rgba(255,0,0,0.05);
+    border: 2px solid rgba(255,0,0,0.3);
+    border-radius: 4px;
+    transition: var(--transition-base);
+}
+
+.checkbox-label:hover {
+    background: rgba(255,0,0,0.1);
+    border-color: var(--mc-red);
+    transform: translateY(-2px);
+}
+
+.checkbox-label input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-custom {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255,255,255,0.3);
+    margin-right: 12px;
+    position: relative;
+    transition: var(--transition-base);
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
+    background: var(--mc-red);
+    border-color: var(--mc-red);
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--white);
+    font-size: 16px;
+}
+
+.checkbox-note {
+    font-size: 14px;
+    color: var(--gray);
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* Auth submit button now uses utility classes: .btn .btn-primary .btn-full .btn-lg */
+.auth-submit-btn {
+    margin-top: 20px;
+}
+
+.auth-submit-btn:active {
+    transform: scale(0.98);
+}
+
+.auth-submit-btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.auth-submit-btn .btn-text,
+.auth-submit-btn .btn-loading {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin: 30px 0;
+    gap: 20px;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.2);
+}
+
+.divider-text {
+    color: var(--gray);
+    font-family: 'Iceland', cursive;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.auth-links {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.auth-links p {
+    color: var(--gray);
+    font-size: 16px;
+}
+
+.auth-link {
+    color: var(--mc-red);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition-base);
+    margin-left: 5px;
+}
+
+.auth-link:hover {
+    color: var(--white);
+    text-decoration: underline;
+}
+
+.error-message,
+.success-message {
+    padding: 15px;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 16px;
+    border-radius: 4px;
+}
+
+.error-message {
+    background: rgba(255,0,0,0.1);
+    border: 1px solid var(--mc-red);
+    color: var(--mc-red);
+}
+
+.success-message {
+    background: rgba(0,255,0,0.1);
+    border: 1px solid #00ff00;
+    color: #00ff00;
+}
+
+/* Field validation styles */
+.auth-form input.invalid {
+    border-color: var(--mc-red);
+    background: rgba(255,0,0,0.05);
+}
+
+.field-error {
+    color: var(--mc-red);
+    font-size: 12px;
+    margin-top: 5px;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+/* ===================================================================
+   14. ANIMATIONS
+   =================================================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
     }
-
-    /* Background Logo Watermark */
-    body::before {
-        content: '';
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 60%;
-        height: 60%;
-        background: url('Images/SleipnirLogo.png') no-repeat center center;
-        background-size: contain;
-        opacity: 0.3;
-        z-index: -1;
-        pointer-events: none;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
+}
 
-    /* Language Toggle Styles */
-    .en {
-        display: none;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
     }
-
-    body.lang-en .is {
-        display: none;
+    to {
+        opacity: 1;
     }
+}
 
-    body.lang-en .en {
-        display: inline;
-    }
+/* ===================================================================
+   15. RESPONSIVE DESIGN
+   =================================================================== */
 
-    /* Header Styles */
-    header {
-        background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(26,26,26,0.9) 100%);
-        backdrop-filter: blur(10px);
-        padding: 20px 0;
-        position: fixed;
-        width: 100%;
-        top: 0;
-        z-index: 1000;
-        border-bottom: 2px solid var(--dark-red);
-    }
-
-    nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 40px;
-        min-height: 60px; /* Consistent height to prevent jumps */
-    }
-
-    .logo {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .norse-text {
-        font-family: 'Iceland', cursive;
-        font-size: 14px;
-        color: var(--mc-red);
-        letter-spacing: 2px;
-    }
-
-    .logo-text {
-        font-family: 'Cinzel', serif;
-        font-size: 28px;
-        font-weight: 900;
-        color: var(--white);
-        letter-spacing: 4px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-    }
-
-    .location {
-        font-family: 'Iceland', cursive;
-        font-size: 14px;
-        color: var(--gray);
-        letter-spacing: 3px;
-    }
-
+@media (max-width: 1024px) {
     .nav-links {
-        display: flex;
-        list-style: none;
-        gap: 40px;
-        flex-shrink: 0; /* Prevent links from compressing */
-    }
-
-    .nav-links a {
-        color: var(--white);
-        text-decoration: none;
-        font-size: 16px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: all 0.3s;
-        position: relative;
-    }
-
-    .nav-links a:hover {
-        color: var(--mc-red);
-    }
-
-    .nav-links a::after {
-        content: '';
-        position: absolute;
-        width: 0;
-        height: 2px;
-        bottom: -5px;
-        left: 50%;
-        background: var(--mc-red);
-        transition: all 0.3s;
-        transform: translateX(-50%);
-    }
-
-    .nav-links a:hover::after {
-        width: 100%;
-    }
-
-    .member-portal .member-btn {
-        padding: 10px 25px;
-        background: var(--dark-red);
-        color: var(--white);
-        text-decoration: none;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        border: 2px solid var(--mc-red);
-        transition: all 0.3s;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .member-portal .member-btn:hover {
-        background: var(--mc-red-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(207, 35, 66, 0.3);
-    }
-
-    /* Language Toggle Styles */
-    .language-toggle {
-        margin-left: 20px;
-    }
-    
-    /* Auth buttons */
-    .auth-buttons {
-        margin-left: 20px;
-        display: flex;
-        align-items: center;
-    }
-    
-    .login-btn {
-        background: var(--norse-black);
-        border: 2px solid var(--mc-red);
-        color: var(--white);
-        padding: 8px 20px;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: all 0.3s ease;
-        display: inline-block;
-    }
-    
-    .login-btn:hover {
-        background: var(--mc-red);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(207, 35, 66, 0.3);
-    }
-    
-    /* Member portal */
-    .member-portal {
-        margin-left: 20px;
-        min-width: 150px; /* Reserve space to prevent layout shift */
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-    }
-    
-    /* Prevent layout shift during auth loading */
-    .member-portal.loading {
-        opacity: 1; /* Keep visible to prevent shift */
-        pointer-events: none;
-    }
-    
-    .member-portal.loaded {
-        opacity: 1;
-        transition: opacity 0.2s ease;
-    }
-    
-    /* Skeleton loader animation */
-    @keyframes pulse {
-        0% {
-            opacity: 0.6;
-        }
-        50% {
-            opacity: 0.8;
-        }
-        100% {
-            opacity: 0.6;
-        }
-    }
-
-    .lang-btn {
-        background: var(--norse-black);
-        border: 2px solid var(--mc-red);
-        color: var(--white);
-        padding: 8px 20px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .lang-btn:hover {
-        background: var(--mc-red-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(207, 35, 66, 0.3);
-    }
-
-    /* Lazy loading styles */
-    .lazy-image {
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-    }
-    
-    .lazy-image.loaded {
-        opacity: 1;
-    }
-    
-    /* Language visibility */
-    .en {
-        display: none;
-    }
-
-    body[data-lang="en"] .is {
-        display: none;
-    }
-
-    body[data-lang="en"] .en {
-        display: inline;
-    }
-
-    /* Hero Section */
-    .hero {
-        margin-top: 80px;
-        height: 100vh;
-        background:
-            linear-gradient(180deg,
-                rgba(0,0,0,0.4) 0%,
-                rgba(0,0,0,0.6) 50%,
-                rgba(0,0,0,0.8) 100%),
-            url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect width="1920" height="1080" fill="%23000000"/><polygon points="0,600 480,400 960,500 1440,350 1920,450 1920,1080 0,1080" fill="%231a1a1a" opacity="0.9"/><polygon points="0,700 320,600 640,650 960,550 1280,600 1600,500 1920,550 1920,1080 0,1080" fill="%230a0a0a"/></svg>');
-        background-size: cover;
-        background-position: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .hero-overlay {
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
-    }
-
-    .northern-lights {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-            45deg,
-            transparent 30%,
-            rgba(255,0,0,0.05) 50%,
-            rgba(204,0,0,0.05) 70%,
-            transparent 100%
-        );
-        animation: aurora 20s ease-in-out infinite;
-        opacity: 0.6;
-    }
-
-    @keyframes aurora {
-        0%, 100% { transform: translateX(-100%) translateY(-50%); }
-        50% { transform: translateX(100%) translateY(50%); }
-    }
-
-    .hero-content {
-        z-index: 2;
-        animation: fadeIn 1.2s ease-out;
-    }
-
-    .hero-title {
-        font-family: 'Cinzel', serif;
-        font-size: 72px;
-        font-weight: 900;
-        margin-bottom: 20px;
-        text-transform: uppercase;
-        letter-spacing: 4px;
-        line-height: 1.1;
-    }
-
-    .norse-accent {
-        display: block;
-        font-family: 'Iceland', cursive;
-        font-size: 36px;
-        color: var(--mc-red);
-        margin-bottom: 10px;
-        letter-spacing: 8px;
-    }
-
-    .hero-subtitle {
-        font-size: 24px;
-        font-weight: 300;
-        color: var(--gray);
-        margin-bottom: 40px;
-        font-style: italic;
-    }
-
-    .cta-group {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-    }
-
-    .cta-button {
-        display: inline-block;
-        padding: 15px 40px;
-        text-decoration: none;
-        font-family: 'Cinzel', serif;
-        font-size: 16px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        transition: all 0.3s;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .cta-button.primary {
-        background: var(--mc-red);
-        color: var(--white);
-        border: 2px solid var(--mc-red);
-    }
-
-    .cta-button.secondary {
-        background: transparent;
-        color: var(--white);
-        border: 2px solid var(--white);
-    }
-
-    .cta-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 30px rgba(207, 35, 66, 0.3);
-    }
-
-    .cta-button.primary:hover {
-        background: var(--mc-red-hover);
-        border-color: var(--mc-red);
-    }
-
-    .cta-button.secondary:hover {
-        background: var(--mc-red);
-        border-color: var(--mc-red);
-        color: var(--white);
-    }
-
-    .frost-border {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 100px;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 100"><path d="M0,50 Q480,20 960,50 T1920,50 L1920,100 L0,100 Z" fill="%23ff0000" opacity="0.05"/></svg>');
-        background-size: cover;
-    }
-
-    /* Products Section */
-    .products {
-        padding: 100px 40px;
-        max-width: 1400px;
-        margin: 0 auto;
-        position: relative;
-    }
-
-    .section-header {
-        text-align: center;
-        margin-bottom: 80px;
-    }
-
-    .section-title {
-        font-family: 'Cinzel', serif;
-        font-size: 48px;
-        font-weight: 600;
-        margin-bottom: 20px;
-        text-transform: uppercase;
-        letter-spacing: 3px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 30px;
-    }
-
-    .norse-knotwork {
-        width: 80px;
-        height: 40px;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 40"><path d="M10,20 Q20,10 30,20 T50,20 Q60,10 70,20" stroke="%23ff0000" stroke-width="2" fill="none"/><path d="M10,20 Q20,30 30,20 T50,20 Q60,30 70,20" stroke="%23ff0000" stroke-width="2" fill="none"/></svg>');
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-
-    .norse-knotwork.right {
-        transform: scaleX(-1);
-    }
-
-    .section-subtitle {
-        font-size: 20px;
-        color: var(--gray);
-        font-style: italic;
-    }
-
-    .product-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 50px;
-    }
-
-    .product-card {
-        background: linear-gradient(135deg, rgba(26,26,26,0.9), rgba(10,10,10,0.9));
-        border: 1px solid rgba(255,0,0,0.1);
-        border-radius: 0;
-        overflow: hidden;
-        transition: all 0.4s;
-        position: relative;
-        opacity: 0;
-        transform: translateY(50px);
-    }
-
-    .product-card.visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    .product-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--mc-red);
-        transform: scaleX(0);
-        transition: transform 0.4s;
-    }
-
-    .product-card:hover::before {
-        transform: scaleX(1);
-    }
-
-    .product-card:hover {
-        transform: translateY(-10px);
-        box-shadow:
-            0 20px 40px rgba(255,0,0,0.2),
-            0 0 60px rgba(255,0,0,0.1);
-        border-color: rgba(255,0,0,0.3);
-    }
-
-    .product-image {
-        width: 100%;
-        height: 400px;
-        background: linear-gradient(135deg, var(--norse-black), var(--midnight-black));
-        position: relative;
-        overflow: hidden;
-    }
-
-    .product-badge {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        padding: 8px 20px;
-        background: var(--mc-red);
-        color: var(--white);
-        font-family: 'Iceland', cursive;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        backdrop-filter: blur(10px);
-    }
-
-    .product-overlay {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.4) 100%);
-    }
-
-    .norse-symbol {
-        font-size: 120px;
-        color: var(--dark-red);
-        opacity: 0.2;
-        transition: all 0.4s;
-    }
-
-    .product-card:hover .norse-symbol {
-        opacity: 0.4;
-        transform: scale(1.1);
-    }
-
-    .product-info {
-        padding: 35px;
-        background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.3));
-    }
-
-    .product-name {
-        font-family: 'Cinzel', serif;
-        font-size: 24px;
-        font-weight: 600;
-        margin-bottom: 10px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: var(--white);
-    }
-
-    .product-saga {
-        font-size: 16px;
-        color: var(--gray);
-        font-style: italic;
-        margin-bottom: 20px;
-    }
-
-    .product-price {
-        font-family: 'Iceland', cursive;
-        font-size: 32px;
-        color: var(--mc-red);
-        font-weight: 400;
-        margin-bottom: 25px;
-        letter-spacing: 1px;
-    }
-
-    .size-selector {
-        margin-bottom: 25px;
-    }
-
-    .size-label {
-        display: block;
-        font-family: 'Iceland', cursive;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: var(--gray);
-        margin-bottom: 15px;
-    }
-
-    .size-options {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .size-btn {
-        padding: 10px 18px;
-        background: rgba(26,26,26,0.8);
-        color: var(--white);
-        border: 1px solid rgba(255,255,255,0.2);
-        cursor: pointer;
-        transition: all 0.3s;
-        font-family: 'Iceland', cursive;
-        font-size: 14px;
-        font-weight: 400;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .size-btn:hover {
-        background: rgba(255,0,0,0.2);
-        border-color: var(--mc-red);
-        color: var(--white);
-    }
-
-    .size-btn.selected {
-        background: var(--mc-red);
-        border-color: var(--mc-red);
-        color: var(--white);
-    }
-
-    .add-to-cart {
-        width: 100%;
-        padding: 18px;
-        background: var(--mc-red);
-        color: var(--white);
-        border: none;
-        font-family: 'Cinzel', serif;
-        font-size: 16px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        cursor: pointer;
-        transition: all 0.3s;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .add-to-cart::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        background: rgba(255,255,255,0.2);
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
-    }
-
-    .add-to-cart:hover {
-        background: var(--mc-red-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(207, 35, 66, 0.4);
-    }
-
-    .add-to-cart:active::before {
-        width: 300px;
-        height: 300px;
-    }
-
-    /* Saga Section */
-    .saga {
-        padding: 100px 40px;
-        background: linear-gradient(180deg, var(--midnight-black), var(--norse-black));
-        position: relative;
-        overflow: hidden;
-    }
-
-    .saga::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, var(--mc-red), transparent);
-    }
-
-    .saga-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        text-align: center;
-    }
-
-    .saga-content {
-        margin-top: 60px;
-    }
-
-    .saga-intro {
-        font-size: 24px;
-        line-height: 1.8;
-        color: var(--white);
-        max-width: 800px;
-        margin: 0 auto 60px;
-        font-weight: 300;
-    }
-
-    .saga-values {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 50px;
-        margin-top: 60px;
-    }
-
-    .value-item {
-        background: rgba(26,26,26,0.5);
-        border: 1px solid rgba(255,0,0,0.1);
-        padding: 40px;
-        transition: all 0.4s;
-        position: relative;
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    .value-item.visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    .value-item:hover {
-        background: rgba(255,0,0,0.05);
-        border-color: var(--mc-red);
-        transform: translateY(-5px);
-    }
-
-    .rune {
-        font-size: 48px;
-        color: var(--mc-red);
-        display: block;
-        margin-bottom: 20px;
-    }
-
-    .value-item h3 {
-        font-family: 'Cinzel', serif;
-        font-size: 24px;
-        margin-bottom: 15px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-    }
-
-    .value-item p {
-        font-size: 18px;
-        color: var(--gray);
-        font-style: italic;
-    }
-
-    /* Brotherhood Section */
-    .brotherhood {
-        padding: 120px 40px;
-        background:
-            linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
-            url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 600"><defs><pattern id="norse-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M50,10 L60,30 L50,50 L40,30 Z" fill="none" stroke="%23ff0000" stroke-width="0.5" opacity="0.3"/><circle cx="50" cy="50" r="30" fill="none" stroke="%23ff0000" stroke-width="0.5" opacity="0.2"/></pattern></defs><rect width="1920" height="600" fill="url(%23norse-pattern)"/></svg>');
-        text-align: center;
-    }
-
-    .brotherhood-content {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    .brotherhood-text {
-        font-size: 22px;
-        line-height: 1.8;
-        color: var(--white);
-        margin: 30px 0 40px;
-        font-weight: 300;
-    }
-
-    /* Cart Notification */
-    .cart-notification {
-        position: fixed;
-        top: 100px;
-        right: -400px;
-        background: linear-gradient(135deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95));
-        backdrop-filter: blur(10px);
-        border: 2px solid var(--mc-red);
-        padding: 25px;
-        border-radius: 0;
-        z-index: 2000;
-        transition: right 0.5s ease-out;
-        max-width: 350px;
-        box-shadow: 0 10px 30px rgba(255,0,0,0.3);
-    }
-
-    .cart-notification.show {
-        right: 40px;
-    }
-
-    .notification-content {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .notification-content .norse-symbol {
-        font-size: 36px;
-        color: var(--mc-red);
-    }
-
-    .cart-notification h3 {
-        font-family: 'Cinzel', serif;
-        color: var(--mc-red);
-        margin-bottom: 10px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    /* Contact Page Styles */
-    .contact-section {
-        padding: 100px 40px;
-        max-width: 1400px;
-        margin: 100px auto 0;
-    }
-
-    .contact-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 60px;
-        margin-top: 80px;
-    }
-
-    .contact-info {
-        background: linear-gradient(135deg, rgba(26,26,26,0.9), rgba(10,10,10,0.9));
-        padding: 50px;
-        border: 1px solid rgba(255,0,0,0.1);
-        position: relative;
-    }
-
-    .contact-info::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--mc-red);
-    }
-
-    .contact-info h3 {
-        font-family: 'Cinzel', serif;
-        font-size: 32px;
-        color: var(--mc-red);
-        margin-bottom: 40px;
-        text-transform: uppercase;
-        letter-spacing: 3px;
-    }
-
-    .info-item {
-        margin-bottom: 30px;
-        display: flex;
-        align-items: flex-start;
-        gap: 20px;
-    }
-
-    .info-icon {
-        font-size: 24px;
-        color: var(--mc-red);
-        min-width: 30px;
-    }
-
-    .info-content h4 {
-        font-family: 'Cinzel', serif;
-        font-size: 18px;
-        color: var(--white);
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-    }
-
-    .info-content p {
-        color: var(--gray);
-        font-size: 18px;
-        line-height: 1.6;
-    }
-
-    .info-content a {
-        color: var(--gray);
-        text-decoration: none;
-        transition: color 0.3s;
-    }
-
-    .info-content a:hover {
-        color: var(--mc-red);
-    }
-
-    /* Contact Form Styles */
-    .contact-form-container {
-        background: linear-gradient(135deg, rgba(26,26,26,0.9), rgba(10,10,10,0.9));
-        padding: 50px;
-        border: 1px solid rgba(255,0,0,0.1);
-        position: relative;
-    }
-
-    .contact-form-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--mc-red);
-    }
-
-    .contact-form h3 {
-        font-family: 'Cinzel', serif;
-        font-size: 32px;
-        color: var(--mc-red);
-        margin-bottom: 40px;
-        text-transform: uppercase;
-        letter-spacing: 3px;
-    }
-
-    .form-group {
-        margin-bottom: 30px;
-    }
-
-    .form-group label {
-        display: block;
-        font-family: 'Iceland', cursive;
-        font-size: 14px;
-        color: var(--white);
-        margin-bottom: 12px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        width: 100%;
-        padding: 18px;
-        background: rgba(10,10,10,0.8);
-        border: 1px solid rgba(255,255,255,0.2);
-        color: var(--white);
-        font-size: 16px;
-        font-family: 'Cormorant Garamond', serif;
-        transition: all 0.3s;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-        outline: none;
-        border-color: var(--mc-red);
-        background: rgba(255,0,0,0.05);
-        box-shadow: 0 0 20px rgba(255,0,0,0.2);
-    }
-
-    .form-group textarea {
-        resize: vertical;
-        min-height: 150px;
-    }
-
-    .submit-btn {
-        width: 100%;
-        padding: 20px;
-        background: var(--mc-red);
-        color: var(--white);
-        border: none;
-        font-family: 'Cinzel', serif;
-        font-size: 18px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        cursor: pointer;
-        transition: all 0.3s;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .submit-btn:hover {
-        background: var(--mc-red-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 15px 30px rgba(207, 35, 66, 0.4);
-    }
-
-    /* Footer */
-    footer {
-        background: linear-gradient(180deg, var(--norse-black), var(--midnight-black));
-        padding: 60px 40px 40px;
-        text-align: center;
-        border-top: 2px solid var(--dark-red);
-        position: relative;
-    }
-
-    footer::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--mc-red);
-    }
-
-    .footer-content {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .footer-section h4 {
-        font-family: 'Cinzel', serif;
-        font-size: 24px;
-        color: var(--mc-red);
-        margin-bottom: 15px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-    }
-
-    .footer-section p {
-        color: var(--gray);
-        font-size: 16px;
-        margin-bottom: 30px;
-    }
-
-    .social-links {
-        display: flex;
-        justify-content: center;
-        gap: 40px;
-        margin: 30px 0;
-    }
-
-    .social-links a {
-        color: var(--gray);
-        font-size: 28px;
-        transition: all 0.3s;
-        display: inline-block;
-    }
-
-    .social-links a:hover {
-        color: var(--mc-red);
-        transform: translateY(-3px) scale(1.2);
-    }
-
-    .footer-bottom {
-        margin-top: 40px;
-        padding-top: 30px;
-        border-top: 1px solid rgba(255,0,0,0.1);
-    }
-
-    .footer-bottom p {
-        color: var(--gray);
-        font-size: 14px;
-        letter-spacing: 1px;
-    }
-
-    /* Animations */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(40px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-
-    /* Responsive Design */
-    @media (max-width: 1024px) {
-        .nav-links {
-            gap: 25px;
-        }
-
-        .hero-title {
-            font-size: 56px;
-        }
-
-        .product-grid {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        }
-    }
-
-    @media (max-width: 768px) {
-        nav {
-            flex-direction: column;
-            gap: 20px;
-            padding: 0 20px;
-        }
-
-        .nav-links {
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .nav-links a {
-            font-size: 14px;
-        }
-
-        .member-portal {
-            margin-top: 10px;
-        }
-
-        .hero {
-            height: 80vh;
-        }
-
-        .hero-title {
-            font-size: 42px;
-        }
-
-        .norse-accent {
-            font-size: 28px;
-        }
-
-        .hero-subtitle {
-            font-size: 18px;
-        }
-
-        .cta-group {
-            flex-direction: column;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        .section-title {
-            font-size: 36px;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .norse-knotwork {
-            width: 60px;
-            height: 30px;
-        }
-
-        .product-grid {
-            grid-template-columns: 1fr;
-            gap: 40px;
-        }
-
-        .saga-values {
-            grid-template-columns: 1fr;
-        }
-
-        .contact-container {
-            grid-template-columns: 1fr;
-            gap: 40px;
-        }
-
-        .contact-info,
-        .contact-form-container {
-            padding: 35px;
-        }
-    }
-
-
-    /* Authentication Pages Styles */
-    .auth-section {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 20px;
-        margin-top: 80px;
-    }
-
-    .auth-container {
-        width: 100%;
-        max-width: 500px;
-    }
-
-    .auth-card {
-        background: linear-gradient(135deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95));
-        border: 2px solid rgba(255,0,0,0.2);
-        padding: 50px;
-        position: relative;
-        backdrop-filter: blur(10px);
-    }
-
-    .auth-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--mc-red);
-    }
-
-    .register-card {
-        max-width: 600px;
-    }
-
-    .auth-title {
-        font-family: 'Cinzel', serif;
-        font-size: 36px;
-        text-align: center;
-        margin-bottom: 40px;
-        color: var(--white);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .auth-title .rune {
-        font-size: 48px;
-        color: var(--mc-red);
-    }
-
-    .auth-form {
-        display: flex;
-        flex-direction: column;
         gap: 25px;
     }
 
-    .auth-form .form-group label {
-        font-family: 'Iceland', cursive;
+    .hero-title {
+        font-size: 56px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    /* Dropdown adjustments for tablets */
+    .dropdown-menu {
+        min-width: 220px;
+    }
+}
+
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        gap: 20px;
+        padding: 0 20px;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .nav-links a {
         font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: var(--white);
-        margin-bottom: 8px;
-        display: block;
     }
 
-    .auth-form input {
-        width: 100%;
-        padding: 15px;
-        background: rgba(0,0,0,0.6);
-        border: 1px solid rgba(255,255,255,0.2);
-        color: var(--white);
-        font-size: 16px;
-        font-family: 'Cormorant Garamond', serif;
-        transition: all 0.3s;
-    }
-
-    .auth-form input:focus {
-        outline: none;
-        border-color: var(--mc-red);
-        background: rgba(255,0,0,0.05);
-        box-shadow: 0 0 20px rgba(255,0,0,0.2);
-    }
-
-    .checkbox-group {
-        margin: 20px 0;
-    }
-
-    .checkbox-label {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        font-size: 16px;
-        padding: 15px;
-        background: rgba(255,0,0,0.05);
-        border: 2px solid rgba(255,0,0,0.3);
-        border-radius: 4px;
-        transition: all 0.3s;
-    }
-    
-    .checkbox-label:hover {
-        background: rgba(255,0,0,0.1);
-        border-color: var(--mc-red);
-        transform: translateY(-2px);
-    }
-
-    .checkbox-label input[type="checkbox"] {
-        display: none;
-    }
-
-    .checkbox-custom {
-        width: 24px;
-        height: 24px;
-        border: 2px solid rgba(255,255,255,0.3);
-        margin-right: 12px;
+    /* Mobile dropdown */
+    .nav-dropdown {
         position: relative;
-        transition: all 0.3s;
     }
 
-    .checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
-        background: var(--mc-red);
-        border-color: var(--mc-red);
-    }
-
-    .checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
-        content: '✓';
+    .dropdown-menu {
         position: absolute;
-        top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%);
-        color: var(--white);
-        font-size: 16px;
+        transform: translateX(-50%);
+        top: calc(100% + 10px);
+        width: 90%;
+        max-width: 300px;
     }
 
-    .checkbox-note {
-        font-size: 14px;
-        color: var(--gray);
-        margin-top: 8px;
-        font-style: italic;
+    .nav-dropdown > a::before {
+        right: -12px;
     }
 
-    .auth-submit-btn {
-        position: relative;
-        padding: 18px;
-        background: var(--mc-red);
-        color: var(--white);
-        border: none;
-        font-family: 'Cinzel', serif;
-        overflow: hidden;
+    .member-portal {
+        margin-top: 10px;
+    }
+
+    .hero {
+        height: 80vh;
+    }
+
+    .hero-title {
+        font-size: 42px;
+    }
+
+    .norse-accent {
+        font-size: 28px;
+    }
+
+    .hero-subtitle {
         font-size: 18px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-top: 20px;
     }
 
-    .auth-submit-btn:hover {
-        background: var(--mc-red-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(207, 35, 66, 0.4);
+    .cta-group {
+        flex-direction: column;
+        width: 100%;
+        max-width: 300px;
     }
 
-    .auth-divider {
-        display: flex;
-        align-items: center;
-        margin: 30px 0;
+    .section-title {
+        font-size: 36px;
+        flex-direction: column;
         gap: 20px;
     }
 
-    .divider-line {
-        flex: 1;
-        height: 1px;
-        background: rgba(255,255,255,0.2);
+    .norse-knotwork {
+        width: 60px;
+        height: 30px;
     }
 
-    .divider-text {
-        color: var(--gray);
-        font-family: 'Iceland', cursive;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-    }
-
-    .auth-links {
-        text-align: center;
-        margin-top: 20px;
-    }
-
-    .auth-links p {
-        color: var(--gray);
-        font-size: 16px;
-    }
-
-    .auth-link {
-        color: var(--mc-red);
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s;
-        margin-left: 5px;
-    }
-
-    .auth-link:hover {
-        color: var(--white);
-        text-decoration: underline;
-    }
-
-    .error-message,
-    .success-message {
-        padding: 15px;
-        margin-top: 20px;
-        text-align: center;
-        font-size: 16px;
-        border-radius: 4px;
-    }
-
-    .error-message {
-        background: rgba(255,0,0,0.1);
-        border: 1px solid var(--mc-red);
-        color: var(--mc-red);
-    }
-
-    .success-message {
-        background: rgba(0,255,0,0.1);
-        border: 1px solid #00ff00;
-        color: #00ff00;
-    }
-
-    /* Loading states */
-    .auth-submit-btn.loading {
-        pointer-events: none;
-        opacity: 0.8;
-    }
-
-    .auth-submit-btn .btn-text,
-    .auth-submit-btn .btn-loading {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .spinner {
-        width: 20px;
-        height: 20px;
-        border: 2px solid rgba(255,255,255,0.3);
-        border-top-color: var(--white);
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    /* Field validation styles */
-    .auth-form input.invalid {
-        border-color: var(--mc-red);
-        background: rgba(255,0,0,0.05);
-    }
-
-    .field-error {
-        color: var(--mc-red);
-        font-size: 12px;
-        margin-top: 5px;
-        text-transform: none;
-        letter-spacing: normal;
-    }
-
-    /* Safari-specific fixes */
-    @supports (-webkit-appearance: none) {
-        .auth-submit-btn {
-            -webkit-appearance: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .auth-form input {
-            -webkit-appearance: none;
-        }
-    }
-
-    /* Improved button active state */
-    .auth-submit-btn:active {
-        transform: scale(0.98);
-    }
-
-    .auth-submit-btn:disabled {
-        cursor: not-allowed;
-    }
-
-    /* User name display in header */
-    .user-name {
-        font-family: 'Iceland', cursive;
-        font-size: 16px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    /* Auth loading state */
-    .member-portal {
-        min-width: 200px;
-        text-align: right;
-    }
-    
-
-    
-    /* User dropdown menu */
-    .user-menu {
-        position: relative;
-        display: inline-block;
-    }
-    
-    .user-menu-toggle {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        cursor: pointer;
-        padding: 8px 15px;
-        background: rgba(255,0,0,0.1);
-        border: 1px solid var(--mc-red);
-        border-radius: 4px;
-        transition: all 0.3s;
-    }
-    
-    .user-menu-toggle:hover {
-        background: rgba(255,0,0,0.2);
-    }
-    
-    .user-menu-dropdown {
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%) translateY(-10px);
-        margin-top: 10px;
-        background: var(--norse-black);
-        border: 1px solid var(--mc-red);
-        border-radius: 4px;
-        min-width: 200px;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s;
-        z-index: 1000;
-    }
-    
-    .user-menu.active .user-menu-dropdown {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(-50%) translateY(0);
-    }
-    
-    .user-menu-dropdown a {
-        display: block;
-        padding: 12px 20px;
-        color: var(--white);
-        text-decoration: none;
-        transition: all 0.3s;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .user-menu-dropdown a:last-child {
-        border-bottom: none;
-    }
-    
-    .user-menu-dropdown a:hover {
-        background: rgba(255,0,0,0.2);
-        color: var(--mc-red);
-    }
-    
-    .user-menu-dropdown .logout-btn {
-        color: var(--mc-red);
-        font-weight: bold;
-    }
-
-    /* Active nav link */
-    .nav-links a.active {
-        color: var(--mc-red);
-    }
-
-    .nav-links a.active::after {
-        width: 100%;
-    }
-
-    /* Responsive Auth Pages */
-    @media (max-width: 768px) {
-        .auth-card {
-            padding: 30px 20px;
-        }
-
-        .auth-title {
-            font-size: 28px;
-        }
-
-        .auth-title .rune {
-            font-size: 36px;
-        }
-
-        @media (max-width: 480px) {
-            .logo-text {
-                font-size: 22px;
-            }
-
-            .hero-title {
-                font-size: 32px;
-            }
-
-            .hero-subtitle {
-                font-size: 16px;
-            }
-
-            .cta-button {
-                padding: 12px 30px;
-                font-size: 14px;
-            }
-
-            .section-title {
-                font-size: 28px;
-            }
-
-            .product-info {
-                padding: 25px;
-            }
-
-            .product-name {
-                font-size: 20px;
-            }
-
-            .product-price {
-                font-size: 28px;
-            }
-        }
-    }
-
-    /* Product Modal Styles */
-    .product-modal {
-        display: none;
-        position: fixed;
-        z-index: 2000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.95);
-        overflow-y: auto;
-    }
-
-    .product-modal-content {
-        background-color: var(--norse-black);
-        margin: 50px auto;
-        padding: 0;
-        width: 90%;
-        max-width: 1200px;
-        position: relative;
-        border: 2px solid var(--mc-red);
-    }
-
-    .modal-close {
-        position: absolute;
-        top: 20px;
-        right: 30px;
-        color: var(--mc-red);
-        font-size: 40px;
-        font-weight: bold;
-        cursor: pointer;
-        z-index: 10;
-        transition: all 0.3s;
-    }
-
-    .modal-close:hover {
-        color: var(--white);
-        transform: rotate(90deg);
-    }
-
-    .modal-body {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+    .product-grid {
+        grid-template-columns: 1fr;
         gap: 40px;
-        padding: 40px;
     }
 
-    .modal-images {
-        position: relative;
+    .saga-values {
+        grid-template-columns: 1fr;
     }
 
-    .main-image {
+    .contact-container,
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .contact-info,
+    .contact-form-container {
+        padding: 35px;
+    }
+
+    /* Mobile specific styles */
+    .cart-sidebar {
         width: 100%;
-        height: 500px;
-        object-fit: cover;
-        border: 1px solid var(--mc-red);
-        margin-bottom: 20px;
+        right: -100%;
     }
 
-    .image-thumbnails {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    .filter-buttons {
         gap: 10px;
     }
 
-    .thumbnail {
-        width: 100%;
-        height: 80px;
-        object-fit: cover;
-        cursor: pointer;
-        border: 2px solid transparent;
-        transition: all 0.3s;
+    .filter-btn {
+        padding: 8px 20px;
+        font-size: 14px;
     }
 
-    .thumbnail:hover,
-    .thumbnail.active {
-        border-color: var(--mc-red);
-        transform: scale(1.05);
+    .product-image-gallery {
+        height: 300px;
     }
 
-    .modal-info h2 {
-        font-family: 'Cinzel', serif;
-        font-size: 36px;
-        margin-bottom: 20px;
-        color: var(--white);
-    }
-
-    .modal-price {
-        font-size: 28px;
-        color: var(--mc-red);
-        margin-bottom: 20px;
-        font-weight: bold;
-    }
-
-    .modal-description {
-        font-size: 18px;
-        line-height: 1.6;
-        color: var(--gray);
-        margin-bottom: 30px;
-    }
-
-    .modal-sizes {
-        margin-bottom: 30px;
-    }
-
-    .modal-sizes h3 {
-        font-family: 'Cinzel', serif;
-        font-size: 20px;
-        margin-bottom: 15px;
-        color: var(--white);
-    }
-
-    .modal-size-options {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .modal-size-btn {
-        padding: 12px 20px;
-        background: rgba(255,0,0,0.1);
-        border: 2px solid var(--mc-red);
-        color: var(--white);
-        cursor: pointer;
-        transition: all 0.3s;
+    .gallery-nav {
+        opacity: 1;
+        padding: 8px 12px;
         font-size: 16px;
-        font-weight: bold;
     }
 
-    .modal-size-btn:hover {
-        background: rgba(255,0,0,0.2);
-        transform: translateY(-2px);
+    .pagination-controls {
+        font-size: 14px;
     }
-
-    .modal-size-btn.selected {
-        background: var(--mc-red);
-        color: var(--pure-black);
+    
+    .pagination-btn {
+        padding: 8px 12px;
+        font-size: 14px;
     }
-
-    .modal-size-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    .modal-add-to-cart {
+    
+    .pagination-info {
         width: 100%;
-        padding: 18px;
-        background: var(--mc-red);
-        color: var(--white);
-        border: none;
-        font-size: 20px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s;
-        text-transform: uppercase;
-        letter-spacing: 2px;
+        text-align: center;
+        margin-left: 0;
+        margin-top: 10px;
     }
 
-    .modal-add-to-cart:hover {
-        background: var(--mc-red-hover);
-        transform: translateY(-2px);
+    /* About page mobile */
+    .about-hero {
+        height: 50vh;
+        min-height: 300px;
     }
 
-    .modal-add-to-cart:disabled {
-        background: var(--charcoal);
-        cursor: not-allowed;
+    .about-hero h1 {
+        font-size: 2.5rem;
     }
 
-    .product-features {
-        margin-top: 30px;
-        padding-top: 30px;
-        border-top: 1px solid rgba(255,255,255,0.1);
+    .members-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
     }
 
-    .product-features h3 {
-        font-family: 'Cinzel', serif;
-        font-size: 20px;
-        margin-bottom: 15px;
-        color: var(--mc-red);
+    .member-photo {
+        height: 250px;
     }
 
-    .feature-list {
-        list-style: none;
+    /* Contact page mobile */
+    .contact-title {
+        font-size: 42px;
     }
 
-    .feature-list li {
-        padding: 8px 0;
-        color: var(--gray);
-        display: flex;
-        align-items: center;
-        gap: 10px;
+    .contact-subtitle {
+        font-size: 18px;
     }
 
-    .feature-list li:before {
-        content: 'ᛋ';
-        color: var(--mc-red);
-        font-size: 20px;
+    .form-container {
+        padding: 35px 25px;
     }
 
-    .shop-product-card {
-        cursor: pointer;
-        transition: all 0.3s;
+    .map-header h3,
+    .form-header h3 {
+        font-size: 24px;
     }
 
-    .shop-product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(207, 35, 66, 0.3);
+    #map {
+        height: 400px;
+    }
+
+    .map-details {
+        grid-template-columns: 1fr;
+    }
+
+    /* Story page mobile */
+    .story-hero h1 {
+        font-size: 3rem;
+    }
+
+    .story-text {
+        padding: 40px 30px;
+    }
+
+    .timeline::before {
+        left: 30px;
+    }
+
+    .timeline-item {
+        padding-left: 80px !important;
+        padding-right: 20px !important;
+        text-align: left !important;
+    }
+
+    .timeline-dot {
+        left: 20px !important;
+        right: auto !important;
+    }
+
+    .edit-btn {
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+
+    /* Modal adjustments */
+    .modal-body {
+        grid-template-columns: 1fr;
     }
     
-    /* Shop Product Card Info */
-    .shop-product-card .product-info {
-        padding: 25px;
-        background: transparent;
+    .main-image {
+        height: 300px;
     }
-    
-    .shop-product-card .product-name {
+
+    /* Auth page mobile */
+    .auth-card {
+        padding: 30px 20px;
+    }
+
+    .auth-title {
+        font-size: 28px;
+    }
+
+    .auth-title .rune {
+        font-size: 36px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-text {
         font-size: 22px;
-        margin-bottom: 8px;
-    }
-    
-    .shop-product-card .product-saga {
-        font-size: 14px;
-        margin-bottom: 15px;
-    }
-    
-    .shop-product-card .product-price {
-        font-size: 26px;
-        margin-bottom: 20px;
-    }
-    
-    /* Size Selector Styles */
-    .size-selector {
-        margin-bottom: 20px;
-    }
-    
-    .size-label {
-        display: block;
-        font-family: 'Cinzel', serif;
-        font-size: 14px;
-        margin-bottom: 10px;
-        color: var(--mc-red);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    .size-options {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-    
-    .size-btn {
-        padding: 8px 16px;
-        background: transparent;
-        color: var(--white);
-        border: 1px solid rgba(255,255,255,0.3);
-        cursor: pointer;
-        transition: all 0.3s;
-        font-family: 'Iceland', cursive;
-        font-size: 14px;
-    }
-    
-    .size-btn:hover:not(:disabled) {
-        border-color: var(--mc-red);
-        color: var(--mc-red);
-    }
-    
-    .size-btn.selected {
-        background: var(--mc-red);
-        border-color: var(--mc-red);
-        color: var(--white);
-    }
-    
-    .size-btn:disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-    }
-    
-    /* Add to Cart Button */
-    .add-to-cart {
-        width: 100%;
-        padding: 10px 20px;
-        background: var(--mc-red);
-        color: var(--white);
-        border: none;
-        cursor: pointer;
-        font-family: 'Iceland', cursive;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        transition: all 0.3s;
-        margin-top: 15px;
-    }
-    
-    .add-to-cart:hover:not(:disabled) {
-        background: var(--mc-red-hover);
-        transform: scale(1.02);
-    }
-    
-    .add-to-cart:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
     }
 
-    @media (max-width: 768px) {
-        .modal-body {
-            grid-template-columns: 1fr;
-        }
-        
-        .main-image {
-            height: 300px;
-        }
+    .hero-title {
+        font-size: 32px;
     }
+
+    .hero-subtitle {
+        font-size: 16px;
+    }
+
+    .cta-button {
+        padding: 12px 30px;
+        font-size: 14px;
+    }
+
+    .section-title {
+        font-size: 28px;
+    }
+
+    .product-info {
+        padding: 25px;
+    }
+
+    .product-name {
+        font-size: 20px;
+    }
+
+    .product-price {
+        font-size: 28px;
+    }
+
+    /* Story page small mobile */
+    .story-hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .story-text {
+        padding: 30px 20px;
+    }
+
+    .timeline-year {
+        font-size: 1.5rem;
+    }
+}

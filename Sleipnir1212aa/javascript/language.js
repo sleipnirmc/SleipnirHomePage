@@ -29,16 +29,9 @@ function updateLanguageDisplay() {
 }
 
 function updatePageTitle(pageName) {
+    function updatePageTitle(pageName) {
     const titles = {
         'index.html': {
-            is: 'Sleipnir MC Reykjavík - Opinber Verslun',
-            en: 'Sleipnir MC Reykjavík - Official Store'
-        },
-        'index.html': {
-            is: 'Sleipnir MC Reykjavík - Opinber Verslun',
-            en: 'Sleipnir MC Reykjavík - Official Store'
-        },
-        '': {
             is: 'Sleipnir MC Reykjavík - Opinber Verslun',
             en: 'Sleipnir MC Reykjavík - Official Store'
         },
@@ -48,7 +41,11 @@ function updatePageTitle(pageName) {
         },
         'about.html': {
             is: 'Sleipnir MC - Hópurinn',
-            en: 'Sleipnir MC - About Us'
+            en: 'Sleipnir MC - Members'
+        },
+        'sagan.html': {
+            is: 'Sleipnir MC - Sagan',
+            en: 'Sleipnir MC - Story'
         },
         'contact.html': {
             is: 'Sleipnir MC - Hafa Samband',
@@ -67,6 +64,10 @@ function updatePageTitle(pageName) {
             en: 'Sleipnir MC - Admin Panel'
         }
     };
+
+    const pageTitle = titles[pageName] || titles['index.html'];
+    document.title = currentLang === 'is' ? pageTitle.is : pageTitle.en;
+}
     
     const pageTitle = titles[pageName] || titles['index.html'];
     document.title = currentLang === 'is' ? pageTitle.is : pageTitle.en;

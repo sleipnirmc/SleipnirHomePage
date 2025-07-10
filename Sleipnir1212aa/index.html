@@ -5,76 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sleipnir MC Reykjavík - Official Homepage</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Homepage specific styles */
-        .hero {
-            height: 100vh;
-            margin-top: 0;
-            position: relative;
-        }
-
-        /* Make hero take full screen */
-        body.homepage {
-            overflow: hidden;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Prevent animation shift */
-        .hero-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 2;
-            animation: none !important; /* Override any animation */
-        }
-
-        /* Large background logo */
-        .hero-logo-bg {
-            position: absolute;
-            top: 55%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 1200px;
-            height: 1200px;
-            background: url('Images/SleipnirLogo.png') no-repeat center center;
-            background-size: contain;
-            opacity: 0.4;
-            z-index: 1;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.15; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.25; transform: translate(-50%, -50%) scale(1.05); }
-        }
-
-        /* Footer only visible if user scrolls */
-        footer {
-            position: absolute;
-            bottom: -100%;
-            width: 100%;
-        }
-
-        /* Override body background watermark for homepage */
-        body.homepage::before {
-            display: none;
-        }
-
-        /* Ensure no margin/padding issues */
-        * {
-            box-sizing: border-box;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
 </head>
 <body class="homepage">
     <!-- Header -->
@@ -87,11 +17,17 @@
             <ul class="nav-links">
                 <li><a href="index.html" class="active"><span class="is">Heim</span><span class="en">Home</span></a></li>
                 <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
-                <li><a href="about.html"><span class="is">Hópurinn</span><span class="en">About Us</span></a></li>
+                <li class="nav-dropdown">
+                    <a href="#"><span class="is">Um Okkur</span><span class="en">About Us</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="about.html"><span class="is">Hópurinn</span><span class="en">Members</span></a></li>
+                        <li><a href="sagan.html"><span class="is">Sagan</span><span class="en">Story</span></a></li>
+                    </ul>
+                </li>
                 <li><a href="contact.html"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
             </ul>
             <div class="language-toggle">
-                <button class="lang-btn" onclick="toggleLanguage()">
+                <button class="btn btn-dark btn-sm" onclick="toggleLanguage()">
                     <span class="is">EN</span>
                     <span class="en">IS</span>
                 </button>
@@ -100,7 +36,7 @@
     </header>
 
     <!-- Hero Section - Full Screen -->
-    <section class="hero" id="home">
+    <section class="hero hero-full" id="home">
         <div class="hero-overlay"></div>
         <div class="northern-lights"></div>
         <div class="hero-logo-bg"></div>
@@ -110,11 +46,11 @@
                 NO ATTITUDE
             </h1>
             <div class="cta-group">
-                <a href="shop.html" class="cta-button primary">
+                <a href="shop.html" class="btn btn-primary">
                     <span class="is">Versla</span>
                     <span class="en">Shop</span>
                 </a>
-                <a href="about.html" class="cta-button secondary">
+                <a href="about.html" class="btn btn-secondary">
                     <span class="is">Meðlimir</span>
                     <span class="en">Members</span>
                 </a>
