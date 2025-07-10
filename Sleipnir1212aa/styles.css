@@ -9,6 +9,11 @@
 /* Norse-inspired Font Import */
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:wght@300;400;600&family=Iceland&display=swap');
 
+@font-face {
+    font-family: 'VIKING-N';
+    src: url('fonts/VIKING-N.woff');
+}
+
 /* CSS Variables for MC Theme - BLACK & RED ONLY */
 :root {
     --pure-black: #000000;
@@ -413,6 +418,47 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 25px;
 }
 
+.form-group label {
+    display: block;
+    font-family: 'Iceland', cursive;
+    font-size: 14px;
+    color: var(--white);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 15px;
+    background: rgba(0,0,0,0.6);
+    border: var(--border-light);
+    color: var(--white);
+    font-size: 16px;
+    font-family: 'Cormorant Garamond', serif;
+    transition: var(--transition-base);
+}
+
+.form-group select option {
+    background: var(--norse-black);
+    color: var(--white);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--mc-red);
+    background: rgba(255,0,0,0.05);
+    box-shadow: 0 0 20px rgba(255,0,0,0.2);
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
 .form-label {
     display: block;
     font-family: 'Iceland', cursive;
@@ -529,7 +575,7 @@ nav {
 }
 
 .logo-text {
-    font-family: 'Cinzel', serif;
+    font-family: 'VIKING-N', serif;
     font-size: 28px;
     font-weight: 900;
     color: var(--mc-red);
@@ -552,6 +598,7 @@ nav {
 }
 
 .nav-links a {
+    font-family: 'Cinzel', serif;
     color: var(--white);
     text-decoration: none;
     font-size: 16px;
@@ -629,6 +676,7 @@ nav {
 }
 
 .dropdown-menu a {
+    font-family: 'Cinzel', serif;
     display: block;
     padding: 15px 25px;
     color: var(--white);
@@ -1228,6 +1276,7 @@ body.homepage {
 }
 
 .product-saga {
+    font-family: 'Cormorant Garamond', serif;
     font-size: 16px;
     color: var(--gray);
     font-style: italic;
@@ -1263,18 +1312,84 @@ body.homepage {
     flex-wrap: wrap;
 }
 
-/* Size button now uses utility classes: .btn .btn-outline .btn-sm */
+/* Size button styling - Clean and Modern */
 .size-btn {
+    padding: 12px 20px;
+    background: var(--pure-black);
+    color: var(--white);
+    border: 1px solid var(--mc-red);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: 'Iceland', cursive;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    position: relative;
+    overflow: hidden;
+    margin: 0 6px 6px 0;
+    border-radius: 0;
+}
+
+.size-btn:hover:not(:disabled) {
+    background: var(--mc-red);
+    color: var(--white);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(207, 35, 66, 0.4);
 }
 
 .size-btn.selected {
     background: var(--mc-red);
     border-color: var(--mc-red);
     color: var(--white);
+    box-shadow: inset 0 0 0 2px var(--pure-black);
 }
 
-/* Add to cart button now uses utility classes: .btn .btn-primary .btn-full */
+.size-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+    border-color: var(--charcoal);
+    color: var(--charcoal);
+}
+
+/* Add to cart button - clean modern style */
+.add-to-cart {
+    width: 100%;
+    padding: 14px 30px;
+    background: var(--mc-red);
+    color: var(--white);
+    border: 2px solid var(--mc-red);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.add-to-cart:hover {
+    background: var(--pure-black);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(207, 35, 66, 0.4);
+}
+
+.add-to-cart:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(207, 35, 66, 0.3);
+}
+
+.add-to-cart:disabled {
+    background: var(--charcoal);
+    border-color: var(--charcoal);
+    color: var(--gray);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Ripple effect on click */
 .add-to-cart::before {
     content: '';
     position: absolute;
@@ -1282,15 +1397,17 @@ body.homepage {
     left: 50%;
     width: 0;
     height: 0;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.3);
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
+    transition: width 0.4s ease-out, height 0.4s ease-out;
+    pointer-events: none;
 }
 
 .add-to-cart:active::before {
     width: 300px;
     height: 300px;
+    opacity: 0;
 }
 
 /* Saga Section */
@@ -1939,6 +2056,7 @@ body.homepage {
 }
 
 .cart-item-info p {
+    font-family: 'Cormorant Garamond', serif;
     color: var(--gray);
     font-size: 14px;
 }
@@ -2044,6 +2162,7 @@ body.homepage {
 }
 
 .no-products {
+    font-family: 'Cormorant Garamond', serif;
     text-align: center;
     padding: 60px;
     color: var(--gray);
@@ -2166,6 +2285,7 @@ body.homepage {
 }
 
 .modal-description {
+    font-family: 'Cormorant Garamond', serif;
     font-size: 18px;
     line-height: 1.6;
     color: var(--gray);
@@ -2191,52 +2311,96 @@ body.homepage {
 
 .modal-size-btn {
     padding: 12px 20px;
-    background: rgba(255,0,0,0.1);
-    border: 2px solid var(--mc-red);
+    background: var(--pure-black);
     color: var(--white);
+    border: 1px solid var(--mc-red);
     cursor: pointer;
-    transition: var(--transition-base);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 600;
+    font-family: 'Iceland', cursive;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
 }
 
 .modal-size-btn:hover {
-    background: rgba(255,0,0,0.2);
+    background: rgba(207, 35, 66, 0.1);
+    border-color: var(--mc-red);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(207, 35, 66, 0.3);
 }
 
 .modal-size-btn.selected {
     background: var(--mc-red);
-    color: var(--pure-black);
+    border-color: var(--mc-red);
+    color: var(--white);
+    box-shadow: inset 0 0 0 2px var(--pure-black);
 }
 
 .modal-size-btn:disabled {
-    opacity: 0.5;
+    opacity: 0.25;
     cursor: not-allowed;
+    border-color: var(--charcoal);
+    color: var(--charcoal);
 }
 
 .modal-add-to-cart {
     width: 100%;
-    padding: 18px;
+    padding: 16px 30px;
     background: var(--mc-red);
     color: var(--white);
-    border: none;
-    font-size: 20px;
-    font-weight: bold;
+    border: 2px solid var(--mc-red);
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
-    transition: var(--transition-base);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-transform: uppercase;
     letter-spacing: 2px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 20px;
 }
 
 .modal-add-to-cart:hover {
-    background: var(--mc-red-hover);
+    background: var(--pure-black);
     transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(207, 35, 66, 0.4);
+}
+
+.modal-add-to-cart:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(207, 35, 66, 0.3);
 }
 
 .modal-add-to-cart:disabled {
     background: var(--charcoal);
+    border-color: var(--charcoal);
+    color: var(--gray);
     cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Modal button ripple effect */
+.modal-add-to-cart::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease-out, height 0.4s ease-out;
+    pointer-events: none;
+}
+
+.modal-add-to-cart:active::before {
+    width: 400px;
+    height: 400px;
+    opacity: 0;
 }
 
 .product-features {
@@ -2257,6 +2421,7 @@ body.homepage {
 }
 
 .feature-list li {
+    font-family: 'Cormorant Garamond', serif;
     padding: 8px 0;
     color: var(--gray);
     display: flex;
@@ -2295,6 +2460,7 @@ body.homepage {
 }
 
 .contact-subtitle {
+    font-family: 'Cormorant Garamond', serif;
     font-size: 24px;
     color: var(--gray);
     font-style: italic;
@@ -2302,11 +2468,129 @@ body.homepage {
 
 /* Main Contact Section */
 .contact-main {
-    padding: 80px 40px;
-    max-width: 1400px;
-    margin: 0 auto;
+    padding: 0 40px 80px;
+    position: relative;
 }
 
+.contact-container {
+    max-width: 1400px;
+    margin: -60px auto 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Contact Cards - Shared Styles */
+.contact-card {
+    background: linear-gradient(135deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95));
+    border: 2px solid rgba(207, 35, 66, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 40px rgba(207, 35, 66, 0.2);
+    border-color: var(--mc-red);
+}
+
+.contact-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--mc-red), transparent);
+    animation: slideGlow 3s ease-in-out infinite;
+}
+
+@keyframes slideGlow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+.card-header {
+    padding: 30px;
+    background: rgba(0,0,0,0.5);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+}
+
+.card-header .rune {
+    font-size: 48px;
+    color: var(--mc-red);
+    opacity: 0.5;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.card-header h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+}
+
+.card-header .location-text {
+    color: var(--gray);
+    font-size: 16px;
+    font-style: italic;
+}
+
+/* Form Row Layout */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Button Loading Animation */
+.contact-submit-btn {
+    position: relative;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.contact-submit-btn .btn-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.contact-submit-btn.loading .btn-text {
+    visibility: hidden;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: var(--white);
+    border-radius: 50%;
+    display: inline-block;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Success State */
+.contact-submit-btn.success {
+    background: #00cc00;
+    border-color: #00cc00;
+}
+
+/* Keep original contact-grid for backwards compatibility */
 .contact-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -2316,22 +2600,10 @@ body.homepage {
 
 /* Enhanced Map Container */
 .map-container {
-    background: var(--card-bg);
-    border: 2px solid rgba(255,0,0,0.2);
-    padding: 0;
-    position: relative;
-    overflow: hidden;
-}
-
-.map-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--mc-red);
-    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 700px;
 }
 
 .map-header {
@@ -2356,11 +2628,52 @@ body.homepage {
 }
 
 #map {
-    height: 500px;
+    flex: 1;
     width: 100%;
+    min-height: 400px;
+    filter: hue-rotate(180deg) invert(90%) contrast(90%);
     transition: filter 0.3s ease;
 }
 
+/* Contact Info Grid */
+.contact-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 30px;
+    background: rgba(0,0,0,0.5);
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.info-icon {
+    font-size: 32px;
+    color: var(--mc-red);
+    min-width: 40px;
+    text-align: center;
+}
+
+.info-item h4 {
+    font-family: 'Iceland', cursive;
+    font-size: 14px;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.info-item p {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--gray);
+    font-size: 14px;
+}
+
+/* Legacy styles for backwards compatibility */
 .map-info {
     background: rgba(0,0,0,0.8);
     padding: 30px;
@@ -2394,26 +2707,14 @@ body.homepage {
 }
 
 .detail-item p {
+    font-family: 'Cormorant Garamond', serif;
     color: var(--gray);
     font-size: 14px;
 }
 
 /* Enhanced Form Container */
 .form-container {
-    background: var(--card-bg);
-    border: 2px solid rgba(255,0,0,0.2);
-    padding: 50px;
-    position: relative;
-}
-
-.form-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--mc-red);
+    padding: 0;
 }
 
 .form-header {
@@ -2440,9 +2741,10 @@ body.homepage {
 
 /* Contact Form */
 .contact-form {
+    padding: 40px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
 }
 
 /* Submit button now uses utility classes: .btn .btn-primary .btn-full */
@@ -2467,6 +2769,68 @@ body.homepage {
     background: rgba(255,0,0,0.1);
     border: 1px solid var(--mc-red);
     color: var(--mc-red);
+}
+
+/* Single Contact Card Layout */
+.contact-single {
+    padding: 0 40px 80px;
+}
+
+.contact-container-single {
+    max-width: 700px;
+    margin: -60px auto 0;
+    position: relative;
+    z-index: 2;
+}
+
+.contact-single .contact-card {
+    width: 100%;
+}
+
+.contact-single .form-group {
+    margin-bottom: 20px;
+}
+
+.contact-single .form-row .form-group {
+    margin-bottom: 0;
+}
+
+/* Responsive Contact Design */
+@media (max-width: 968px) {
+    .contact-container {
+        grid-template-columns: 1fr;
+        margin-top: -40px;
+    }
+    
+    .contact-container-single {
+        max-width: 100%;
+        margin-top: -40px;
+        padding: 0 20px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .contact-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .map-container {
+        min-height: 500px;
+    }
+    
+    .contact-card {
+        margin-bottom: 30px;
+    }
+    
+    .contact-title {
+        font-size: 40px;
+    }
+    
+    .contact-subtitle {
+        font-size: 20px;
+    }
 }
 
 /* ===================================================================
