@@ -35,11 +35,23 @@
                 </li>
                 <li><a href="contact.html"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
             </ul>
-            <div class="language-toggle">
-                <button class="btn btn-dark btn-sm" onclick="toggleLanguage()">
-                    <span class="is">EN</span>
-                    <span class="en">IS</span>
-                </button>
+            <div class="nav-controls">
+                <div class="language-toggle">
+                    <button class="btn btn-dark btn-sm" onclick="toggleLanguage()">
+                        <span class="is">EN</span>
+                        <span class="en">IS</span>
+                    </button>
+                </div>
+                <div class="cart-toggle">
+                    <button class="btn btn-dark btn-sm cart-nav-btn" id="cartBtn">
+                        <span class="cart-icon">🛒</span>
+                        <span class="cart-text">
+                            <span class="is">Karfa</span>
+                            <span class="en">Cart</span>
+                        </span>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                </div>
             </div>
         </nav>
     </header>
@@ -125,12 +137,6 @@
             </button>
         </div>
     </div>
-
-    <!-- Cart Button -->
-    <button class="floating-cart-btn" id="cartBtn">
-        <span class="cart-icon">🛒</span>
-        <span class="cart-count" id="cartCount">0</span>
-    </button>
 
     <!-- Product Modal -->
     <div id="productModal" class="product-modal">
