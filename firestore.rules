@@ -1,34 +1,79 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow users to read their own data
-    match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if request.auth != null && request.auth.uid == userId;
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
     }
     
-    // Allow all users to read products (public access)
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && getUserData().role == "admin";
+    }
+    
+    function isMember() {
+      return isAuthenticated() && getUserData().members == true;
+    }
+    
+    // Allow users to read their own data and admins to read all users
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) && 
+        // Users can't change their own role or member status
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'members']) || isAdmin());
+      allow delete: if false; // Never allow user deletion through client
+    }
+    
+    // Products - everyone can read (filtering happens client-side for better UX)
     match /products/{product} {
       allow read: if true;
-      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+      allow write: if isAdmin();
     }
     
-    // Allow authenticated users to manage their orders
+    // Orders - users can manage their own orders, admins can manage all
     match /orders/{order} {
-      allow read: if request.auth != null && (request.auth.uid == resource.data.userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin");
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow update: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+      allow read: if isAuthenticated() && 
+        (request.auth.uid == resource.data.userId || isAdmin());
+      allow create: if isAuthenticated() && 
+        request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+        (request.auth.uid == resource.data.userId || isAdmin());
+      allow delete: if isAdmin();
     }
     
-    // Allow authenticated users to write email logs
+    // Email logs - admin only
     match /email_logs/{log} {
-      allow read: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
-      allow create: if request.auth != null;
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
     }
     
-    // Admin access to all documents
+    // Admin activity logs - admin only, write-once
+    match /adminActivityLog/{log} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Logs should be immutable
+    }
+    
+    // Events collection
+    match /events/{event} {
+      allow read: if true; // Public can view events
+      allow write: if isAdmin();
+    }
+    
+    // Catch-all for admin access (be careful with this)
     match /{document=**} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+      // This gives admins full access to all collections
+      // Comment out or remove if you want more granular control
+      allow read, write: if isAdmin();
     }
   }
 }
