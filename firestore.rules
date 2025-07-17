@@ -11,15 +11,20 @@ service cloud.firestore {
     }
     
     function getUserData() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      return userDoc.data;
+    }
+    
+    function userExists() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid));
     }
     
     function isAdmin() {
-      return isAuthenticated() && getUserData().role == "admin";
+      return isAuthenticated() && userExists() && getUserData().role == "admin";
     }
     
     function isMember() {
-      return isAuthenticated() && getUserData().members == true;
+      return isAuthenticated() && userExists() && getUserData().members == true;
     }
     
     // Allow users to read their own data and admins to read all users
