@@ -1,0 +1,584 @@
+-<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viðburðir - Sleipnir MC Reykjavík</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html" class="logo-link">
+                    <span class="logo-text">SLEIPNIR MC</span>
+                    <span class="location">REYKJAVÍK</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><span class="is">Heim</span><span class="en">Home</span></a></li>
+                <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
+                <li class="nav-dropdown">
+                    <a href="#"><span class="is">Um Okkur</span><span class="en">About Us</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="about.html"><span class="is">Hópurinn</span><span class="en">Members</span></a></li>
+                        <li><a href="sagan.html"><span class="is">Sagan</span><span class="en">Story</span></a></li>
+                        <li class="nav-dropdown-nested">
+                            <a href="#"><span class="is">Chapterar</span><span class="en">Chapters</span></a>
+                            <ul class="dropdown-menu-nested">
+                                <li><a href="Reykjavík.html"><span class="is">Reykjavík</span><span class="en">Reykjavík</span></a></li>
+                                <li><a href="Akureyri.html"><span class="is">Akureyri</span><span class="en">Akureyri</span></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="contact.html"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
+                <li class="active"><a href="events1.html"><span class="is">Viðburðir</span><span class="en">Events</span></a></li>
+            </ul>
+            <div class="nav-controls">
+                <div class="language-toggle">
+                    <button class="btn btn-dark btn-sm" onclick="toggleLanguage()">
+                        <span class="is">EN</span>
+                        <span class="en">IS</span>
+                    </button>
+                </div>
+                <div class="cart-toggle">
+                    <button class="btn btn-dark btn-sm cart-nav-btn" id="cartBtn">
+                        <span class="cart-icon">🛒</span>
+                        <span class="cart-text">
+                            <span class="is">Karfa</span>
+                            <span class="en">Cart</span>
+                        </span>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero hero-medium">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="is">Viðburðir</span>
+                <span class="en">Events</span>
+            </h1>
+            <p class="hero-subtitle">
+                <span class="is">Ríðum saman, bræðralag að eilífu</span>
+                <span class="en">Ride together, brotherhood forever</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- Events Filter Section -->
+    <section class="events-filter-section py-md bg-norse">
+        <div class="container">
+            <div class="filter-controls flex-center gap-md">
+                <button class="btn btn-primary btn-sm active" data-filter="all">
+                    <span class="is">Allir</span>
+                    <span class="en">All</span>
+                </button>
+                <button class="btn btn-dark btn-sm" data-filter="upcoming">
+                    <span class="is">Framundan</span>
+                    <span class="en">Upcoming</span>
+                </button>
+                <button class="btn btn-dark btn-sm" data-filter="past">
+                    <span class="is">Liðnir</span>
+                    <span class="en">Past</span>
+                </button>
+                <button class="btn btn-dark btn-sm" data-filter="ride">
+                    <span class="is">Ferðir</span>
+                    <span class="en">Rides</span>
+                </button>
+                <button class="btn btn-dark btn-sm" data-filter="meeting">
+                    <span class="is">Fundir</span>
+                    <span class="en">Meetings</span>
+                </button>
+                <button class="btn btn-dark btn-sm" data-filter="social">
+                    <span class="is">Samkomur</span>
+                    <span class="en">Social</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Grid Section -->
+    <section class="events-section py-xl">
+        <div class="container">
+            <div class="events-grid grid-3 gap-lg">
+                <!-- Event Card 1 - Upcoming Ride -->
+                <div class="event-card card animate-fadeInUp" data-category="upcoming ride">
+                    <div class="event-image">
+                        <div class="event-date">
+                            <span class="date-day">15</span>
+                            <span class="date-month">MAÍ</span>
+                        </div>
+                        <div class="event-category">
+                            <span class="is">Ferð</span>
+                            <span class="en">Ride</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="event-title">
+                            <span class="is">Sumarferð til Vestfjarða</span>
+                            <span class="en">Summer Ride to Westfjords</span>
+                        </h3>
+                        <p class="event-description text-gray">
+                            <span class="is">Árleg sumarferð okkar til Vestfjarða. 3 dagar af ævintýrum og bræðralagi á vegum Íslands.</span>
+                            <span class="en">Our annual summer ride to the Westfjords. 3 days of adventure and brotherhood on Iceland's roads.</span>
+                        </p>
+                        <div class="event-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">📍</span>
+                                <span class="is">Brottför: Reykjavík</span>
+                                <span class="en">Departure: Reykjavík</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">⏰</span>
+                                <span>09:00</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary btn-block mt-md">
+                            <span class="is">Skrá þátttöku</span>
+                            <span class="en">Register</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Event Card 2 - Upcoming Meeting -->
+                <div class="event-card card animate-fadeInUp" data-category="upcoming meeting" style="animation-delay: 0.1s;">
+                    <div class="event-image">
+                        <div class="event-date">
+                            <span class="date-day">22</span>
+                            <span class="date-month">MAÍ</span>
+                        </div>
+                        <div class="event-category">
+                            <span class="is">Fundur</span>
+                            <span class="en">Meeting</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="event-title">
+                            <span class="is">Mánaðarlegur Félagsfundur</span>
+                            <span class="en">Monthly Club Meeting</span>
+                        </h3>
+                        <p class="event-description text-gray">
+                            <span class="is">Reglulegur félagsfundur þar sem við förum yfir mál félagsins og skipuleggjum næstu viðburði.</span>
+                            <span class="en">Regular club meeting where we discuss club matters and plan upcoming events.</span>
+                        </p>
+                        <div class="event-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">📍</span>
+                                <span class="is">Félagsheimili</span>
+                                <span class="en">Clubhouse</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">⏰</span>
+                                <span>20:00</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-dark btn-block mt-md">
+                            <span class="is">Meðlimir aðeins</span>
+                            <span class="en">Members Only</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Event Card 3 - Upcoming Social -->
+                <div class="event-card card animate-fadeInUp" data-category="upcoming social" style="animation-delay: 0.2s;">
+                    <div class="event-image">
+                        <div class="event-date">
+                            <span class="date-day">01</span>
+                            <span class="date-month">JÚN</span>
+                        </div>
+                        <div class="event-category">
+                            <span class="is">Samkoma</span>
+                            <span class="en">Social</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="event-title">
+                            <span class="is">Sumargrillveisla</span>
+                            <span class="en">Summer BBQ Party</span>
+                        </h3>
+                        <p class="event-description text-gray">
+                            <span class="is">Fjölskylduveisla með grilli, tónlist og góðu fólki. Allir velkomnir!</span>
+                            <span class="en">Family BBQ party with music and good people. Everyone welcome!</span>
+                        </p>
+                        <div class="event-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">📍</span>
+                                <span class="is">Félagssvæðið</span>
+                                <span class="en">Club Grounds</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">⏰</span>
+                                <span>14:00 - 22:00</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary btn-block mt-md">
+                            <span class="is">Sýna áhuga</span>
+                            <span class="en">Show Interest</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Event Card 4 - Past Ride -->
+                <div class="event-card card animate-fadeInUp past-event" data-category="past ride" style="animation-delay: 0.3s;">
+                    <div class="event-image">
+                        <div class="event-date">
+                            <span class="date-day">20</span>
+                            <span class="date-month">APR</span>
+                        </div>
+                        <div class="event-category">
+                            <span class="is">Ferð</span>
+                            <span class="en">Ride</span>
+                        </div>
+                        <div class="past-overlay">
+                            <span class="is">Lokið</span>
+                            <span class="en">Completed</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="event-title">
+                            <span class="is">Vorferð um Suðurland</span>
+                            <span class="en">Spring Ride to South Iceland</span>
+                        </h3>
+                        <p class="event-description text-gray">
+                            <span class="is">Frábær ferð með 25 bræðrum um fallegt Suðurland.</span>
+                            <span class="en">Great ride with 25 brothers through beautiful South Iceland.</span>
+                        </p>
+                        <div class="event-stats">
+                            <span class="stat">👥 25</span>
+                            <span class="stat">🛣️ 350km</span>
+                            <span class="stat">⏱️ 8 klst</span>
+                        </div>
+                        <a href="#" class="btn btn-dark btn-block mt-md">
+                            <span class="is">Sjá myndir</span>
+                            <span class="en">View Photos</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Event Card 5 - Past Meeting -->
+                <div class="event-card card animate-fadeInUp past-event" data-category="past meeting" style="animation-delay: 0.4s;">
+                    <div class="event-image">
+                        <div class="event-date">
+                            <span class="date-day">10</span>
+                            <span class="date-month">APR</span>
+                        </div>
+                        <div class="event-category">
+                            <span class="is">Fundur</span>
+                            <span class="en">Meeting</span>
+                        </div>
+                        <div class="past-overlay">
+                            <span class="is">Lokið</span>
+                            <span class="en">Completed</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="event-title">
+                            <span class="is">Ársfundur 2024</span>
+                            <span class="en">Annual Meeting 2024</span>
+                        </h3>
+                        <p class="event-description text-gray">
+                            <span class="is">Árlegur aðalfundur félagsins með stjórnarkjöri.</span>
+                            <span class="en">Annual general meeting with board elections.</span>
+                        </p>
+                        <div class="event-stats">
+                            <span class="stat">👥 42</span>
+                            <span class="stat">📋 12 mál</span>
+                        </div>
+                        <a href="#" class="btn btn-dark btn-block mt-md">
+                            <span class="is">Fundargerð</span>
+                            <span class="en">Minutes</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Event Card 6 - Upcoming Ride -->
+                <div class="event-card card animate-fadeInUp" data-category="upcoming ride" style="animation-delay: 0.5s;">
+                    <div class="event-image">
+                        <div class="event-date">
+                            <span class="date-day">17</span>
+                            <span class="date-month">JÚN</span>
+                        </div>
+                        <div class="event-category">
+                            <span class="is">Ferð</span>
+                            <span class="en">Ride</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="event-title">
+                            <span class="is">Hringferð um landið</span>
+                            <span class="en">Round Iceland Tour</span>
+                        </h3>
+                        <p class="event-description text-gray">
+                            <span class="is">Stærsta ferð ársins! 7 dagar í hringferð um Ísland með viðkomu á öllum landshlutum.</span>
+                            <span class="en">The biggest ride of the year! 7 days touring around Iceland with stops in all regions.</span>
+                        </p>
+                        <div class="event-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">📍</span>
+                                <span class="is">Hringvegurinn</span>
+                                <span class="en">Ring Road</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">📅</span>
+                                <span>17-23 JÚN</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-primary btn-block mt-md">
+                            <span class="is">Takmarkaðir staðir</span>
+                            <span class="en">Limited Spots</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-xl">
+                <button class="btn btn-dark btn-lg">
+                    <span class="is">Sýna fleiri viðburði</span>
+                    <span class="en">Show More Events</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Sleipnir MC Reykjavík</h4>
+                <p>
+                    <span class="is">Ríðum í gegnum ljósanótt síðan 2015</span>
+                    <span class="en">Riding through ljósanótt since 2015</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Styles for Event Cards -->
+    <style>
+        .events-filter-section {
+            border-bottom: 2px solid var(--dark-red);
+        }
+
+        .filter-controls {
+            flex-wrap: wrap;
+        }
+
+        .events-grid {
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+            animation-delay: 0.2s;
+        }
+
+        .event-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .event-image {
+            height: 250px;
+            background: linear-gradient(135deg, var(--norse-black), var(--midnight-black));
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .event-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('Images/SleipnirLogo.png') center/60% no-repeat;
+            opacity: 0.1;
+        }
+
+        .event-date {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--mc-red);
+            padding: 10px 15px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .date-day {
+            display: block;
+            font-family: 'Cinzel', serif;
+            font-size: 32px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .date-month {
+            display: block;
+            font-family: 'Iceland', cursive;
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .event-category {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--mc-red);
+            padding: 5px 15px;
+            font-family: 'Iceland', cursive;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .event-title {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--white);
+        }
+
+        .event-description {
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .event-details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .detail-icon {
+            font-size: 16px;
+        }
+
+        .event-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            font-family: 'Iceland', cursive;
+            font-size: 16px;
+            color: var(--gray);
+        }
+
+        .past-event {
+            opacity: 0.7;
+        }
+
+        .past-event:hover {
+            opacity: 1;
+        }
+
+        .past-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--gray);
+        }
+
+        /* Filter Button Active State */
+        .filter-controls .btn.active {
+            background: var(--mc-red);
+            border-color: var(--mc-red);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .events-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .events-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .event-image {
+                height: 200px;
+            }
+
+            .event-title {
+                font-size: 20px;
+            }
+
+            .filter-controls {
+                justify-content: center;
+            }
+        }
+    </style>
+
+    <script src="javascript/language.js"></script>
+    <script>
+        // Filter functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('[data-filter]');
+            const eventCards = document.querySelectorAll('.event-card');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active button
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const filter = this.getAttribute('data-filter');
+
+                    // Filter cards
+                    eventCards.forEach(card => {
+                        if (filter === 'all') {
+                            card.style.display = 'block';
+                        } else {
+                            const categories = card.getAttribute('data-category').split(' ');
+                            if (categories.includes(filter)) {
+                                card.style.display = 'block';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

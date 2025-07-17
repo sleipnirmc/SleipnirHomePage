@@ -303,10 +303,40 @@
             letter-spacing: 2px;
             transition: all 0.3s ease;
             pointer-events: none;
+            background: linear-gradient(135deg, 
+                var(--norse-black) 0%, 
+                var(--midnight-black) 100%);
+            padding: 0 5px;
         }
 
         .split-input-group input:focus + label,
-        .split-input-group input:not(:placeholder-shown) + label {
+        .split-input-group input:not(:placeholder-shown) + label,
+        .split-input-group input:-webkit-autofill + label {
+            top: -10px;
+            left: 0;
+            font-size: 12px;
+            color: var(--mc-red);
+        }
+
+        /* Handle autofill styles */
+        .split-input-group input:-webkit-autofill,
+        .split-input-group input:-webkit-autofill:hover,
+        .split-input-group input:-webkit-autofill:focus,
+        .split-input-group input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px rgba(0, 0, 0, 0.3) inset !important;
+            -webkit-text-fill-color: var(--white) !important;
+            transition: background-color 5000s ease-in-out 0s;
+            animation: onAutoFillStart 0.1s;
+        }
+
+        /* Animation to detect autofill */
+        @keyframes onAutoFillStart {
+            from { opacity: 0.99; }
+            to { opacity: 1; }
+        }
+
+        /* Force label to stay up when input has value */
+        .split-input-group.has-value label {
             top: -10px;
             left: 0;
             font-size: 12px;
@@ -651,7 +681,7 @@
 
                     <!-- Phone Field (for signup) -->
                     <div class="split-input-group" id="phoneGroup" style="display: none;">
-                        <input type="tel" id="phone" placeholder=" " pattern="[0-9]{3}-[0-9]{4}" title="Format: 123-4567">
+                        <input type="tel" id="phone" placeholder=" " pattern="[+]?[(]?[0-9]{1,4}[)]?[-\s.]*[(]?[0-9]{1,4}[)]?[-\s.]*[0-9]{1,9}[-\s.]*[0-9]{0,9}" title="Format: +1 (555) 123-4567 or 555-1234 or +354 123 4567">
                         <label for="phone">
                             <span class="is">Símanúmer</span>
                             <span class="en">Phone Number</span>
@@ -732,6 +762,12 @@
         </div>
     </div>
 
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="javascript/firebase-config.js"></script>
+    <script src="javascript/authentication.js"></script>
     <script src="javascript/language.js"></script>
     <script>
         // Tab switching functionality
@@ -789,21 +825,295 @@
             });
         });
 
+        // Check for redirect parameter from admin page
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirect = urlParams.get('redirect');
+        const error = urlParams.get('error');
+        const sessionExpired = urlParams.get('session_expired');
+        const mode = urlParams.get('mode');
+        const oobCode = urlParams.get('oobCode');
+
+        // Handle email verification mode
+        if (mode === 'verifyEmail' && oobCode) {
+            // Firebase handles the verification automatically with the oobCode
+            sleipnirAuth.showAuthMessage({
+                is: 'Netfang verið að staðfesta...',
+                en: 'Verifying email...'
+            }, false);
+            
+            // Apply the verification code
+            firebase.auth().applyActionCode(oobCode).then(() => {
+                sleipnirAuth.showAuthMessage({
+                    is: 'Netfang hefur verið staðfest! Þú getur nú skráð þig inn.',
+                    en: 'Email has been verified! You can now sign in.'
+                }, false);
+                
+                // If user is signed in, reload their auth state
+                if (firebase.auth().currentUser) {
+                    firebase.auth().currentUser.reload();
+                }
+            }).catch((error) => {
+                console.error('Email verification error:', error);
+                sleipnirAuth.showAuthMessage({
+                    is: 'Villa kom upp við staðfestingu. Vinsamlegast reyndu aftur.',
+                    en: 'Error verifying email. Please try again.'
+                }, true);
+            });
+        }
+
+        if (error) {
+            sleipnirAuth.showAuthMessage(decodeURIComponent(error), true);
+        }
+
+        if (sessionExpired) {
+            sleipnirAuth.showAuthMessage({
+                is: 'Innskráning rann út. Vinsamlegast skráðu þig inn aftur.',
+                en: 'Session expired. Please sign in again.'
+            }, true);
+        }
+
         // Form submission
-        document.getElementById('authForm').addEventListener('submit', (e) => {
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            // Add your authentication logic here
-            console.log('Form submitted');
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const isSignup = document.querySelector('.tab-btn.active').dataset.tab === 'signup';
+            
+            // Disable submit button during processing
+            submitBtn.disabled = true;
+            
+            try {
+                if (isSignup) {
+                    // Sign up
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+                    const fullName = document.getElementById('fullName').value;
+                    const phone = document.getElementById('phone').value;
+                    const address = document.getElementById('address').value;
+                    const city = document.getElementById('city').value;
+                    const postalCode = document.getElementById('postalCode').value;
+                    
+                    // Validate passwords match
+                    if (password !== confirmPassword) {
+                        sleipnirAuth.showAuthMessage({
+                            is: 'Lykilorð passa ekki saman',
+                            en: 'Passwords do not match'
+                        }, true);
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                    
+                    const result = await sleipnirAuth.signUp(email, password, {
+                        fullName,
+                        phone,
+                        address,
+                        city,
+                        postalCode
+                    });
+                    
+                    if (result.success) {
+                        // Show appropriate message based on email verification
+                        if (result.emailVerificationSent && result.message) {
+                            sleipnirAuth.showAuthMessage(result.message, false);
+                        } else {
+                            sleipnirAuth.showAuthMessage({
+                                is: 'Aðgangur búinn til! Skráir þig inn...',
+                                en: 'Account created! Signing you in...'
+                            }, false);
+                        }
+                        
+                        // Redirect after successful signup
+                        setTimeout(() => {
+                            window.location.href = redirect === 'admin' ? './admin2.html' : './index.html';
+                        }, 2000);
+                    } else {
+                        sleipnirAuth.showAuthMessage(result.error, true);
+                        submitBtn.disabled = false;
+                    }
+                } else {
+                    // Sign in
+                    let result;
+                    
+                    // Check if this is an admin login attempt (coming from admin redirect)
+                    if (redirect === 'admin') {
+                        result = await sleipnirAuth.adminSignIn(email, password);
+                        
+                        if (result.success) {
+                            sleipnirAuth.showAuthMessage({
+                                is: 'Innskráning tókst! Beið...',
+                                en: 'Login successful! Redirecting...'
+                            }, false);
+                            
+                            // Redirect to admin panel
+                            setTimeout(() => {
+                                window.location.href = './admin2.html';
+                            }, 1000);
+                        } else {
+                            sleipnirAuth.showAuthMessage(result.error, true);
+                            submitBtn.disabled = false;
+                        }
+                    } else {
+                        // Regular user sign in
+                        result = await sleipnirAuth.signIn(email, password);
+                        
+                        if (result.success) {
+                            sleipnirAuth.showAuthMessage({
+                                is: 'Innskráning tókst! Beið...',
+                                en: 'Login successful! Redirecting...'
+                            }, false);
+                            
+                            // Redirect to home page
+                            setTimeout(() => {
+                                window.location.href = './index.html';
+                            }, 1000);
+                        } else {
+                            sleipnirAuth.showAuthMessage(result.error, true);
+                            submitBtn.disabled = false;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                sleipnirAuth.showAuthMessage({
+                    is: 'Villa kom upp. Reyndu aftur.',
+                    en: 'An error occurred. Please try again.'
+                }, true);
+                submitBtn.disabled = false;
+            }
         });
 
-        // Add hover effect to input icons
+        // Social login handlers
+        document.querySelectorAll('.social-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const provider = btn.textContent.includes('Google') ? 'google' : 'facebook';
+                
+                try {
+                    let result;
+                    if (provider === 'google') {
+                        result = await sleipnirAuth.signInWithGoogle();
+                    } else {
+                        result = await sleipnirAuth.signInWithFacebook();
+                    }
+                    
+                    if (result.success) {
+                        sleipnirAuth.showAuthMessage({
+                            is: 'Innskráning tókst! Beið...',
+                            en: 'Login successful! Redirecting...'
+                        }, false);
+                        
+                        // Check if user is admin and redirect accordingly
+                        const userData = sleipnirAuth.getCurrentUserData();
+                        if (userData.isAdmin && redirect === 'admin') {
+                            // Initialize admin session
+                            await sleipnirAuth.initializeAdminSession();
+                            setTimeout(() => {
+                                window.location.href = './admin2.html';
+                            }, 1000);
+                        } else {
+                            setTimeout(() => {
+                                window.location.href = './index.html';
+                            }, 1000);
+                        }
+                    } else {
+                        sleipnirAuth.showAuthMessage(result.error, true);
+                    }
+                } catch (error) {
+                    console.error('Social login error:', error);
+                    sleipnirAuth.showAuthMessage({
+                        is: 'Villa kom upp við innskráningu.',
+                        en: 'Error during sign in.'
+                    }, true);
+                }
+            });
+        });
+
+        // Forgot password handler
+        document.querySelector('.split-link').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            
+            if (!email) {
+                sleipnirAuth.showAuthMessage({
+                    is: 'Vinsamlegast sláðu inn netfang',
+                    en: 'Please enter your email address'
+                }, true);
+                return;
+            }
+            
+            try {
+                const result = await sleipnirAuth.sendPasswordResetEmail(email);
+                if (result.success) {
+                    sleipnirAuth.showAuthMessage({
+                        is: 'Tölvupóstur sendur! Athugaðu pósthólfið þitt.',
+                        en: 'Email sent! Check your inbox.'
+                    }, false);
+                } else {
+                    sleipnirAuth.showAuthMessage(result.error, true);
+                }
+            } catch (error) {
+                console.error('Password reset error:', error);
+                sleipnirAuth.showAuthMessage({
+                    is: 'Villa kom upp. Reyndu aftur.',
+                    en: 'An error occurred. Please try again.'
+                }, true);
+            }
+        });
+
+        // Add hover effect to input icons and handle autofill
         const inputs = document.querySelectorAll('.split-input-group input');
         inputs.forEach(input => {
+            // Handle focus/blur for icons
             input.addEventListener('focus', () => {
                 input.parentElement.querySelector('.input-icon').style.transform = 'translateY(-50%) scale(1.2)';
             });
             input.addEventListener('blur', () => {
                 input.parentElement.querySelector('.input-icon').style.transform = 'translateY(-50%) scale(1)';
+            });
+            
+            // Handle input changes to manage label position
+            input.addEventListener('input', () => {
+                if (input.value) {
+                    input.parentElement.classList.add('has-value');
+                } else {
+                    input.parentElement.classList.remove('has-value');
+                }
+            });
+            
+            // Check initial value
+            if (input.value) {
+                input.parentElement.classList.add('has-value');
+            }
+        });
+        
+        // Detect autofill
+        function detectAutofill() {
+            inputs.forEach(input => {
+                try {
+                    // Check if input has been autofilled
+                    if (input.matches(':-webkit-autofill')) {
+                        input.parentElement.classList.add('has-value');
+                    }
+                } catch (e) {
+                    // Fallback for browsers that don't support :-webkit-autofill
+                    if (input.value) {
+                        input.parentElement.classList.add('has-value');
+                    }
+                }
+            });
+        }
+        
+        // Check for autofill on various events
+        window.addEventListener('load', detectAutofill);
+        setTimeout(detectAutofill, 100);
+        setTimeout(detectAutofill, 500);
+        setTimeout(detectAutofill, 1000);
+        
+        // Also check on animation events which fire when autofill happens
+        inputs.forEach(input => {
+            input.addEventListener('animationstart', (e) => {
+                if (e.animationName === 'onAutoFillStart') {
+                    input.parentElement.classList.add('has-value');
+                }
             });
         });
         

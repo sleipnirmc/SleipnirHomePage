@@ -29,7 +29,6 @@ function updateLanguageDisplay() {
 }
 
 function updatePageTitle(pageName) {
-    function updatePageTitle(pageName) {
     const titles = {
         'index.html': {
             is: 'Sleipnir MC Reykjavík - Opinber Verslun',
@@ -65,10 +64,6 @@ function updatePageTitle(pageName) {
         }
     };
 
-    const pageTitle = titles[pageName] || titles['index.html'];
-    document.title = currentLang === 'is' ? pageTitle.is : pageTitle.en;
-}
-    
     const pageTitle = titles[pageName] || titles['index.html'];
     document.title = currentLang === 'is' ? pageTitle.is : pageTitle.en;
 }

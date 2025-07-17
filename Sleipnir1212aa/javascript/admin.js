@@ -1,10 +1,39 @@
-// Admin functionality - Comprehensive management system without authentication
+// Admin functionality - Comprehensive management system with authentication
 
 // Image upload handling
 let uploadedImages = [];
 let editImages = [];
 let currentProductImages = [];
 let editUploadedImages = [];
+
+// Authentication check on page load
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Protect admin page - redirects to login if not authenticated or not admin
+        await protectAdminPage();
+        
+        // Initialize admin panel after authentication
+        initializeAdminPanel();
+    } catch (error) {
+        console.error('Admin authentication error:', error);
+        window.location.href = '../login.html?redirect=admin';
+    }
+});
+
+// Initialize admin panel
+async function initializeAdminPanel() {
+    // Load dashboard stats
+    await loadDashboardStats();
+    
+    // Initialize other admin functions
+    initializeDragDrop();
+    loadProducts();
+    loadOrders();
+    loadEvents();
+    
+    // Set up periodic refresh for dashboard stats
+    setInterval(loadDashboardStats, 60000); // Refresh every minute
+}
 
 // Dashboard Stats Loading
 async function loadDashboardStats() {

@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viðburðir í Brennidepli - Sleipnir MC Reykjavík</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html" class="logo-link">
+                    <span class="logo-text">SLEIPNIR MC</span>
+                    <span class="location">REYKJAVÍK</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><span class="is">Heim</span><span class="en">Home</span></a></li>
+                <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
+                <li class="nav-dropdown">
+                    <a href="#"><span class="is">Um Okkur</span><span class="en">About Us</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="about.html"><span class="is">Hópurinn</span><span class="en">Members</span></a></li>
+                        <li><a href="sagan.html"><span class="is">Sagan</span><span class="en">Story</span></a></li>
+                        <li class="nav-dropdown-nested">
+                            <a href="#"><span class="is">Chapterar</span><span class="en">Chapters</span></a>
+                            <ul class="dropdown-menu-nested">
+                                <li><a href="Reykjavík.html"><span class="is">Reykjavík</span><span class="en">Reykjavík</span></a></li>
+                                <li><a href="Akureyri.html"><span class="is">Akureyri</span><span class="en">Akureyri</span></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="contact.html"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
+                <li class="active"><a href="events3.html"><span class="is">Í Brennidepli</span><span class="en">Featured</span></a></li>
+            </ul>
+            <div class="nav-controls">
+                <div class="language-toggle">
+                    <button class="btn btn-dark btn-sm" onclick="toggleLanguage()">
+                        <span class="is">EN</span>
+                        <span class="en">IS</span>
+                    </button>
+                </div>
+                <div class="cart-toggle">
+                    <button class="btn btn-dark btn-sm cart-nav-btn" id="cartBtn">
+                        <span class="cart-icon">🛒</span>
+                        <span class="cart-text">
+                            <span class="is">Karfa</span>
+                            <span class="en">Cart</span>
+                        </span>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Featured Event Hero -->
+    <section class="featured-event-hero">
+        <div class="hero-media">
+            <div class="hero-overlay"></div>
+            <div class="hero-video-bg"></div>
+        </div>
+        <div class="featured-hero-content">
+            <div class="event-badge">
+                <span class="is">Næsti Stórviðburður</span>
+                <span class="en">Next Big Event</span>
+            </div>
+            <h1 class="featured-title animate-fadeInUp">
+                <span class="is">Hringferð um Ísland 2024</span>
+                <span class="en">Round Iceland Tour 2024</span>
+            </h1>
+            <p class="featured-subtitle animate-fadeInUp" style="animation-delay: 0.2s;">
+                <span class="is">7 dagar | 1.332 km | Ævintýri lífsins</span>
+                <span class="en">7 days | 1,332 km | Adventure of a lifetime</span>
+            </p>
+            <div class="hero-countdown animate-fadeInUp" style="animation-delay: 0.4s;">
+                <div class="countdown-item">
+                    <span class="countdown-number" id="days">31</span>
+                    <span class="countdown-label">
+                        <span class="is">Dagar</span>
+                        <span class="en">Days</span>
+                    </span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="hours">05</span>
+                    <span class="countdown-label">
+                        <span class="is">Klst</span>
+                        <span class="en">Hours</span>
+                    </span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="minutes">42</span>
+                    <span class="countdown-label">
+                        <span class="is">Mín</span>
+                        <span class="en">Min</span>
+                    </span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="seconds">18</span>
+                    <span class="countdown-label">
+                        <span class="is">Sek</span>
+                        <span class="en">Sec</span>
+                    </span>
+                </div>
+            </div>
+            <div class="hero-cta animate-fadeInUp" style="animation-delay: 0.6s;">
+                <a href="#register" class="btn btn-primary btn-lg">
+                    <span class="is">Skrá þátttöku</span>
+                    <span class="en">Register Now</span>
+                </a>
+                <a href="#details" class="btn btn-secondary btn-lg">
+                    <span class="is">Sjá nánar</span>
+                    <span class="en">Learn More</span>
+                </a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span class="is">Skrolla niður</span>
+            <span class="en">Scroll down</span>
+            <div class="scroll-arrow">↓</div>
+        </div>
+    </section>
+
+    <!-- Event Details Section -->
+    <section id="details" class="event-details-section py-xl">
+        <div class="container">
+            <div class="event-details-grid">
+                <!-- Event Info Card -->
+                <div class="detail-card animate-fadeInUp">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="is">Um Ferðina</span>
+                            <span class="en">About the Ride</span>
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-lg">
+                            <span class="is">Hringferð Sleipnir MC er árlegur hápunktur félagsins. Við ríðum hringinn í kringum landið okkar fallega, heimsækjum alla landshluta og njótum samverunnar við bræður okkar. Þetta er meira en bara ferð - þetta er hefð sem sameinar okkur.</span>
+                            <span class="en">The Sleipnir MC Round Iceland Tour is the annual highlight of our club. We ride the ring road around our beautiful country, visiting all regions and enjoying the brotherhood. This is more than just a ride - it's a tradition that unites us.</span>
+                        </p>
+                        <div class="event-highlights mt-lg">
+                            <div class="highlight-item">
+                                <span class="highlight-icon">🏍️</span>
+                                <span class="is">Opið öllum meðlimum</span>
+                                <span class="en">Open to all members</span>
+                            </div>
+                            <div class="highlight-item">
+                                <span class="highlight-icon">🏨</span>
+                                <span class="is">Gisting innifalin</span>
+                                <span class="en">Accommodation included</span>
+                            </div>
+                            <div class="highlight-item">
+                                <span class="highlight-icon">🍽️</span>
+                                <span class="is">Kvöldverðir á hverjum degi</span>
+                                <span class="en">Dinners every evening</span>
+                            </div>
+                            <div class="highlight-item">
+                                <span class="highlight-icon">📸</span>
+                                <span class="is">Ljósmyndari með í för</span>
+                                <span class="en">Professional photographer</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Route Card -->
+                <div class="detail-card animate-fadeInUp" style="animation-delay: 0.2s;">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <span class="is">Leiðin</span>
+                            <span class="en">The Route</span>
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="route-map">
+                            <div class="map-placeholder">
+                                <!-- Map visualization would go here -->
+                                <div class="route-stats">
+                                    <div class="stat">
+                                        <span class="stat-value">1,332</span>
+                                        <span class="stat-label">km</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-value">7</span>
+                                        <span class="stat-label">
+                                            <span class="is">dagar</span>
+                                            <span class="en">days</span>
+                                        </span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-value">15</span>
+                                        <span class="stat-label">
+                                            <span class="is">staðir</span>
+                                            <span class="en">stops</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="route-days mt-md">
+                            <div class="route-day">
+                                <span class="day-number">1</span>
+                                <span class="day-route">Reykjavík → Akureyri (390 km)</span>
+                            </div>
+                            <div class="route-day">
+                                <span class="day-number">2</span>
+                                <span class="day-route">Akureyri → Egilsstaðir (265 km)</span>
+                            </div>
+                            <div class="route-day">
+                                <span class="day-number">3</span>
+                                <span class="day-route">Egilsstaðir → Höfn (250 km)</span>
+                            </div>
+                            <div class="route-day">
+                                <span class="day-number">4</span>
+                                <span class="day-route">Höfn → Vík (275 km)</span>
+                            </div>
+                            <div class="route-day">
+                                <span class="day-number">5</span>
+                                <span class="day-route">Vík → Reykjavík (180 km)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="event-gallery-section py-lg bg-norse">
+        <div class="container">
+            <h2 class="section-title text-center mb-lg">
+                <div class="norse-knotwork"></div>
+                <span class="is">Myndir frá síðustu ferð</span>
+                <span class="en">Photos from last tour</span>
+                <div class="norse-knotwork"></div>
+            </h2>
+            
+            <div class="gallery-grid">
+                <div class="gallery-item large animate-fadeInUp">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">
+                            <span class="is">Bræður á Dettifossi</span>
+                            <span class="en">Brothers at Dettifoss</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="gallery-item animate-fadeInUp" style="animation-delay: 0.1s;">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">
+                            <span class="is">Morgunakstur</span>
+                            <span class="en">Morning ride</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="gallery-item animate-fadeInUp" style="animation-delay: 0.2s;">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">
+                            <span class="is">Við Jökulsárlón</span>
+                            <span class="en">At Glacier Lagoon</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="gallery-item animate-fadeInUp" style="animation-delay: 0.3s;">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">
+                            <span class="is">Kvöldstund</span>
+                            <span class="en">Evening gathering</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="gallery-item wide animate-fadeInUp" style="animation-delay: 0.4s;">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">
+                            <span class="is">Hópurinn allur</span>
+                            <span class="en">The whole group</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration Section -->
+    <section id="register" class="registration-section py-xl">
+        <div class="container">
+            <div class="registration-card">
+                <h2 class="text-center mb-lg">
+                    <span class="is">Skrá þátttöku</span>
+                    <span class="en">Register for the Tour</span>
+                </h2>
+                
+                <div class="registration-info text-center mb-lg">
+                    <p class="text-lg">
+                        <span class="is">Takmarkaður fjöldi - Aðeins 5 pláss eftir!</span>
+                        <span class="en">Limited spots - Only 5 places left!</span>
+                    </p>
+                </div>
+
+                <div class="registration-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span class="is">Fullt nafn</span>
+                                <span class="en">Full name</span>
+                            </label>
+                            <input type="text" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span class="is">Netfang</span>
+                                <span class="en">Email</span>
+                            </label>
+                            <input type="email" class="form-input" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span class="is">Mótorhjól</span>
+                                <span class="en">Motorcycle</span>
+                            </label>
+                            <input type="text" class="form-input" placeholder="Make, Model, Year">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span class="is">Séróskir</span>
+                                <span class="en">Special requests</span>
+                            </label>
+                            <input type="text" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span class="is">Athugasemdir</span>
+                            <span class="en">Comments</span>
+                        </label>
+                        <textarea class="form-textarea" rows="4"></textarea>
+                    </div>
+
+                    <div class="registration-footer">
+                        <div class="price-info">
+                            <span class="price-label">
+                                <span class="is">Verð á mann:</span>
+                                <span class="en">Price per person:</span>
+                            </span>
+                            <span class="price">150.000 ISK</span>
+                        </div>
+                        <button class="btn btn-primary btn-lg">
+                            <span class="is">Staðfesta skráningu</span>
+                            <span class="en">Confirm Registration</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- More Events Section -->
+    <section class="more-events-section py-lg bg-norse">
+        <div class="container">
+            <h3 class="text-center mb-lg">
+                <span class="is">Fleiri viðburðir framundan</span>
+                <span class="en">More upcoming events</span>
+            </h3>
+            
+            <div class="events-carousel">
+                <div class="carousel-track">
+                    <div class="carousel-item">
+                        <div class="mini-event-card">
+                            <div class="mini-event-date">22 MAÍ</div>
+                            <h4 class="mini-event-title">
+                                <span class="is">Félagsfundur</span>
+                                <span class="en">Club Meeting</span>
+                            </h4>
+                            <a href="events1.html" class="btn btn-sm btn-dark">
+                                <span class="is">Sjá nánar</span>
+                                <span class="en">View</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="mini-event-card">
+                            <div class="mini-event-date">01 JÚN</div>
+                            <h4 class="mini-event-title">
+                                <span class="is">Grillveisla</span>
+                                <span class="en">BBQ Party</span>
+                            </h4>
+                            <a href="events1.html" class="btn btn-sm btn-dark">
+                                <span class="is">Sjá nánar</span>
+                                <span class="en">View</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="mini-event-card">
+                            <div class="mini-event-date">15 JÚN</div>
+                            <h4 class="mini-event-title">
+                                <span class="is">Dagsferð</span>
+                                <span class="en">Day Trip</span>
+                            </h4>
+                            <a href="events1.html" class="btn btn-sm btn-dark">
+                                <span class="is">Sjá nánar</span>
+                                <span class="en">View</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Sleipnir MC Reykjavík</h4>
+                <p>
+                    <span class="is">Ríðum í gegnum ljósanótt síðan 2015</span>
+                    <span class="en">Riding through ljósanótt since 2015</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Styles for Featured Event Page -->
+    <style>
+        .featured-event-hero {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-media {
+            position: absolute;
+            inset: 0;
+        }
+
+        .hero-video-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, var(--midnight-black), var(--norse-black));
+            background-image: url('Images/SleipnirLogo.png');
+            background-size: 50%;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.1;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.7) 100%);
+        }
+
+        .featured-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 1000px;
+            padding: 0 40px;
+        }
+
+        .event-badge {
+            display: inline-block;
+            background: var(--mc-red);
+            padding: 8px 20px;
+            font-family: 'Iceland', cursive;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(207, 35, 66, 0.4);
+        }
+
+        .featured-title {
+            font-family: 'Cinzel', serif;
+            font-size: 64px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .featured-subtitle {
+            font-size: 24px;
+            color: var(--gray);
+            margin-bottom: 50px;
+            font-style: italic;
+        }
+
+        .hero-countdown {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .countdown-item {
+            text-align: center;
+        }
+
+        .countdown-number {
+            display: block;
+            font-family: 'Cinzel', serif;
+            font-size: 56px;
+            font-weight: 900;
+            color: var(--mc-red);
+            text-shadow: 0 0 20px rgba(207, 35, 66, 0.5);
+        }
+
+        .countdown-label {
+            display: block;
+            font-family: 'Iceland', cursive;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: var(--gray);
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-arrow {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        .event-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+
+        .detail-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(207, 35, 66, 0.2);
+            overflow: hidden;
+        }
+
+        .detail-card .card-header {
+            padding: 30px;
+            background: rgba(0,0,0,0.5);
+            border-bottom: 2px solid var(--dark-red);
+        }
+
+        .detail-card .card-title {
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .event-highlights {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .highlight-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .highlight-icon {
+            font-size: 24px;
+        }
+
+        .route-map {
+            height: 300px;
+            background: var(--midnight-black);
+            border: 2px solid var(--dark-red);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-placeholder {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: url('Images/SleipnirLogo.png') center/30% no-repeat;
+            opacity: 0.1;
+        }
+
+        .route-stats {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: rgba(0,0,0,0.8);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            display: block;
+            font-family: 'Cinzel', serif;
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--mc-red);
+        }
+
+        .stat-label {
+            display: block;
+            font-family: 'Iceland', cursive;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gray);
+        }
+
+        .route-days {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .route-day {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-left: 3px solid var(--mc-red);
+        }
+
+        .day-number {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--mc-red);
+            min-width: 30px;
+        }
+
+        .day-route {
+            color: var(--gray);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            grid-auto-rows: 250px;
+        }
+
+        .gallery-item {
+            background: linear-gradient(135deg, var(--norse-black), var(--midnight-black));
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item.large {
+            grid-row: span 2;
+        }
+
+        .gallery-item.wide {
+            grid-column: span 2;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        .gallery-caption {
+            font-family: 'Iceland', cursive;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .registration-card {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 2px solid var(--dark-red);
+            padding: 60px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .registration-form {
+            margin-top: 40px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .registration-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .price-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .price-label {
+            font-family: 'Iceland', cursive;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gray);
+        }
+
+        .price {
+            font-family: 'Cinzel', serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--mc-red);
+        }
+
+        .events-carousel {
+            overflow: hidden;
+            margin: 0 -40px;
+            padding: 0 40px;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 30px;
+            padding: 20px 0;
+        }
+
+        .carousel-item {
+            flex: 0 0 300px;
+        }
+
+        .mini-event-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(207, 35, 66, 0.2);
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .mini-event-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--mc-red);
+            box-shadow: var(--shadow-red);
+        }
+
+        .mini-event-date {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--mc-red);
+            margin-bottom: 15px;
+        }
+
+        .mini-event-title {
+            font-family: 'Iceland', cursive;
+            font-size: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .event-details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-auto-rows: 200px;
+            }
+
+            .gallery-item.wide {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .featured-title {
+                font-size: 42px;
+            }
+
+            .featured-subtitle {
+                font-size: 18px;
+            }
+
+            .hero-countdown {
+                gap: 20px;
+            }
+
+            .countdown-number {
+                font-size: 42px;
+            }
+
+            .registration-card {
+                padding: 30px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .registration-footer {
+                flex-direction: column;
+                gap: 30px;
+                text-align: center;
+            }
+
+            .event-highlights {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                grid-auto-rows: 180px;
+            }
+
+            .gallery-item.large {
+                grid-row: span 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .featured-title {
+                font-size: 32px;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hero-cta .btn {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+    </style>
+
+    <script src="javascript/language.js"></script>
+    <script>
+        // Countdown timer
+        function updateCountdown() {
+            const eventDate = new Date('2024-06-17T09:00:00');
+            const now = new Date();
+            const diff = eventDate - now;
+
+            if (diff > 0) {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('days').textContent = days.toString().padStart(2, '0');
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            }
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Smooth scroll to sections
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Form submission
+        document.querySelector('.registration-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Takk fyrir skráninguna! / Thank you for registering!');
+        });
+    </script>
+</body>
+</html>

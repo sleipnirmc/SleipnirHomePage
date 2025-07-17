@@ -2,12 +2,13 @@
 let cart = [];
 let products = [];
 let currentFilter = 'all';
+let currentUserData = null;
 
 // Lazy loading observer
 let imageObserver = null;
 
 // Pagination variables
-const PRODUCTS_PER_PAGE = 12;
+const PRODUCTS_PER_PAGE = 8; // 4 items per row, 2 rows
 let currentPage = 1;
 let totalPages = 1;
 
@@ -188,6 +189,21 @@ async function addSampleProducts() {
     }
 }
 
+// Listen for auth state changes
+window.addEventListener('authStateChanged', (event) => {
+    const { user, userDoc } = event.detail;
+    currentUserData = {
+        user: user,
+        userDoc: userDoc,
+        isMember: userDoc && userDoc.members === true,
+        isAdmin: userDoc && userDoc.role === 'admin'
+    };
+    // Refresh product display when auth state changes
+    if (products.length > 0) {
+        displayProducts();
+    }
+});
+
 // Display products based on filter
 async function displayProducts() {
     const productGrid = document.getElementById('productGrid');
@@ -197,7 +213,11 @@ async function displayProducts() {
         ? products
         : products.filter(p => p.category === currentFilter);
     
-    // Show all products regardless of membership status (auth removed)
+    // Filter products based on membership status
+    if (!currentUserData || !currentUserData.isMember) {
+        // User is not logged in or is not a member - hide members-only products
+        filteredProducts = filteredProducts.filter(p => !p.membersOnly);
+    }
 
     if (filteredProducts.length === 0) {
         productGrid.innerHTML = '<div class="no-products"><p><span class="is">Engar vörur fundust í þessum flokki</span><span class="en">No products found in this category</span></p></div>';
@@ -217,7 +237,7 @@ async function displayProducts() {
     const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
     const endIndex = startIndex + PRODUCTS_PER_PAGE;
     const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
-
+    
     productGrid.innerHTML = paginatedProducts.map((product, index) => {
         const images = product.images && product.images.length > 0 ? product.images : 
                        (product.imageUrl ? [{dataUrl: product.imageUrl}] : []);
@@ -230,7 +250,6 @@ async function displayProducts() {
             <div class="product-badges">
                 ${product.isNew ? '<div class="product-badge">Nýtt</div>' : ''}
                 ${product.isPopular ? '<div class="product-badge">Vinsælt</div>' : ''}
-                ${product.membersOnly ? '<div class="product-badge">Meðlimur</div>' : ''}
             </div>
             
             <!-- Image Gallery -->
@@ -796,16 +815,11 @@ async function openProductModal(productId) {
         `;
     }).join('');
     
-    // Set add to cart button
+    // Set add to cart button - no member check needed since only visible products can be opened
     const addToCartBtn = document.getElementById('modalAddToCart');
-    if (product.membersOnly && !isMember) {
-        addToCartBtn.disabled = true;
-        addToCartBtn.innerHTML = '<span class="is">Eingöngu Meðlimir</span><span class="en">Members Only</span>';
-    } else {
-        addToCartBtn.disabled = false;
-        addToCartBtn.innerHTML = '<span class="is">Bæta í körfu</span><span class="en">Add to Cart</span>';
-        addToCartBtn.onclick = () => addModalProductToCart();
-    }
+    addToCartBtn.disabled = false;
+    addToCartBtn.innerHTML = '<span class="is">Bæta í körfu</span><span class="en">Add to Cart</span>';
+    addToCartBtn.onclick = () => addModalProductToCart();
     
     // Show modal
     modal.style.display = 'block';

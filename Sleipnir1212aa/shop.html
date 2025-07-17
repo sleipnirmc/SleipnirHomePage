@@ -52,6 +52,44 @@
                         <span class="cart-count" id="cartCount">0</span>
                     </button>
                 </div>
+                <!-- Login/Account Button -->
+                <div class="auth-buttons">
+                    <!-- Login button (shown when not authenticated) -->
+                    <a href="login.html" class="btn btn-dark btn-sm login-link">
+                        <span class="is">Innskrá</span>
+                        <span class="en">Login</span>
+                    </a>
+                    <!-- User menu (shown when authenticated) -->
+                    <div class="user-menu">
+                        <div class="user-menu-toggle btn btn-dark btn-sm">
+                            <span class="user-icon">👤</span>
+                            <span class="user-name">User</span>
+                            <span>▾</span>
+                        </div>
+                        <div class="user-menu-dropdown">
+                            <div style="padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <div class="user-name" style="font-size: 18px; margin-bottom: 5px;"></div>
+                                <div class="member-status-badge"></div>
+                            </div>
+                            <a href="#" class="orders-link">
+                                <span class="is">Pantanir mínar</span>
+                                <span class="en">My Orders</span>
+                            </a>
+                            <a href="#" class="outstanding-orders-link">
+                                <span class="is">Óafgreiddar pantanir</span>
+                                <span class="en">Outstanding Orders</span>
+                            </a>
+                            <a href="#" class="admin-link" style="display: none;">
+                                <span class="is">Stjórnborð</span>
+                                <span class="en">Admin Panel</span>
+                            </a>
+                            <a href="#" class="logout-btn">
+                                <span class="is">Útskrá</span>
+                                <span class="en">Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
@@ -219,11 +257,59 @@
     </footer>
 
     <!-- Firebase Scripts -->
-    <!-- Firebase Scripts (without auth) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="javascript/firebase-config.js"></script>
+    <script src="javascript/authentication.js"></script>
     <script src="javascript/language.js"></script>
     <script src="javascript/shop.js"></script>
+    
+    <script>
+        // User menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const userMenu = document.querySelector('.user-menu');
+            const userMenuToggle = document.querySelector('.user-menu-toggle');
+            const logoutBtn = document.querySelector('.logout-btn');
+            
+            // Toggle dropdown
+            if (userMenuToggle) {
+                userMenuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userMenu.classList.toggle('active');
+                });
+            }
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (userMenu && !userMenu.contains(e.target)) {
+                    userMenu.classList.remove('active');
+                }
+            });
+            
+            // Handle logout
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    const result = await sleipnirAuth.signOut();
+                    if (result.success) {
+                        window.location.href = 'index.html';
+                    }
+                });
+            }
+            
+            // Listen for auth state changes
+            window.addEventListener('authStateChanged', function(event) {
+                const { user, userDoc } = event.detail;
+                if (user && userDoc) {
+                    // Update user name in dropdown
+                    const userNameElements = document.querySelectorAll('.user-menu .user-name');
+                    userNameElements.forEach(el => {
+                        el.textContent = userDoc.displayName || user.email.split('@')[0];
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
