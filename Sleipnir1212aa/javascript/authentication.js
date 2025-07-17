@@ -49,11 +49,19 @@ auth.onAuthStateChanged(async (user) => {
 
 // Load user document from Firestore
 async function loadUserDocument(userId) {
+    console.log('loadUserDocument: Loading document for user', userId);
     try {
         const doc = await db.collection('users').doc(userId).get();
         if (doc.exists) {
             userDocument = { id: doc.id, ...doc.data() };
+            console.log('loadUserDocument: User document loaded', {
+                userId: userDocument.id,
+                email: userDocument.email,
+                role: userDocument.role,
+                members: userDocument.members
+            });
         } else {
+            console.log('loadUserDocument: No document exists, creating new one');
             // Create user document if it doesn't exist (for legacy users)
             userDocument = await createUserDocument(userId, currentUser);
         }
@@ -368,7 +376,13 @@ function showEmailVerificationPrompt() {
 
 // Check if user is admin
 function isUserAdmin() {
-    return userDocument && userDocument.role === 'admin';
+    const isAdmin = userDocument && userDocument.role === 'admin';
+    console.log('isUserAdmin check:', {
+        hasUserDocument: !!userDocument,
+        userRole: userDocument?.role,
+        isAdmin: isAdmin
+    });
+    return isAdmin;
 }
 
 // Get current user data
@@ -610,6 +624,11 @@ const ADMIN_ACTIVITY_LOG = 'adminActivityLog';
 
 // Enhanced admin authentication with security checks
 async function verifyAdminAccess() {
+    console.log('verifyAdminAccess: Starting verification', {
+        hasCurrentUser: !!currentUser,
+        userEmail: currentUser?.email
+    });
+    
     if (!currentUser) {
         return { success: false, error: 'Not authenticated' };
     }
@@ -626,8 +645,15 @@ async function verifyAdminAccess() {
     
     // Verify admin session is still valid
     const adminSession = localStorage.getItem('adminSession');
+    console.log('verifyAdminAccess: Checking admin session', { hasSession: !!adminSession });
     if (!adminSession) {
-        return { success: false, error: 'No valid admin session' };
+        console.log('verifyAdminAccess: No admin session found, will create one');
+        // Initialize admin session if user is admin but no session exists
+        const sessionResult = await initializeAdminSession();
+        if (!sessionResult.success) {
+            return sessionResult;
+        }
+        return { success: true };
     }
     
     const sessionData = JSON.parse(adminSession);
@@ -703,7 +729,7 @@ function startAdminSessionTimeout() {
     adminSessionTimeout = setTimeout(() => {
         clearAdminSession();
         // Redirect to login page
-        window.location.href = '../login.html?session_expired=true';
+        window.location.href = 'login.html?session_expired=true';
     }, ADMIN_SESSION_DURATION);
 }
 
@@ -809,16 +835,25 @@ async function adminSignOut() {
 
 // Protect admin pages - to be called on admin page load
 async function protectAdminPage() {
+    console.log('protectAdminPage: Starting protection check', {
+        hasCurrentUser: !!currentUser,
+        userEmail: currentUser?.email,
+        hasUserDocument: !!userDocument
+    });
+    
     // Check if user is authenticated
     if (!currentUser) {
-        window.location.href = '../login.html?redirect=admin';
+        console.log('protectAdminPage: No current user, redirecting to login');
+        window.location.href = 'login.html?redirect=admin';
         return false;
     }
     
     // Verify admin access
     const verifyResult = await verifyAdminAccess();
+    console.log('protectAdminPage: Verification result', verifyResult);
     if (!verifyResult.success) {
-        window.location.href = '../login.html?error=' + encodeURIComponent(verifyResult.error);
+        console.log('protectAdminPage: Admin verification failed, redirecting to login');
+        window.location.href = 'login.html?error=' + encodeURIComponent(verifyResult.error);
         return false;
     }
     

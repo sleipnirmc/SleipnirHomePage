@@ -6,22 +6,48 @@ let editImages = [];
 let currentProductImages = [];
 let editUploadedImages = [];
 
-// Authentication check on page load
-document.addEventListener('DOMContentLoaded', async () => {
+// Wait for Firebase auth state to be established
+let authInitialized = false;
+
+// Listen for auth state changes
+window.addEventListener('authStateChanged', async (event) => {
+    if (authInitialized) return; // Only run once
+    authInitialized = true;
+    
+    console.log('Admin panel: Auth state changed', event.detail);
+    
     try {
         // Protect admin page - redirects to login if not authenticated or not admin
-        await protectAdminPage();
+        const isAuthorized = await protectAdminPage();
+        console.log('Admin panel: Authorization result:', isAuthorized);
         
-        // Initialize admin panel after authentication
-        initializeAdminPanel();
+        if (isAuthorized) {
+            // Initialize admin panel after authentication
+            initializeAdminPanel();
+        }
     } catch (error) {
         console.error('Admin authentication error:', error);
-        window.location.href = '../login.html?redirect=admin';
+        window.location.href = 'login.html?redirect=admin';
     }
 });
 
+// Fallback in case auth state takes too long
+setTimeout(() => {
+    if (!authInitialized) {
+        console.log('Admin panel: Auth state timeout, redirecting to login');
+        window.location.href = 'login.html?redirect=admin';
+    }
+}, 5000); // 5 second timeout
+
 // Initialize admin panel
 async function initializeAdminPanel() {
+    // Show the page content after successful authentication
+    document.body.style.display = 'block';
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+    }
+    
     // Load dashboard stats
     await loadDashboardStats();
     

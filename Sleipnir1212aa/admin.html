@@ -880,56 +880,34 @@
     <script src="javascript/admin.js"></script>
 
     <script>
-        // Authentication check
+        // Authentication is handled by admin.js through protectAdminPage()
         let isAdminAuthenticated = false;
 
-        // Check authentication on page load
-        firebase.auth().onAuthStateChanged(async (user) => {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            
-            if (user) {
-                // User is signed in, check if they're an admin
-                try {
-                    const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-                    const userData = userDoc.data();
-                    
-                    if (userData && userData.role === 'admin') {
-                        // User is admin
-                        isAdminAuthenticated = true;
-                        document.body.style.display = 'block';
-                        loadingOverlay.style.display = 'none';
-                        
-                        // Update UI
-                        const userMenus = document.querySelectorAll('.user-menu');
-                        userMenus.forEach(menu => {
-                            menu.style.display = 'flex';
-                            const nameDisplay = menu.querySelector('.user-name');
-                            if (nameDisplay) {
-                                nameDisplay.textContent = userData.displayName || user.email;
-                            }
-                        });
-                        
-                        // Load dashboard stats
-                        loadDashboardStats();
-                        
-                        // Initialize admin session
-                        await sleipnirAuth.initializeAdminSession();
-                    } else {
-                        // User is not admin
-                        alert('Access denied. Admin privileges required.');
-                        window.location.href = 'index.html';
-                    }
-                } catch (error) {
-                    console.error('Error checking admin status:', error);
-                    window.location.href = 'login.html?redirect=admin';
+        // Wait for auth state to be established by admin.js
+        window.addEventListener('authStateChanged', (event) => {
+            const { user, userDoc } = event.detail;
+            if (user && userDoc && userDoc.role === 'admin') {
+                isAdminAuthenticated = true;
+                
+                // Update UI
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
                 }
-            } else {
-                // User is not signed in
-                window.location.href = 'login.html?redirect=admin';
+                document.body.style.display = 'block';
+                
+                const userMenus = document.querySelectorAll('.user-menu');
+                userMenus.forEach(menu => {
+                    menu.style.display = 'flex';
+                    const nameDisplay = menu.querySelector('.user-name');
+                    if (nameDisplay) {
+                        nameDisplay.textContent = userDoc.displayName || user.email;
+                    }
+                });
             }
         });
 
-        // Load dashboard stats on page load
+        // Additional page-specific initialization
         document.addEventListener('DOMContentLoaded', () => {
             // Add event listeners for user search and filter
             const userSearch = document.getElementById('userSearch');
