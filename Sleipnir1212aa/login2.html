@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC - Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Enable smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Login Page 2 - Split Screen Design */
+        .login-split-container {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            background: var(--pure-black);
+            overflow: visible;
+        }
+
+        /* Left Side - Visual Section */
+        .login-visual-section {
+            flex: 1;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            background: var(--midnight-black);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        /* Animated Background Pattern with Parallax */
+        .visual-bg-pattern {
+            position: absolute;
+            top: -20%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(207, 35, 66, 0.03) 10px,
+                    rgba(207, 35, 66, 0.03) 20px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(207, 35, 66, 0.03) 10px,
+                    rgba(207, 35, 66, 0.03) 20px
+                );
+            animation: pattern-shift 20s linear infinite;
+            will-change: transform;
+            transition: transform 0.5s ease-out;
+        }
+
+        @keyframes pattern-shift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 20px); }
+        }
+
+        /* Logo Container */
+        .visual-logo-container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            animation: logo-entrance 1.5s ease-out;
+            transition: transform 0.3s ease-out;
+        }
+
+        @keyframes logo-entrance {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) rotate(-10deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .visual-logo {
+            width: 300px;
+            height: 300px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 50px rgba(207, 35, 66, 0.5));
+            animation: logo-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes logo-pulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 50px rgba(207, 35, 66, 0.5));
+            }
+            50% {
+                filter: drop-shadow(0 0 80px rgba(207, 35, 66, 0.8));
+            }
+        }
+
+        .visual-text {
+            margin-top: 30px;
+        }
+
+        .visual-title {
+            font-family: 'VIKING-N', 'Cinzel', serif;
+            font-size: 48px;
+            color: var(--white);
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            text-shadow: 
+                0 0 20px rgba(207, 35, 66, 0.5),
+                0 0 40px rgba(207, 35, 66, 0.3);
+        }
+
+        .visual-motto {
+            font-family: 'Iceland', cursive;
+            font-size: 20px;
+            color: var(--mc-red);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        /* Decorative Elements */
+        .visual-decoration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .corner-accent {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 3px solid var(--mc-red);
+            opacity: 0.3;
+        }
+
+        .corner-accent.top-left {
+            top: 50px;
+            left: 50px;
+            border-right: none;
+            border-bottom: none;
+            animation: corner-pulse 3s ease-in-out infinite;
+        }
+
+        .corner-accent.bottom-right {
+            bottom: 50px;
+            right: 50px;
+            border-left: none;
+            border-top: none;
+            animation: corner-pulse 3s ease-in-out infinite 1.5s;
+        }
+
+        @keyframes corner-pulse {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.6;
+                transform: scale(1.05);
+            }
+        }
+
+        /* Right Side - Form Section */
+        .login-form-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, 
+                var(--norse-black) 0%, 
+                var(--midnight-black) 100%);
+            position: relative;
+        }
+
+        /* Form Container */
+        .split-form-container {
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Form Header */
+        .split-form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .split-form-title {
+            font-family: 'Cinzel', serif;
+            font-size: 36px;
+            color: var(--white);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .split-form-subtitle {
+            font-family: 'Iceland', cursive;
+            font-size: 16px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* Tab Navigation */
+        .form-tabs {
+            display: flex;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            font-family: 'Iceland', cursive;
+            font-size: 16px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            color: var(--mc-red);
+        }
+
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--mc-red);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .tab-btn.active::after {
+            transform: scaleX(1);
+        }
+
+        /* Form Styles */
+        .split-login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Enhanced Input Fields */
+        .split-input-group {
+            position: relative;
+        }
+
+        .split-input-group input {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid transparent;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            font-size: 16px;
+            font-family: 'Cormorant Garamond', serif;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        .split-input-group input:focus {
+            outline: none;
+            border-bottom-color: var(--mc-red);
+            background: rgba(207, 35, 66, 0.05);
+        }
+
+        .split-input-group label {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-family: 'Iceland', cursive;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .split-input-group input:focus + label,
+        .split-input-group input:not(:placeholder-shown) + label {
+            top: -10px;
+            left: 0;
+            font-size: 12px;
+            color: var(--mc-red);
+        }
+
+        /* Input Icons */
+        .input-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .split-input-group input:focus ~ .input-icon {
+            color: var(--mc-red);
+        }
+
+        /* Enhanced Submit Button */
+        .split-submit-btn {
+            padding: 18px;
+            background: var(--mc-red);
+            border: 2px solid var(--mc-red);
+            color: var(--white);
+            font-family: 'Iceland', cursive;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .split-submit-btn:hover {
+            background: transparent;
+            box-shadow: 0 0 30px rgba(207, 35, 66, 0.5);
+        }
+
+        .split-submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.2), 
+                transparent);
+            transition: left 0.5s ease;
+        }
+
+        .split-submit-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Additional Options */
+        .split-form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .split-checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .split-checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--mc-red);
+            cursor: pointer;
+        }
+
+        .split-link {
+            color: var(--mc-red);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .split-link:hover {
+            color: var(--white);
+        }
+
+        .split-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--white);
+            transition: width 0.3s ease;
+        }
+
+        .split-link:hover::after {
+            width: 100%;
+        }
+
+        /* Social Login Section */
+        .split-social-section {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .split-social-title {
+            text-align: center;
+            color: var(--gray);
+            font-family: 'Iceland', cursive;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .split-social-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            font-family: 'Iceland', cursive;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .social-btn:hover {
+            background: rgba(207, 35, 66, 0.1);
+            border-color: var(--mc-red);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .visual-logo {
+                width: 250px;
+                height: 250px;
+            }
+
+            .visual-title {
+                font-size: 36px;
+            }
+        }
+
+        /* Scroll-triggered animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .split-input-group {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.5s ease;
+        }
+        
+        .split-input-group.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* Stagger animation delay */
+        .split-input-group:nth-child(1) { transition-delay: 0.1s; }
+        .split-input-group:nth-child(2) { transition-delay: 0.2s; }
+        .split-input-group:nth-child(3) { transition-delay: 0.3s; }
+        .split-input-group:nth-child(4) { transition-delay: 0.4s; }
+        .split-input-group:nth-child(5) { transition-delay: 0.5s; }
+        .split-input-group:nth-child(6) { transition-delay: 0.6s; }
+        .split-input-group:nth-child(7) { transition-delay: 0.7s; }
+        .split-input-group:nth-child(8) { transition-delay: 0.8s; }
+        
+        @media (max-width: 768px) {
+            .login-split-container {
+                flex-direction: column;
+            }
+
+            .login-visual-section {
+                position: relative;
+                height: 50vh;
+                flex: none;
+            }
+
+            .visual-logo {
+                width: 150px;
+                height: 150px;
+            }
+
+            .visual-title {
+                font-size: 28px;
+            }
+
+            .visual-motto {
+                font-size: 16px;
+            }
+
+            .corner-accent {
+                display: none;
+            }
+
+            .login-form-section {
+                flex: 1;
+                padding: 20px;
+            }
+
+            .split-form-title {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .split-social-buttons {
+                flex-direction: column;
+            }
+
+            .split-form-options {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-split-container">
+        <!-- Left Visual Section -->
+        <div class="login-visual-section">
+            <div class="visual-bg-pattern"></div>
+            
+            <div class="visual-logo-container">
+                <img src="Images/SleipnirLogo.png" alt="Sleipnir MC" class="visual-logo">
+                <div class="visual-text">
+                    <h1 class="visual-title">SLEIPNIR MC</h1>
+                    <p class="visual-motto">NO DRUGS • NO ATTITUDE</p>
+                </div>
+            </div>
+            
+            <div class="visual-decoration">
+                <div class="corner-accent top-left"></div>
+                <div class="corner-accent bottom-right"></div>
+            </div>
+        </div>
+
+        <!-- Right Form Section -->
+        <div class="login-form-section">
+            <div class="split-form-container">
+                <!-- Form Header -->
+                <div class="split-form-header">
+                    <h2 class="split-form-title">
+                        <span class="is">Velkomin</span>
+                        <span class="en">Welcome</span>
+                    </h2>
+                    <p class="split-form-subtitle">
+                        <span class="is">Skráðu þig inn á svæðið</span>
+                        <span class="en">Access your account</span>
+                    </p>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div class="form-tabs">
+                    <button class="tab-btn active" data-tab="login">
+                        <span class="is">Innskrá</span>
+                        <span class="en">Login</span>
+                    </button>
+                    <button class="tab-btn" data-tab="signup">
+                        <span class="is">Nýskrá</span>
+                        <span class="en">Sign Up</span>
+                    </button>
+                </div>
+
+                <!-- Login Form -->
+                <form class="split-login-form" id="authForm">
+                    <!-- Email Field -->
+                    <div class="split-input-group">
+                        <input type="email" id="email" placeholder=" " required>
+                        <label for="email">
+                            <span class="is">Netfang</span>
+                            <span class="en">Email Address</span>
+                        </label>
+                        <span class="input-icon">✉</span>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="split-input-group">
+                        <input type="password" id="password" placeholder=" " required>
+                        <label for="password">
+                            <span class="is">Lykilorð</span>
+                            <span class="en">Password</span>
+                        </label>
+                        <span class="input-icon">🔒</span>
+                    </div>
+
+                    <!-- Confirm Password (for signup) -->
+                    <div class="split-input-group" id="confirmGroup" style="display: none;">
+                        <input type="password" id="confirmPassword" placeholder=" ">
+                        <label for="confirmPassword">
+                            <span class="is">Staðfesta Lykilorð</span>
+                            <span class="en">Confirm Password</span>
+                        </label>
+                        <span class="input-icon">🔒</span>
+                    </div>
+
+                    <!-- Name Field (for signup) -->
+                    <div class="split-input-group" id="nameGroup" style="display: none;">
+                        <input type="text" id="fullName" placeholder=" ">
+                        <label for="fullName">
+                            <span class="is">Fullt Nafn</span>
+                            <span class="en">Full Name</span>
+                        </label>
+                        <span class="input-icon">👤</span>
+                    </div>
+
+                    <!-- Phone Field (for signup) -->
+                    <div class="split-input-group" id="phoneGroup" style="display: none;">
+                        <input type="tel" id="phone" placeholder=" " pattern="[0-9]{3}-[0-9]{4}" title="Format: 123-4567">
+                        <label for="phone">
+                            <span class="is">Símanúmer</span>
+                            <span class="en">Phone Number</span>
+                        </label>
+                        <span class="input-icon">📱</span>
+                    </div>
+
+                    <!-- Address Field (for signup) -->
+                    <div class="split-input-group" id="addressGroup" style="display: none;">
+                        <input type="text" id="address" placeholder=" ">
+                        <label for="address">
+                            <span class="is">Heimilisfang</span>
+                            <span class="en">Street Address</span>
+                        </label>
+                        <span class="input-icon">🏠</span>
+                    </div>
+
+                    <!-- City Field (for signup) -->
+                    <div class="split-input-group" id="cityGroup" style="display: none;">
+                        <input type="text" id="city" placeholder=" ">
+                        <label for="city">
+                            <span class="is">Borg/Bær</span>
+                            <span class="en">City</span>
+                        </label>
+                        <span class="input-icon">🏙️</span>
+                    </div>
+
+                    <!-- Postal Code Field (for signup) -->
+                    <div class="split-input-group" id="postalGroup" style="display: none;">
+                        <input type="text" id="postalCode" placeholder=" " pattern="[0-9]{3}" title="3 digit postal code">
+                        <label for="postalCode">
+                            <span class="is">Póstnúmer</span>
+                            <span class="en">Postal Code</span>
+                        </label>
+                        <span class="input-icon">📮</span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="split-submit-btn">
+                        <span class="is" data-login="Innskrá" data-signup="Búa til aðgang">Innskrá</span>
+                        <span class="en" data-login="Login" data-signup="Create Account">Login</span>
+                    </button>
+
+                    <!-- Additional Options -->
+                    <div class="split-form-options">
+                        <label class="split-checkbox-group">
+                            <input type="checkbox" id="rememberMe">
+                            <span>
+                                <span class="is">Muna mig</span>
+                                <span class="en">Remember me</span>
+                            </span>
+                        </label>
+                        <a href="#" class="split-link">
+                            <span class="is">Gleymt lykilorð?</span>
+                            <span class="en">Forgot password?</span>
+                        </a>
+                    </div>
+                </form>
+
+                <!-- Social Login Section -->
+                <div class="split-social-section">
+                    <p class="split-social-title">
+                        <span class="is">Eða skráðu þig inn með</span>
+                        <span class="en">Or continue with</span>
+                    </p>
+                    <div class="split-social-buttons">
+                        <button class="social-btn">
+                            <span>🌐</span>
+                            <span>Google</span>
+                        </button>
+                        <button class="social-btn">
+                            <span>📘</span>
+                            <span>Facebook</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="javascript/language.js"></script>
+    <script>
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab-btn');
+        const confirmGroup = document.getElementById('confirmGroup');
+        const nameGroup = document.getElementById('nameGroup');
+        const phoneGroup = document.getElementById('phoneGroup');
+        const addressGroup = document.getElementById('addressGroup');
+        const cityGroup = document.getElementById('cityGroup');
+        const postalGroup = document.getElementById('postalGroup');
+        const submitBtn = document.querySelector('.split-submit-btn');
+        const formTitle = document.querySelector('.split-form-title');
+        const formSubtitle = document.querySelector('.split-form-subtitle');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const isSignup = tab.dataset.tab === 'signup';
+
+                // Show/hide signup fields
+                confirmGroup.style.display = isSignup ? 'block' : 'none';
+                nameGroup.style.display = isSignup ? 'block' : 'none';
+                phoneGroup.style.display = isSignup ? 'block' : 'none';
+                addressGroup.style.display = isSignup ? 'block' : 'none';
+                cityGroup.style.display = isSignup ? 'block' : 'none';
+                postalGroup.style.display = isSignup ? 'block' : 'none';
+                
+                // Re-trigger animations for new fields
+                if (isSignup) {
+                    setTimeout(() => {
+                        observeElements();
+                    }, 100);
+                }
+
+                // Update button text
+                submitBtn.querySelectorAll('[data-login]').forEach(el => {
+                    el.textContent = isSignup ? el.dataset.signup : el.dataset.login;
+                });
+
+                // Update header text
+                if (isSignup) {
+                    formTitle.querySelector('.is').textContent = 'Búa til aðgang';
+                    formTitle.querySelector('.en').textContent = 'Create Account';
+                    formSubtitle.querySelector('.is').textContent = 'Skráðu þig í hópinn';
+                    formSubtitle.querySelector('.en').textContent = 'Join our community';
+                } else {
+                    formTitle.querySelector('.is').textContent = 'Velkomin';
+                    formTitle.querySelector('.en').textContent = 'Welcome';
+                    formSubtitle.querySelector('.is').textContent = 'Skráðu þig inn á svæðið';
+                    formSubtitle.querySelector('.en').textContent = 'Access your account';
+                }
+            });
+        });
+
+        // Form submission
+        document.getElementById('authForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Add your authentication logic here
+            console.log('Form submitted');
+        });
+
+        // Add hover effect to input icons
+        const inputs = document.querySelectorAll('.split-input-group input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.querySelector('.input-icon').style.transform = 'translateY(-50%) scale(1.2)';
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.querySelector('.input-icon').style.transform = 'translateY(-50%) scale(1)';
+            });
+        });
+        
+        // Parallax scrolling effect
+        let ticking = false;
+        function updateParallax() {
+            const scrolled = window.pageYOffset;
+            const parallaxSpeed = 0.5;
+            const bgPattern = document.querySelector('.visual-bg-pattern');
+            const logoContainer = document.querySelector('.visual-logo-container');
+            
+            if (bgPattern) {
+                bgPattern.style.transform = `translate(${scrolled * 0.1}px, ${scrolled * parallaxSpeed}px)`;
+            }
+            
+            if (logoContainer) {
+                logoContainer.style.transform = `translateY(${scrolled * 0.3}px)`;
+            }
+            
+            ticking = false;
+        }
+        
+        function requestTick() {
+            if (!ticking) {
+                window.requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        }
+        
+        window.addEventListener('scroll', requestTick);
+        
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        function observeElements() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe form elements
+            document.querySelectorAll('.split-input-group').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Observe other elements
+            document.querySelectorAll('.split-form-header, .form-tabs, .split-submit-btn, .split-social-section').forEach(el => {
+                el.classList.add('fade-in');
+                observer.observe(el);
+            });
+        }
+        
+        // Initialize animations on load
+        window.addEventListener('load', () => {
+            observeElements();
+        });
+        
+        // Smooth scroll to form when clicking anywhere on visual section
+        document.querySelector('.login-visual-section').addEventListener('click', (e) => {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+                document.querySelector('.login-form-section').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    </script>
+</body>
+</html>

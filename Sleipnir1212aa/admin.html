@@ -12,7 +12,7 @@
             margin: 100px auto 40px;
             padding: 20px;
         }
-        
+
         /* Admin Header */
         .admin-header {
             background: var(--norse-black);
@@ -23,18 +23,18 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .admin-title {
             font-family: 'Iceland', 'Cinzel', serif;
             font-size: 2.5rem;
             color: var(--white);
         }
-        
+
         /* Options Dropdown */
         .admin-options {
             position: relative;
         }
-        
+
         .options-btn {
             padding: 12px 30px;
             background: var(--mc-red);
@@ -50,12 +50,12 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .options-btn:hover {
             background: var(--mc-red-hover);
             transform: translateY(-2px);
         }
-        
+
         .options-dropdown {
             position: absolute;
             top: 100%;
@@ -70,13 +70,13 @@
             transition: all 0.3s;
             z-index: 1000;
         }
-        
+
         .admin-options.active .options-dropdown {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
-        
+
         .options-dropdown a {
             display: block;
             padding: 15px 20px;
@@ -85,17 +85,17 @@
             transition: all 0.3s;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        
+
         .options-dropdown a:last-child {
             border-bottom: none;
         }
-        
+
         .options-dropdown a:hover {
             background: rgba(255,0,0,0.2);
             color: var(--mc-red);
             padding-left: 25px;
         }
-        
+
         /* Dashboard Stats */
         .dashboard-stats {
             display: grid;
@@ -103,7 +103,7 @@
             gap: 20px;
             margin-bottom: 30px;
         }
-        
+
         .stat-card {
             background: var(--norse-black);
             border: 1px solid rgba(207, 35, 66, 0.3);
@@ -111,25 +111,25 @@
             text-align: center;
             transition: all 0.3s;
         }
-        
+
         .stat-card:hover {
             border-color: var(--mc-red);
             transform: translateY(-2px);
         }
-        
+
         .stat-number {
             font-size: 3rem;
             color: var(--mc-red);
             font-weight: bold;
             margin-bottom: 10px;
         }
-        
+
         .stat-label {
             color: var(--gray);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        
+
         /* Admin Sections */
         .admin-section {
             background: rgba(26,26,26,0.9);
@@ -138,35 +138,35 @@
             margin-bottom: 30px;
             display: none;
         }
-        
+
         .admin-section.active {
             display: block;
         }
-        
+
         .section-header {
             border-bottom: 2px solid var(--mc-red);
             padding-bottom: 15px;
             margin-bottom: 25px;
         }
-        
+
         .section-title {
             font-size: 1.8rem;
             color: var(--white);
             margin-bottom: 5px;
         }
-        
+
         /* Forms */
         .admin-form {
             display: grid;
             gap: 15px;
             max-width: 600px;
         }
-        
+
         .form-group {
             display: grid;
             gap: 5px;
         }
-        
+
         .admin-input, .admin-textarea, .admin-select {
             width: 100%;
             padding: 12px;
@@ -176,18 +176,18 @@
             font-size: 1rem;
             transition: all 0.3s;
         }
-        
+
         .admin-input:focus, .admin-textarea:focus, .admin-select:focus {
             outline: none;
             border-color: var(--mc-red);
             background: rgba(0,0,0,0.7);
         }
-        
+
         .admin-textarea {
             resize: vertical;
             min-height: 100px;
         }
-        
+
         /* Buttons */
         .admin-btn {
             padding: 12px 25px;
@@ -201,24 +201,24 @@
             letter-spacing: 1px;
             transition: all 0.3s;
         }
-        
+
         .admin-btn:hover {
             background: var(--mc-red-hover);
             transform: translateY(-2px);
         }
-        
+
         .admin-btn.secondary {
             background: var(--charcoal);
         }
-        
+
         .admin-btn.edit {
             background: var(--crimson);
         }
-        
+
         .admin-btn.delete {
             background: var(--dark-red);
         }
-        
+
         /* Grid Layouts */
         .admin-grid {
             display: grid;
@@ -226,7 +226,7 @@
             gap: 20px;
             margin-top: 20px;
         }
-        
+
         .admin-card {
             background: rgba(10,10,10,0.8);
             border: 1px solid rgba(255,0,0,0.2);
@@ -234,12 +234,12 @@
             position: relative;
             transition: all 0.3s;
         }
-        
+
         .admin-card:hover {
             border-color: var(--mc-red);
             transform: translateY(-2px);
         }
-        
+
         .admin-card img {
             width: 100%;
             height: 200px;
@@ -247,21 +247,21 @@
             margin-bottom: 15px;
             border-radius: 4px;
         }
-        
+
         /* Orders Table */
         .orders-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        
+
         .orders-table th,
         .orders-table td {
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        
+
         .orders-table th {
             background: rgba(207, 35, 66, 0.2);
             color: var(--white);
@@ -269,28 +269,28 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        
+
         .orders-table tr:hover {
             background: rgba(255,255,255,0.05);
         }
-        
+
         .order-status {
             padding: 5px 15px;
             border-radius: 20px;
             font-size: 0.9rem;
             font-weight: 600;
         }
-        
+
         .order-status.pending {
             background: rgba(255, 165, 0, 0.2);
             color: orange;
         }
-        
+
         .order-status.completed {
             background: rgba(0, 255, 0, 0.2);
             color: #00ff00;
         }
-        
+
         /* Tabs */
         .admin-tabs {
             display: flex;
@@ -298,7 +298,7 @@
             margin-bottom: 20px;
             border-bottom: 1px solid rgba(255,255,255,0.2);
         }
-        
+
         .tab-btn {
             padding: 10px 20px;
             background: transparent;
@@ -309,11 +309,11 @@
             transition: all 0.3s;
             position: relative;
         }
-        
+
         .tab-btn.active {
             color: var(--white);
         }
-        
+
         .tab-btn.active::after {
             content: '';
             position: absolute;
@@ -323,15 +323,15 @@
             height: 2px;
             background: var(--mc-red);
         }
-        
+
         .tab-content {
             display: none;
         }
-        
+
         .tab-content.active {
             display: block;
         }
-        
+
         /* File Upload */
         .drop-zone {
             border: 2px dashed var(--mc-red);
@@ -343,49 +343,52 @@
             transition: all 0.3s;
             background: rgba(255,0,0,0.05);
         }
-        
+
         .drop-zone:hover {
             background: rgba(255,0,0,0.1);
             border-color: var(--white);
         }
-        
+
         .drop-zone.dragover {
             background: rgba(255,0,0,0.2);
             transform: scale(1.02);
         }
-        
+
         /* Member Card */
         .member-card {
             display: flex;
             align-items: center;
             gap: 15px;
-            padding: 15px;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 10px;
+            padding: 20px;
+            background: rgba(26,26,26,0.9);
+            border: 1px solid rgba(207, 35, 66, 0.3);
+            margin-bottom: 15px;
             transition: all 0.3s;
+            border-radius: 5px;
         }
-        
+
         .member-card:hover {
             border-color: var(--mc-red);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(207, 35, 66, 0.2);
         }
-        
+
         .member-photo-small {
             width: 60px;
             height: 60px;
             border-radius: 50%;
             object-fit: cover;
         }
-        
+
         .member-info {
             flex: 1;
         }
-        
+
         .member-actions {
             display: flex;
             gap: 10px;
         }
-        
+
         /* Size checkboxes */
         .size-checkbox {
             display: inline-flex;
@@ -398,15 +401,15 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .size-checkbox:hover {
             border-color: var(--mc-red);
         }
-        
+
         .size-checkbox input[type="checkbox"] {
             cursor: pointer;
         }
-        
+
         /* Responsive */
         @media (max-width: 768px) {
             .admin-header {
@@ -414,11 +417,11 @@
                 gap: 20px;
                 text-align: center;
             }
-            
+
             .admin-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .dashboard-stats {
                 grid-template-columns: 1fr;
             }
@@ -461,6 +464,8 @@
                     Options ▼
                 </button>
                 <div class="options-dropdown">
+                    <a href="#" onclick="showSection('members')">View Members</a>
+                    <a href="#" onclick="showSection('users')">View Users</a>
                     <a href="#" onclick="showSection('products')">Manage Products</a>
                     <a href="#" onclick="showSection('events')">Manage Events</a>
                     <a href="#" onclick="showSection('orders')">View Orders</a>
@@ -468,9 +473,17 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Dashboard Stats -->
         <div class="dashboard-stats" id="dashboardStats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalMembers">0</div>
+                <div class="stat-label">Total Members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Registered Users</div>
+            </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalOrders">0</div>
                 <div class="stat-label">Total Orders</div>
@@ -488,18 +501,66 @@
                 <div class="stat-label">Events</div>
             </div>
         </div>
-        
+
+        <!-- Members Section -->
+        <div class="admin-section" id="membersSection">
+            <div class="section-header">
+                <h2 class="section-title">Club Members</h2>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <input type="text" class="admin-input" placeholder="Search members..." id="memberSearch" style="max-width: 400px;">
+            </div>
+
+            <div id="membersContainer" style="display: grid; gap: 20px;">
+                <!-- Members will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Users Section -->
+        <div class="admin-section" id="usersSection">
+            <div class="section-header">
+                <h2 class="section-title">Registered Users</h2>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <input type="text" class="admin-input" placeholder="Search users..." id="userSearch" style="max-width: 400px;">
+                <select class="admin-select" id="userFilter" style="max-width: 200px; margin-left: 10px;">
+                    <option value="all">All Users</option>
+                    <option value="members">Members Only</option>
+                    <option value="non-members">Non-Members</option>
+                </select>
+            </div>
+
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Registration Date</th>
+                        <th>Member Status</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- Users will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
         <!-- Products Section -->
         <div class="admin-section" id="productsSection">
             <div class="section-header">
                 <h2 class="section-title">Manage Products</h2>
             </div>
-            
+
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="switchTab('addProduct')">Add Product</button>
                 <button class="tab-btn" onclick="switchTab('viewProducts')">View Products</button>
             </div>
-            
+
             <!-- Add Product Tab -->
             <div class="tab-content active" id="addProductTab">
                 <form class="admin-form" id="addProductForm">
@@ -552,7 +613,7 @@
                     <button type="submit" class="admin-btn">Add Product</button>
                 </form>
             </div>
-            
+
             <!-- View Products Tab -->
             <div class="tab-content" id="viewProductsTab">
                 <div class="admin-grid" id="productsGrid">
@@ -560,18 +621,18 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Events Section -->
         <div class="admin-section" id="eventsSection">
             <div class="section-header">
                 <h2 class="section-title">Manage Events</h2>
             </div>
-            
+
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="switchEventTab('addEvent')">Add Event</button>
                 <button class="tab-btn" onclick="switchEventTab('viewEvents')">View Events</button>
             </div>
-            
+
             <!-- Add Event Tab -->
             <div class="tab-content active" id="addEventTab">
                 <form class="admin-form" id="addEventForm">
@@ -609,7 +670,7 @@
                     <button type="submit" class="admin-btn">Add Event</button>
                 </form>
             </div>
-            
+
             <!-- View Events Tab -->
             <div class="tab-content" id="viewEventsTab">
                 <div class="admin-grid" id="eventsGrid">
@@ -617,18 +678,18 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Orders Section -->
         <div class="admin-section" id="ordersSection">
             <div class="section-header">
                 <h2 class="section-title">Manage Orders</h2>
             </div>
-            
+
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="switchOrderTab('pending')">Pending Orders</button>
                 <button class="tab-btn" onclick="switchOrderTab('completed')">Completed Orders</button>
             </div>
-            
+
             <!-- Orders Tables -->
             <div class="tab-content active" id="pendingOrdersTab">
                 <table class="orders-table">
@@ -648,7 +709,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <div class="tab-content" id="completedOrdersTab">
                 <table class="orders-table">
                     <thead>
@@ -667,13 +728,13 @@
                 </table>
             </div>
         </div>
-        
+
         <!-- Export Section -->
         <div class="admin-section" id="exportSection">
             <div class="section-header">
                 <h2 class="section-title">Export Data</h2>
             </div>
-            
+
             <div class="form-group">
                 <label>Date Range</label>
                 <div style="display: flex; gap: 10px;">
@@ -682,7 +743,7 @@
                     <input type="date" class="admin-input" id="exportEndDate">
                 </div>
             </div>
-            
+
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button class="admin-btn" onclick="exportOrders('all')">Export All Orders</button>
                 <button class="admin-btn secondary" onclick="exportOrders('pending')">Export Pending Orders</button>
@@ -698,25 +759,25 @@
                 <h2 style="color: var(--white); margin: 0;">Edit Product</h2>
                 <button onclick="closeEditModal()" style="background: none; border: none; color: var(--white); font-size: 24px; cursor: pointer;">&times;</button>
             </div>
-            
+
             <form id="editProductForm" class="admin-form">
                 <input type="hidden" id="editProductId">
-                
+
                 <div class="form-group">
                     <label>Product Name (Icelandic)</label>
                     <input type="text" class="admin-input" id="editProductNameIs" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Product Name (English)</label>
                     <input type="text" class="admin-input" id="editProductNameEn" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Description</label>
                     <textarea class="admin-textarea" id="editProductDescription" required></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Category</label>
                     <select class="admin-select" id="editProductCategory" required>
@@ -728,17 +789,17 @@
                         <option value="other">Other</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Price (ISK)</label>
                     <input type="number" class="admin-input" id="editProductPrice" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Available Sizes</label>
                     <div id="editSizesContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Members Only</label>
                     <select class="admin-select" id="editProductMembersOnly">
@@ -746,12 +807,12 @@
                         <option value="true">Yes</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Current Images</label>
                     <div id="editCurrentImages" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;"></div>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Add New Images</label>
                     <div class="drop-zone" id="editProductDropZone">
@@ -760,7 +821,7 @@
                     </div>
                     <div id="editImagePreview" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
                 </div>
-                
+
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
                     <button type="submit" class="admin-btn">Save Changes</button>
                     <button type="button" class="admin-btn secondary" onclick="closeEditModal()">Cancel</button>
@@ -775,22 +836,22 @@
     <script src="javascript/firebase-config.js"></script>
     <script src="javascript/language.js"></script>
     <script src="javascript/admin.js"></script>
-    
+
     <script>
         // Show admin panel immediately without auth check
         document.body.style.display = 'block';
-        
+
         // Load dashboard stats on page load
         document.addEventListener('DOMContentLoaded', () => {
             loadDashboardStats();
         });
-        
+
         // Toggle options dropdown
         function toggleOptions() {
             const options = document.getElementById('adminOptions');
             options.classList.toggle('active');
         }
-        
+
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             const options = document.getElementById('adminOptions');
@@ -798,20 +859,26 @@
                 options.classList.remove('active');
             }
         });
-        
+
         // Show section
         function showSection(section) {
             // Hide all sections
             document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-            
+
             // Show selected section
             document.getElementById(section + 'Section').classList.add('active');
-            
+
             // Close dropdown
             document.getElementById('adminOptions').classList.remove('active');
-            
+
             // Load section data
             switch(section) {
+                case 'members':
+                    loadMembers();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
                 case 'products':
                     loadProducts();
                     break;
@@ -823,59 +890,228 @@
                     break;
             }
         }
-        
+
         // Switch tabs
         function switchTab(tab) {
             // Update tab buttons
             document.querySelectorAll('#productsSection .tab-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            
+
             // Update tab content
             document.querySelectorAll('#productsSection .tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(tab + 'Tab').classList.add('active');
         }
-        
+
         function switchEventTab(tab) {
             // Update tab buttons
             document.querySelectorAll('#eventsSection .tab-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            
+
             // Update tab content
             document.querySelectorAll('#eventsSection .tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(tab + 'Tab').classList.add('active');
         }
-        
+
         function switchOrderTab(status) {
             // Update tab buttons
             document.querySelectorAll('#ordersSection .tab-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            
+
             // Update tab content
             document.querySelectorAll('#ordersSection .tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(status + 'OrdersTab').classList.add('active');
         }
-        
+
         // Load dashboard stats
         async function loadDashboardStats() {
             try {
                 // Get orders count
                 const ordersSnapshot = await firebase.firestore().collection('orders').get();
                 const pendingOrders = ordersSnapshot.docs.filter(doc => doc.data().status !== 'completed').length;
-                
+
                 document.getElementById('totalOrders').textContent = ordersSnapshot.size;
                 document.getElementById('pendingOrders').textContent = pendingOrders;
-                
+
                 // Get products count
                 const productsSnapshot = await firebase.firestore().collection('products').get();
                 document.getElementById('totalProducts').textContent = productsSnapshot.size;
-                
+
                 // Get events count
                 const eventsSnapshot = await firebase.firestore().collection('events').get();
                 document.getElementById('totalEvents').textContent = eventsSnapshot.size;
+
+                // Get members count
+                const membersSnapshot = await firebase.firestore().collection('displayMembers').get();
+                document.getElementById('totalMembers').textContent = membersSnapshot.size;
+
+                // Get users count
+                const usersSnapshot = await firebase.firestore().collection('users').get();
+                document.getElementById('totalUsers').textContent = usersSnapshot.size;
             } catch (error) {
                 console.error('Error loading dashboard stats:', error);
             }
         }
+
+        // Load Members
+        async function loadMembers() {
+            const container = document.getElementById('membersContainer');
+            container.innerHTML = '<p style="color: #888;">Loading members...</p>';
+
+            try {
+                const snapshot = await firebase.firestore().collection('displayMembers').get();
+                container.innerHTML = '';
+
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="color: #888;">No members found.</p>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const member = doc.data();
+                    const memberCard = document.createElement('div');
+                    memberCard.className = 'member-card';
+                    memberCard.innerHTML = `
+                        <img src="${member.photo || 'https://via.placeholder.com/60'}" alt="${member.name}" class="member-photo-small">
+                        <div class="member-info">
+                            <h3 style="margin: 0; color: var(--white);">${member.name}</h3>
+                            <p style="margin: 5px 0; color: var(--gray);">${member.role || 'Member'}</p>
+                            ${member.email ? `<p style="margin: 0; font-size: 0.9rem; color: var(--gray);">Email: ${member.email}</p>` : ''}
+                            ${member.phone ? `<p style="margin: 0; font-size: 0.9rem; color: var(--gray);">Phone: ${member.phone}</p>` : ''}
+                            ${member.joined ? `<p style="margin: 0; font-size: 0.9rem; color: var(--gray);">Member since: ${member.joined}</p>` : ''}
+
+                            <!-- Motorcycle Information -->
+                            ${member.motorcycle ? `
+                                <div style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px;">
+                                    <h4 style="margin: 0 0 5px 0; color: var(--mc-red); font-size: 1rem;">🏍️ Motorcycle</h4>
+                                    ${member.motorcycle.make ? `<p style="margin: 2px 0; font-size: 0.85rem;">Make: ${member.motorcycle.make}</p>` : ''}
+                                    ${member.motorcycle.model ? `<p style="margin: 2px 0; font-size: 0.85rem;">Model: ${member.motorcycle.model}</p>` : ''}
+                                    ${member.motorcycle.year ? `<p style="margin: 2px 0; font-size: 0.85rem;">Year: ${member.motorcycle.year}</p>` : ''}
+                                    ${member.motorcycle.licensePlate ? `<p style="margin: 2px 0; font-size: 0.85rem;">Plate: ${member.motorcycle.licensePlate}</p>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="member-actions">
+                            <button class="admin-btn edit" onclick="editMember('${doc.id}')">Edit</button>
+                        </div>
+                    `;
+                    container.appendChild(memberCard);
+                });
+            } catch (error) {
+                console.error('Error loading members:', error);
+                container.innerHTML = '<p style="color: #ff0000;">Error loading members. Please try again.</p>';
+            }
+        }
+
+        // Load Users
+        async function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #888;">Loading users...</td></tr>';
+
+            try {
+                const snapshot = await firebase.firestore().collection('users').get();
+                tbody.innerHTML = '';
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #888;">No users found.</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const user = doc.data();
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${doc.id}</td>
+                        <td>${user.displayName || user.name || 'N/A'}</td>
+                        <td>${user.email || 'N/A'}</td>
+                        <td>${user.createdAt ? new Date(user.createdAt.toDate()).toLocaleDateString() : 'N/A'}</td>
+                        <td>
+                            ${user.isMember ?
+                                '<button class="admin-btn delete" onclick="toggleMemberStatus(\'' + doc.id + '\', false)">Remove Member</button>' :
+                                '<button class="admin-btn secondary" onclick="toggleMemberStatus(\'' + doc.id + '\', true)">Make Member</button>'
+                            }
+                        </td>
+                        <td>${user.lastLogin ? new Date(user.lastLogin.toDate()).toLocaleDateString() : 'Never'}</td>
+                        <td>
+                            <button class="admin-btn edit" onclick="editUser('${doc.id}')">Edit</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #ff0000;">Error loading users. Please try again.</td></tr>';
+            }
+        }
+
+        // Toggle Member Status
+        async function toggleMemberStatus(userId, makeMember) {
+            if (confirm(`Are you sure you want to ${makeMember ? 'make this user a member' : 'remove member status'}?`)) {
+                try {
+                    await firebase.firestore().collection('users').doc(userId).update({
+                        isMember: makeMember
+                    });
+                    loadUsers(); // Reload the users table
+                    alert(`Member status ${makeMember ? 'granted' : 'removed'} successfully!`);
+                } catch (error) {
+                    console.error('Error updating member status:', error);
+                    alert('Error updating member status. Please try again.');
+                }
+            }
+        }
+
+        // Edit Member
+        function editMember(memberId) {
+            // TODO: Implement member editing modal
+            alert('Member editing functionality will be implemented soon.');
+        }
+
+        // Edit User
+        function editUser(userId) {
+            // TODO: Implement user editing modal
+            alert('User editing functionality will be implemented soon.');
+        }
+
+        // Member Search
+        document.getElementById('memberSearch')?.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const memberCards = document.querySelectorAll('#membersContainer .member-card');
+
+            memberCards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+            });
+        });
+
+        // User Search
+        document.getElementById('userSearch')?.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#usersTableBody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // User Filter
+        document.getElementById('userFilter')?.addEventListener('change', (e) => {
+            const filter = e.target.value;
+            const rows = document.querySelectorAll('#usersTableBody tr');
+
+            rows.forEach(row => {
+                const isMember = row.innerHTML.includes('Remove Member');
+
+                if (filter === 'all') {
+                    row.style.display = '';
+                } else if (filter === 'members' && isMember) {
+                    row.style.display = '';
+                } else if (filter === 'non-members' && !isMember) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 </html>
