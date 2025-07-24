@@ -592,6 +592,66 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Bulk Selection Styles */
+        .bulk-actions-bar {
+            background: rgba(207, 35, 66, 0.1);
+            border: 1px solid var(--mc-red);
+            padding: 15px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .bulk-actions-bar.active {
+            display: flex;
+        }
+
+        .bulk-select-checkbox {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--mc-red);
+        }
+
+        .select-all-checkbox {
+            margin-right: 10px;
+        }
+
+        .admin-card {
+            position: relative;
+        }
+
+        .admin-card.selected {
+            border-color: var(--mc-red);
+            background: rgba(207, 35, 66, 0.1);
+        }
+
+        .bulk-info {
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .bulk-delete-btn {
+            background: var(--dark-red);
+            padding: 10px 20px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .bulk-delete-btn:hover {
+            background: #8B0000;
+            transform: translateY(-2px);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .admin-header {
@@ -606,6 +666,11 @@
 
             .dashboard-stats {
                 grid-template-columns: 1fr;
+            }
+
+            .bulk-actions-bar {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
@@ -823,6 +888,16 @@
 
             <!-- View Products Tab -->
             <div class="tab-content" id="viewProductsTab">
+                <!-- Bulk Actions Bar for Products -->
+                <div class="bulk-actions-bar" id="productsBulkActions">
+                    <div>
+                        <input type="checkbox" class="select-all-checkbox" id="selectAllProducts" onchange="toggleSelectAllProducts()">
+                        <label for="selectAllProducts" style="color: var(--white); cursor: pointer;">Select All</label>
+                        <span class="bulk-info" id="productsSelectedCount" style="margin-left: 20px;">0 selected</span>
+                    </div>
+                    <button class="bulk-delete-btn" onclick="bulkDeleteProducts()">Delete Selected Products</button>
+                </div>
+                
                 <div class="admin-grid" id="productsGrid">
                     <!-- Products will be loaded here -->
                 </div>
@@ -880,6 +955,16 @@
 
             <!-- View Events Tab -->
             <div class="tab-content" id="viewEventsTab">
+                <!-- Bulk Actions Bar for Events -->
+                <div class="bulk-actions-bar" id="eventsBulkActions">
+                    <div>
+                        <input type="checkbox" class="select-all-checkbox" id="selectAllEvents" onchange="toggleSelectAllEvents()">
+                        <label for="selectAllEvents" style="color: var(--white); cursor: pointer;">Select All</label>
+                        <span class="bulk-info" id="eventsSelectedCount" style="margin-left: 20px;">0 selected</span>
+                    </div>
+                    <button class="bulk-delete-btn" onclick="bulkDeleteEvents()">Delete Selected Events</button>
+                </div>
+                
                 <div class="admin-grid" id="eventsGrid">
                     <!-- Events will be loaded here -->
                 </div>
@@ -1092,6 +1177,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
     <script src="javascript/firebase-config.js"></script>
     <script src="javascript/authentication.js"></script>
     <script src="javascript/language.js"></script>

@@ -975,8 +975,8 @@
             } catch (error) {
                 console.error('Authentication error:', error);
                 sleipnirAuth.showAuthMessage({
-                    is: 'Villa kom upp. Reyndu aftur.',
-                    en: 'An error occurred. Please try again.'
+                    is: 'Lykilorð eða netfang er rangt',
+                    en: 'Password or email is incorrect'
                 }, true);
                 submitBtn.disabled = false;
             }
@@ -1053,8 +1053,8 @@
             } catch (error) {
                 console.error('Password reset error:', error);
                 sleipnirAuth.showAuthMessage({
-                    is: 'Villa kom upp. Reyndu aftur.',
-                    en: 'An error occurred. Please try again.'
+                    is: 'Lykilorð eða netfang er rangt',
+                    en: 'Password or email is incorrect'
                 }, true);
             }
         });

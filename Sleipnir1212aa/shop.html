@@ -519,27 +519,11 @@
             });
         });
 
-        // Member Status Indicator
+        // Member Status Indicator - Always hidden for clean UI
         function updateMemberStatusIndicator() {
             const indicator = document.getElementById('memberStatusIndicator');
-            const statusMessage = document.getElementById('statusMessage');
-            const fixBtn = document.getElementById('fixStatusBtn');
-            
-            if (!currentUserData || !currentUserData.user) {
-                indicator.style.display = 'none';
-                return;
-            }
-            
-            if (!currentUserData.isMember) {
-                indicator.style.display = 'block';
-                statusMessage.innerHTML = `
-                    <strong>⚠️ Member Status Issue:</strong> 
-                    You are logged in as ${currentUserData.user.email} but the system doesn't recognize you as a member. 
-                    Member value: ${currentUserData.userDoc?.members} (${typeof currentUserData.userDoc?.members})
-                `;
-                fixBtn.style.display = 'inline-block';
-            } else {
-                // Hide the indicator completely for members - they don't need the green bar
+            // Always hide the status indicator - member status is shown subtly in the dropdown instead
+            if (indicator) {
                 indicator.style.display = 'none';
             }
         }

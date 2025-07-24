@@ -108,7 +108,7 @@ async function signUp(email, password, additionalData = {}) {
         // Send email verification
         try {
             await credential.user.sendEmailVerification({
-                url: window.location.origin + '/login.html?mode=verifyEmail',
+                url: 'https://sleipnirmc.com/Sleipnir1212aa/login.html',
                 handleCodeInApp: false
             });
             console.log('Verification email sent to:', credential.user.email);
@@ -273,7 +273,7 @@ async function resendVerificationEmail() {
     
     try {
         await currentUser.sendEmailVerification({
-            url: window.location.origin + '/login.html?mode=verifyEmail',
+            url: 'https://sleipnirmc.com/Sleipnir1212aa/login.html',
             handleCodeInApp: false
         });
         
@@ -435,26 +435,40 @@ function requireEmailVerification() {
 
 // Update UI for authenticated user
 function updateUIForAuthenticatedUser() {
+    // Check if email is verified before granting full access
+    const isVerified = currentUser && currentUser.emailVerified;
+    
     // Update navigation links
     const loginLinks = document.querySelectorAll('.login-link');
     const userMenus = document.querySelectorAll('.user-menu');
     const adminLinks = document.querySelectorAll('.admin-link');
     
-    loginLinks.forEach(link => link.style.display = 'none');
-    userMenus.forEach(menu => {
-        menu.style.display = 'block';
-        // Update user name display
-        const nameDisplay = menu.querySelector('.user-name');
-        if (nameDisplay) {
-            nameDisplay.textContent = userDocument?.displayName || currentUser.email;
+    if (isVerified) {
+        // Full access for verified users
+        loginLinks.forEach(link => link.style.display = 'none');
+        userMenus.forEach(menu => {
+            menu.style.display = 'block';
+            // Update user name display
+            const nameDisplay = menu.querySelector('.user-name');
+            if (nameDisplay) {
+                nameDisplay.textContent = userDocument?.displayName || currentUser.email;
+            }
+        });
+        
+        // Show/hide admin links based on role
+        if (isUserAdmin()) {
+            adminLinks.forEach(link => link.style.display = 'block');
+        } else {
+            adminLinks.forEach(link => link.style.display = 'none');
         }
-    });
-    
-    // Show/hide admin links based on role
-    if (isUserAdmin()) {
-        adminLinks.forEach(link => link.style.display = 'block');
     } else {
+        // Limited access for unverified users - show login links
+        loginLinks.forEach(link => link.style.display = 'block');
+        userMenus.forEach(menu => menu.style.display = 'none');
         adminLinks.forEach(link => link.style.display = 'none');
+        
+        // Show verification prompt
+        showEmailVerificationPrompt();
     }
     
     // Update member badge
@@ -480,16 +494,20 @@ function updateMemberBadge() {
     const memberBadges = document.querySelectorAll('.member-status-badge');
     
     memberBadges.forEach(badge => {
-        if (isUserMember()) {
-            badge.innerHTML = '<span class="badge-member">Member</span>';
-            badge.style.display = 'inline-flex';
-            badge.style.removeProperty('color'); // Let CSS handle the color
-        } else if (currentUser) {
-            // Simple guest indicator
-            badge.innerHTML = '<span class="badge-non-member">Guest</span>';
-            badge.style.display = 'inline-flex';
-            badge.style.removeProperty('color'); // Let CSS handle the color
+        // Only show member status for verified users
+        if (currentUser && currentUser.emailVerified) {
+            if (isUserMember()) {
+                badge.innerHTML = '<span class="badge-member">Member</span>';
+                badge.style.display = 'inline-flex';
+                badge.style.removeProperty('color'); // Let CSS handle the color
+            } else {
+                // Simple guest indicator for verified non-members
+                badge.innerHTML = '<span class="badge-non-member">Guest</span>';
+                badge.style.display = 'inline-flex';
+                badge.style.removeProperty('color'); // Let CSS handle the color
+            }
         } else {
+            // Hide badge for unverified or unauthenticated users
             badge.style.display = 'none';
         }
     });
@@ -519,12 +537,12 @@ function getAuthErrorMessage(errorCode) {
             en: 'This account has been disabled'
         },
         'auth/user-not-found': {
-            is: 'Enginn notandi fannst með þetta netfang',
-            en: 'No user found with this email'
+            is: 'Lykilorð eða netfang er rangt',
+            en: 'Password or email is incorrect'
         },
         'auth/wrong-password': {
-            is: 'Rangt lykilorð',
-            en: 'Wrong password'
+            is: 'Lykilorð eða netfang er rangt',
+            en: 'Password or email is incorrect'
         },
         'auth/popup-closed-by-user': {
             is: 'Innskráning hætt við',
@@ -545,8 +563,8 @@ function getAuthErrorMessage(errorCode) {
     };
     
     return errorMessages[errorCode] || {
-        is: 'Villa kom upp. Reyndu aftur',
-        en: 'An error occurred. Please try again'
+        is: 'Lykilorð eða netfang er rangt',
+        en: 'Password or email is incorrect'
     };
 }
 
