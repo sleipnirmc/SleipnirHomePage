@@ -1046,6 +1046,37 @@ async function fixMemberStatus(makeMember = true) {
     }
 }
 
+// Protect pages that require email verification
+async function protectVerifiedPage(redirectUrl = '/login.html') {
+    // Wait a bit for auth state to be established
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    if (!currentUser) {
+        // Not authenticated at all
+        window.location.href = redirectUrl + '?error=' + encodeURIComponent('Please sign in to continue');
+        return false;
+    }
+    
+    if (!currentUser.emailVerified) {
+        // Authenticated but not verified
+        showAuthMessage({
+            is: 'Vinsamlegast staðfestu netfangið þitt til að fá aðgang að þessari síðu',
+            en: 'Please verify your email to access this page'
+        }, true);
+        
+        showEmailVerificationPrompt();
+        
+        // Redirect to login after a delay
+        setTimeout(() => {
+            window.location.href = redirectUrl + '?error=' + encodeURIComponent('Email verification required');
+        }, 3000);
+        
+        return false;
+    }
+    
+    return true;
+}
+
 // Export functions for use in other scripts
 window.sleipnirAuth = {
     signUp,
@@ -1062,6 +1093,7 @@ window.sleipnirAuth = {
     requireEmailVerification,
     resendVerificationEmail,
     showAuthMessage,
+    showEmailVerificationPrompt,
     getAllUsers,
     toggleUserMembership,
     deleteUser,
@@ -1069,6 +1101,7 @@ window.sleipnirAuth = {
     adminSignIn,
     adminSignOut,
     protectAdminPage,
+    protectVerifiedPage,
     logAdminActivity,
     initializeAdminSession,
     clearAdminSession,

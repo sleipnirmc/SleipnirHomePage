@@ -912,20 +912,35 @@
                     });
                     
                     if (result.success) {
-                        // Show appropriate message based on email verification
+                        // Show verification message
                         if (result.emailVerificationSent && result.message) {
                             sleipnirAuth.showAuthMessage(result.message, false);
-                        } else {
-                            sleipnirAuth.showAuthMessage({
-                                is: 'Aðgangur búinn til! Skráir þig inn...',
-                                en: 'Account created! Signing you in...'
-                            }, false);
                         }
                         
-                        // Redirect after successful signup
-                        setTimeout(() => {
-                            window.location.href = redirect === 'admin' ? './admin.html' : './index.html';
-                        }, 2000);
+                        // DO NOT automatically redirect unverified users
+                        // Instead, show a message to check their email
+                        sleipnirAuth.showAuthMessage({
+                            is: 'Aðgangur búinn til! Vinsamlegast staðfestu netfangið þitt með því að smella á hlekkinn í tölvupóstinum.',
+                            en: 'Account created! Please verify your email by clicking the link in the email we sent you.'
+                        }, false);
+                        
+                        // Clear the form
+                        document.getElementById('authForm').reset();
+                        
+                        // Switch to login tab
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tabs[0].classList.add('active'); // Login tab
+                        confirmGroup.style.display = 'none';
+                        nameGroup.style.display = 'none';
+                        phoneGroup.style.display = 'none';
+                        addressGroup.style.display = 'none';
+                        cityGroup.style.display = 'none';
+                        postalGroup.style.display = 'none';
+                        
+                        // Update button text to login
+                        submitBtn.querySelectorAll('[data-login]').forEach(el => {
+                            el.textContent = el.dataset.login;
+                        });
                     } else {
                         sleipnirAuth.showAuthMessage(result.error, true);
                         submitBtn.disabled = false;
@@ -957,15 +972,32 @@
                         result = await sleipnirAuth.signIn(email, password);
                         
                         if (result.success) {
-                            sleipnirAuth.showAuthMessage({
-                                is: 'Innskráning tókst! Beið...',
-                                en: 'Login successful! Redirecting...'
-                            }, false);
+                            // Check if email is verified before redirecting
+                            const userData = sleipnirAuth.getCurrentUserData();
                             
-                            // Redirect to home page
-                            setTimeout(() => {
-                                window.location.href = './index.html';
-                            }, 1000);
+                            if (userData.isEmailVerified) {
+                                sleipnirAuth.showAuthMessage({
+                                    is: 'Innskráning tókst! Beið...',
+                                    en: 'Login successful! Redirecting...'
+                                }, false);
+                                
+                                // Redirect to home page
+                                setTimeout(() => {
+                                    window.location.href = './index.html';
+                                }, 1000);
+                            } else {
+                                // User is authenticated but not verified
+                                sleipnirAuth.showAuthMessage({
+                                    is: 'Vinsamlegast staðfestu netfangið þitt áður en þú heldur áfram. Athugaðu pósthólfið þitt.',
+                                    en: 'Please verify your email before continuing. Check your inbox.'
+                                }, true);
+                                
+                                // Show verification prompt
+                                sleipnirAuth.showEmailVerificationPrompt();
+                                
+                                // Re-enable button so they can try again after verifying
+                                submitBtn.disabled = false;
+                            }
                         } else {
                             sleipnirAuth.showAuthMessage(result.error, true);
                             submitBtn.disabled = false;

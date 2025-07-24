@@ -592,64 +592,61 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Bulk Selection Styles */
-        .bulk-actions-bar {
-            background: rgba(207, 35, 66, 0.1);
-            border: 1px solid var(--mc-red);
-            padding: 15px;
-            margin-bottom: 20px;
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .bulk-actions-bar.active {
-            display: flex;
-        }
-
-        .bulk-select-checkbox {
-            position: absolute;
-            top: 10px;
-            left: 10px;
+        /* User Deletion Checkbox Styles */
+        .delete-user-checkbox {
             width: 20px;
             height: 20px;
             cursor: pointer;
             accent-color: var(--mc-red);
         }
-
-        .select-all-checkbox {
-            margin-right: 10px;
+        
+        .delete-checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-
-        .admin-card {
-            position: relative;
-        }
-
-        .admin-card.selected {
-            border-color: var(--mc-red);
-            background: rgba(207, 35, 66, 0.1);
-        }
-
-        .bulk-info {
-            color: var(--white);
-            font-weight: 600;
-        }
-
-        .bulk-delete-btn {
-            background: var(--dark-red);
-            padding: 10px 20px;
-            border: none;
-            color: white;
+        
+        .delete-checkbox-label {
+            color: var(--mc-red);
+            font-size: 14px;
             cursor: pointer;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
         }
-
-        .bulk-delete-btn:hover {
-            background: #8B0000;
-            transform: translateY(-2px);
+        
+        /* Email Confirmation Modal */
+        .email-confirm-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.1) ;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .email-confirm-modal h3 {
+            color: var(--mc-red);
+            margin-bottom: 20px;
+        }
+        
+        .email-confirm-modal input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--white);
+            border-radius: 5px;
+        }
+        
+        .email-confirm-modal .warning-text {
+            color: #FF9800;
+            font-size: 14px;
+            margin: 15px 0;
+            line-height: 1.5;
         }
 
         /* Responsive */
@@ -888,16 +885,6 @@
 
             <!-- View Products Tab -->
             <div class="tab-content" id="viewProductsTab">
-                <!-- Bulk Actions Bar for Products -->
-                <div class="bulk-actions-bar" id="productsBulkActions">
-                    <div>
-                        <input type="checkbox" class="select-all-checkbox" id="selectAllProducts" onchange="toggleSelectAllProducts()">
-                        <label for="selectAllProducts" style="color: var(--white); cursor: pointer;">Select All</label>
-                        <span class="bulk-info" id="productsSelectedCount" style="margin-left: 20px;">0 selected</span>
-                    </div>
-                    <button class="bulk-delete-btn" onclick="bulkDeleteProducts()">Delete Selected Products</button>
-                </div>
-                
                 <div class="admin-grid" id="productsGrid">
                     <!-- Products will be loaded here -->
                 </div>
@@ -955,16 +942,6 @@
 
             <!-- View Events Tab -->
             <div class="tab-content" id="viewEventsTab">
-                <!-- Bulk Actions Bar for Events -->
-                <div class="bulk-actions-bar" id="eventsBulkActions">
-                    <div>
-                        <input type="checkbox" class="select-all-checkbox" id="selectAllEvents" onchange="toggleSelectAllEvents()">
-                        <label for="selectAllEvents" style="color: var(--white); cursor: pointer;">Select All</label>
-                        <span class="bulk-info" id="eventsSelectedCount" style="margin-left: 20px;">0 selected</span>
-                    </div>
-                    <button class="bulk-delete-btn" onclick="bulkDeleteEvents()">Delete Selected Events</button>
-                </div>
-                
                 <div class="admin-grid" id="eventsGrid">
                     <!-- Events will be loaded here -->
                 </div>
@@ -1436,7 +1413,10 @@
                         <td>
                             ${user.role !== 'admin' ? 
                                 (isUserRemovalMode ?
-                                    '<button class="admin-btn delete" onclick="deleteUserAccount(\'' + user.id + '\', \'' + user.email + '\')">Remove User</button>' :
+                                    '<div class="delete-checkbox-wrapper">' +
+                                        '<input type="checkbox" class="delete-user-checkbox" id="delete-' + user.id + '" data-user-id="' + user.id + '" data-user-email="' + user.email + '" onchange="handleDeleteCheckbox(this)">' +
+                                        '<label for="delete-' + user.id + '" class="delete-checkbox-label">Delete</label>' +
+                                    '</div>' :
                                     (user.members ?
                                         '<button class="admin-btn delete" onclick="toggleMemberStatus(\'' + user.id + '\', false)">Remove Member</button>' :
                                         '<button class="admin-btn secondary" onclick="toggleMemberStatus(\'' + user.id + '\', true)">Make Member</button>')
@@ -1502,66 +1482,7 @@
             }
         }
 
-        // Delete User Account
-        async function deleteUserAccount(userId, userEmail) {
-            // Enhanced confirmation dialog
-            const confirmMessage = `⚠️ WARNING: User Deletion ⚠️\n\n` +
-                `You are about to permanently delete the user:\n` +
-                `Email: ${userEmail}\n` +
-                `User ID: ${userId}\n\n` +
-                `This action will:\n` +
-                `• Remove the user from Firebase Authentication\n` +
-                `• Delete their user profile\n` +
-                `• Archive their orders and data\n\n` +
-                `This action CANNOT be undone!\n\n` +
-                `Are you absolutely sure you want to delete this user?`;
-            
-            if (confirm(confirmMessage)) {
-                // Double confirmation for safety
-                const finalConfirm = prompt(`To confirm deletion, please type the user's email address:\n${userEmail}`);
-                
-                if (finalConfirm !== userEmail) {
-                    sleipnirAuth.showAuthMessage({
-                        is: 'Hætt við - netfang passaði ekki',
-                        en: 'Cancelled - email address did not match'
-                    }, true);
-                    return;
-                }
-                
-                try {
-                    // Show loading state
-                    const button = event.target;
-                    const originalText = button.textContent;
-                    button.textContent = 'Deleting...';
-                    button.disabled = true;
-                    
-                    // Call the delete user function with archival option
-                    const result = await sleipnirAuth.deleteUser(userId, true);
-                    
-                    if (result.success) {
-                        loadUsers(); // Reload the users table
-                        sleipnirAuth.showAuthMessage({
-                            is: `Notandi ${userEmail} hefur verið fjarlægður. ${result.ordersHandled} pantanir voru geymdar.`,
-                            en: `User ${userEmail} has been deleted. ${result.ordersHandled} orders were archived.`
-                        });
-                    } else {
-                        throw new Error(result.error || 'Failed to delete user');
-                    }
-                } catch (error) {
-                    console.error('Error deleting user:', error);
-                    sleipnirAuth.showAuthMessage({
-                        is: `Villa við að eyða notanda: ${error.message}`,
-                        en: `Error deleting user: ${error.message}`
-                    }, true);
-                    
-                    // Restore button
-                    if (event.target) {
-                        event.target.textContent = 'Remove User';
-                        event.target.disabled = false;
-                    }
-                }
-            }
-        }
+        // Old deleteUserAccount function removed - now using checkbox approach
 
         // Edit Member
         function editMember(memberId) {
@@ -1876,6 +1797,136 @@ Continue?`;
             } catch (error) {
                 console.error('Error syncing real members:', error);
                 alert('Error syncing members: ' + error.message);
+            }
+        }
+        
+        // Handle delete checkbox change
+        function handleDeleteCheckbox(checkbox) {
+            if (checkbox.checked) {
+                const userId = checkbox.dataset.userId;
+                const userEmail = checkbox.dataset.userEmail;
+                
+                // Create and show email confirmation modal
+                showEmailConfirmationModal(userId, userEmail, checkbox);
+            }
+        }
+        
+        // Show email confirmation modal
+        function showEmailConfirmationModal(userId, userEmail, checkbox) {
+            // Remove any existing modal
+            const existingModal = document.getElementById('emailConfirmModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Create modal HTML
+            const modalHtml = `
+                <div class="modal-overlay" id="emailConfirmModal" onclick="closeEmailConfirmModal('${userId}')">
+                    <div class="email-confirm-modal" onclick="event.stopPropagation()">
+                        <h3>⚠️ Confirm User Deletion</h3>
+                        <p>You are about to permanently delete the user:</p>
+                        <p style="font-family: monospace; color: #fff; margin: 10px 0;">
+                            <strong>Email:</strong> ${userEmail}<br>
+                            <strong>ID:</strong> ${userId.substring(0, 8)}...
+                        </p>
+                        <div class="warning-text">
+                            This action will:
+                            <ul style="margin: 5px 0; padding-left: 20px;">
+                                <li>Remove the user from Firebase Authentication</li>
+                                <li>Delete their user profile</li>
+                                <li>Archive their orders and data</li>
+                            </ul>
+                            <strong>This action CANNOT be undone!</strong>
+                        </div>
+                        <p style="margin-top: 20px;">To confirm deletion, please type the user's email address:</p>
+                        <input type="email" id="emailConfirmInput" placeholder="Enter ${userEmail}" autocomplete="off">
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="admin-btn delete" onclick="confirmUserDeletion('${userId}', '${userEmail}')">
+                                Confirm Delete
+                            </button>
+                            <button class="admin-btn secondary" onclick="closeEmailConfirmModal('${userId}')">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Focus on input
+            setTimeout(() => {
+                const input = document.getElementById('emailConfirmInput');
+                if (input) input.focus();
+            }, 100);
+        }
+        
+        // Close email confirmation modal
+        function closeEmailConfirmModal(userId) {
+            const modal = document.getElementById('emailConfirmModal');
+            if (modal) {
+                modal.remove();
+            }
+            
+            // Uncheck the checkbox
+            const checkbox = document.getElementById('delete-' + userId);
+            if (checkbox) {
+                checkbox.checked = false;
+            }
+        }
+        
+        // Confirm user deletion
+        async function confirmUserDeletion(userId, userEmail) {
+            const emailInput = document.getElementById('emailConfirmInput');
+            const enteredEmail = emailInput ? emailInput.value.trim() : '';
+            
+            if (enteredEmail !== userEmail) {
+                sleipnirAuth.showAuthMessage({
+                    is: 'Netfang passaði ekki. Hætt við eyðingu.',
+                    en: 'Email did not match. Deletion cancelled.'
+                }, true);
+                return;
+            }
+            
+            try {
+                // Show loading state
+                const confirmBtn = document.querySelector('.email-confirm-modal .admin-btn.delete');
+                if (confirmBtn) {
+                    confirmBtn.disabled = true;
+                    confirmBtn.textContent = 'Deleting...';
+                }
+                
+                // Use the existing deleteUser method from sleipnirAuth
+                const result = await sleipnirAuth.deleteUser(userId);
+                
+                if (result.success) {
+                    closeEmailConfirmModal(userId);
+                    loadUsers(); // Reload the users table
+                    sleipnirAuth.showAuthMessage({
+                        is: `Notandi ${userEmail} hefur verið fjarlægður. ${result.ordersHandled} pantanir voru geymdar.`,
+                        en: `User ${userEmail} has been deleted. ${result.ordersHandled} orders were archived.`
+                    });
+                    loadDashboardStats(); // Update stats
+                } else {
+                    sleipnirAuth.showAuthMessage({
+                        is: 'Villa við að eyða notanda: ' + (result.error || 'Óþekkt villa'),
+                        en: 'Error deleting user: ' + (result.error || 'Unknown error')
+                    }, true);
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                sleipnirAuth.showAuthMessage({
+                    is: 'Villa við að eyða notanda. Vinsamlegast reyndu aftur.',
+                    en: 'Error deleting user. Please try again.'
+                }, true);
+            } finally {
+                // Reset button state if modal still exists
+                const confirmBtn = document.querySelector('.email-confirm-modal .admin-btn.delete');
+                if (confirmBtn) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Confirm Delete';
+                }
             }
         }
     </script>

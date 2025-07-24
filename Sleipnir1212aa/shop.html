@@ -474,6 +474,9 @@
     <script src="javascript/shop.js"></script>
     
     <script>
+        // Protect this page - require email verification
+        sleipnirAuth.protectVerifiedPage('/Sleipnir1212aa/login.html');
+        
         // User menu toggle
         document.addEventListener('DOMContentLoaded', function() {
             const userMenu = document.querySelector('.user-menu');

@@ -17,7 +17,13 @@ window.addEventListener('authStateChanged', async (event) => {
     console.log('Admin panel: Auth state changed', event.detail);
     
     try {
-        // Protect admin page - redirects to login if not authenticated or not admin
+        // First check email verification
+        const isVerified = await sleipnirAuth.protectVerifiedPage('login.html');
+        if (!isVerified) {
+            return; // Page will redirect if not verified
+        }
+        
+        // Then protect admin page - redirects to login if not authenticated or not admin
         const isAuthorized = await protectAdminPage();
         console.log('Admin panel: Authorization result:', isAuthorized);
         
@@ -413,8 +419,7 @@ async function loadProducts() {
             const product = doc.data();
             const firstImage = product.images && product.images.length > 0 ? product.images[0].dataUrl : '';
             return `
-                <div class="admin-card" data-product-id="${doc.id}">
-                    <input type="checkbox" class="bulk-select-checkbox" value="${doc.id}" onchange="updateProductSelection()">
+                <div class="admin-card">
                     ${firstImage ? `<img src="${firstImage}" alt="${product.nameIs}">` : ''}
                     <h4>${product.nameIs} / ${product.nameEn}</h4>
                     <p>${product.description}</p>
@@ -747,8 +752,7 @@ async function loadEvents() {
             const event = doc.data();
             const eventDate = event.date ? new Date(event.date).toLocaleDateString() : 'No date';
             return `
-                <div class="admin-card" data-event-id="${doc.id}">
-                    <input type="checkbox" class="bulk-select-checkbox" value="${doc.id}" onchange="updateEventSelection()">
+                <div class="admin-card">
                     <h4>${event.nameIs} / ${event.nameEn}</h4>
                     <p>${event.description}</p>
                     <p><strong>Date:</strong> ${eventDate}</p>
@@ -968,202 +972,6 @@ function formatPrice(price) {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
-// Bulk Selection Functions
-
-// Update product selection
-function updateProductSelection() {
-    const checkboxes = document.querySelectorAll('#productsGrid .bulk-select-checkbox');
-    const checkedBoxes = document.querySelectorAll('#productsGrid .bulk-select-checkbox:checked');
-    const bulkActionsBar = document.getElementById('productsBulkActions');
-    const selectedCount = document.getElementById('productsSelectedCount');
-    const selectAllCheckbox = document.getElementById('selectAllProducts');
-    
-    // Update selected count
-    if (selectedCount) {
-        selectedCount.textContent = `${checkedBoxes.length} selected`;
-    }
-    
-    // Show/hide bulk actions bar
-    if (bulkActionsBar) {
-        if (checkedBoxes.length > 0) {
-            bulkActionsBar.classList.add('active');
-        } else {
-            bulkActionsBar.classList.remove('active');
-        }
-    }
-    
-    // Update select all checkbox state
-    if (selectAllCheckbox) {
-        selectAllCheckbox.checked = checkboxes.length > 0 && checkboxes.length === checkedBoxes.length;
-        selectAllCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
-    }
-}
-
-// Update event selection
-function updateEventSelection() {
-    const checkboxes = document.querySelectorAll('#eventsGrid .bulk-select-checkbox');
-    const checkedBoxes = document.querySelectorAll('#eventsGrid .bulk-select-checkbox:checked');
-    const bulkActionsBar = document.getElementById('eventsBulkActions');
-    const selectedCount = document.getElementById('eventsSelectedCount');
-    const selectAllCheckbox = document.getElementById('selectAllEvents');
-    
-    // Update selected count
-    if (selectedCount) {
-        selectedCount.textContent = `${checkedBoxes.length} selected`;
-    }
-    
-    // Show/hide bulk actions bar
-    if (bulkActionsBar) {
-        if (checkedBoxes.length > 0) {
-            bulkActionsBar.classList.add('active');
-        } else {
-            bulkActionsBar.classList.remove('active');
-        }
-    }
-    
-    // Update select all checkbox state
-    if (selectAllCheckbox) {
-        selectAllCheckbox.checked = checkboxes.length > 0 && checkboxes.length === checkedBoxes.length;
-        selectAllCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
-    }
-}
-
-// Toggle select all products
-function toggleSelectAllProducts() {
-    const selectAllCheckbox = document.getElementById('selectAllProducts');
-    const checkboxes = document.querySelectorAll('#productsGrid .bulk-select-checkbox');
-    
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = selectAllCheckbox.checked;
-    });
-    
-    updateProductSelection();
-}
-
-// Toggle select all events
-function toggleSelectAllEvents() {
-    const selectAllCheckbox = document.getElementById('selectAllEvents');
-    const checkboxes = document.querySelectorAll('#eventsGrid .bulk-select-checkbox');
-    
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = selectAllCheckbox.checked;
-    });
-    
-    updateEventSelection();
-}
-
-// Bulk delete products
-async function bulkDeleteProducts() {
-    const checkedBoxes = document.querySelectorAll('#productsGrid .bulk-select-checkbox:checked');
-    
-    if (checkedBoxes.length === 0) {
-        alert('No products selected');
-        return;
-    }
-    
-    const confirmMessage = `Are you sure you want to delete ${checkedBoxes.length} product${checkedBoxes.length > 1 ? 's' : ''}?`;
-    if (!confirm(confirmMessage)) return;
-    
-    try {
-        // Show loading state
-        const bulkDeleteBtn = document.querySelector('#productsBulkActions .bulk-delete-btn');
-        if (bulkDeleteBtn) {
-            bulkDeleteBtn.disabled = true;
-            bulkDeleteBtn.textContent = 'Deleting...';
-        }
-        
-        // Create batch for efficient deletion
-        const batch = firebase.firestore().batch();
-        
-        checkedBoxes.forEach(checkbox => {
-            const productId = checkbox.value;
-            const docRef = firebase.firestore().collection('products').doc(productId);
-            batch.delete(docRef);
-        });
-        
-        // Commit the batch
-        await batch.commit();
-        
-        alert(`Successfully deleted ${checkedBoxes.length} product${checkedBoxes.length > 1 ? 's' : ''}`);
-        
-        // Reload products
-        loadProducts();
-        
-        // Reset bulk actions bar
-        const bulkActionsBar = document.getElementById('productsBulkActions');
-        if (bulkActionsBar) {
-            bulkActionsBar.classList.remove('active');
-        }
-        
-    } catch (error) {
-        console.error('Error deleting products:', error);
-        alert('Error deleting products. Please try again.');
-    } finally {
-        // Reset button state
-        const bulkDeleteBtn = document.querySelector('#productsBulkActions .bulk-delete-btn');
-        if (bulkDeleteBtn) {
-            bulkDeleteBtn.disabled = false;
-            bulkDeleteBtn.textContent = 'Delete Selected Products';
-        }
-    }
-}
-
-// Bulk delete events
-async function bulkDeleteEvents() {
-    const checkedBoxes = document.querySelectorAll('#eventsGrid .bulk-select-checkbox:checked');
-    
-    if (checkedBoxes.length === 0) {
-        alert('No events selected');
-        return;
-    }
-    
-    const confirmMessage = `Are you sure you want to delete ${checkedBoxes.length} event${checkedBoxes.length > 1 ? 's' : ''}?`;
-    if (!confirm(confirmMessage)) return;
-    
-    try {
-        // Show loading state
-        const bulkDeleteBtn = document.querySelector('#eventsBulkActions .bulk-delete-btn');
-        if (bulkDeleteBtn) {
-            bulkDeleteBtn.disabled = true;
-            bulkDeleteBtn.textContent = 'Deleting...';
-        }
-        
-        // Create batch for efficient deletion
-        const batch = firebase.firestore().batch();
-        
-        checkedBoxes.forEach(checkbox => {
-            const eventId = checkbox.value;
-            const docRef = firebase.firestore().collection('events').doc(eventId);
-            batch.delete(docRef);
-        });
-        
-        // Commit the batch
-        await batch.commit();
-        
-        alert(`Successfully deleted ${checkedBoxes.length} event${checkedBoxes.length > 1 ? 's' : ''}`);
-        
-        // Reload events
-        loadEvents();
-        
-        // Reset bulk actions bar
-        const bulkActionsBar = document.getElementById('eventsBulkActions');
-        if (bulkActionsBar) {
-            bulkActionsBar.classList.remove('active');
-        }
-        
-    } catch (error) {
-        console.error('Error deleting events:', error);
-        alert('Error deleting events. Please try again.');
-    } finally {
-        // Reset button state
-        const bulkDeleteBtn = document.querySelector('#eventsBulkActions .bulk-delete-btn');
-        if (bulkDeleteBtn) {
-            bulkDeleteBtn.disabled = false;
-            bulkDeleteBtn.textContent = 'Delete Selected Events';
-        }
-    }
-}
-
 // Make functions globally available
 window.loadDashboardStats = loadDashboardStats;
 window.removeProductImage = removeProductImage;
@@ -1180,12 +988,6 @@ window.deleteEvent = deleteEvent;
 window.loadOrders = loadOrders;
 window.completeOrder = completeOrder;
 window.exportOrders = exportOrders;
-window.updateProductSelection = updateProductSelection;
-window.updateEventSelection = updateEventSelection;
-window.toggleSelectAllProducts = toggleSelectAllProducts;
-window.toggleSelectAllEvents = toggleSelectAllEvents;
-window.bulkDeleteProducts = bulkDeleteProducts;
-window.bulkDeleteEvents = bulkDeleteEvents;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
