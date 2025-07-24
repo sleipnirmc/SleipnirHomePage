@@ -192,15 +192,40 @@ async function addSampleProducts() {
 // Listen for auth state changes
 window.addEventListener('authStateChanged', (event) => {
     const { user, userDoc } = event.detail;
+    
+    // Enhanced member status checking to handle different data formats
+    let isMember = false;
+    if (userDoc && userDoc.members !== undefined) {
+        // Check for boolean true, string 'true', or any truthy value
+        isMember = userDoc.members === true || 
+                   userDoc.members === 'true' || 
+                   userDoc.members === 1 ||
+                   userDoc.members === '1';
+    }
+    
+    console.log('Shop: Auth state changed', { 
+        user: user?.email, 
+        userDoc: userDoc,
+        memberStatus: userDoc?.members,
+        memberStatusType: typeof userDoc?.members,
+        isMember: isMember 
+    });
+    
     currentUserData = {
         user: user,
         userDoc: userDoc,
-        isMember: userDoc && userDoc.members === true,
+        isMember: isMember,
         isAdmin: userDoc && userDoc.role === 'admin'
     };
+    
+    console.log('Shop: Current user data updated', currentUserData);
+    
     // Refresh product display when auth state changes
     if (products.length > 0) {
+        console.log('Shop: Refreshing products display for authenticated user');
         displayProducts();
+    } else {
+        console.log('Shop: No products loaded yet, will filter when products load');
     }
 });
 
@@ -214,9 +239,37 @@ async function displayProducts() {
         : products.filter(p => p.category === currentFilter);
     
     // Filter products based on membership status
+    const membersOnlyProducts = filteredProducts.filter(p => p.membersOnly);
+    const publicProducts = filteredProducts.filter(p => !p.membersOnly);
+    
+    console.log('Shop: Product filtering details', {
+        totalProducts: filteredProducts.length,
+        membersOnlyProducts: membersOnlyProducts.length,
+        publicProducts: publicProducts.length,
+        currentUserData: currentUserData,
+        userEmail: currentUserData?.user?.email,
+        isMember: currentUserData?.isMember,
+        memberFieldValue: currentUserData?.userDoc?.members,
+        memberFieldType: typeof currentUserData?.userDoc?.members
+    });
+    
     if (!currentUserData || !currentUserData.isMember) {
         // User is not logged in or is not a member - hide members-only products
+        const beforeFilter = filteredProducts.length;
         filteredProducts = filteredProducts.filter(p => !p.membersOnly);
+        const afterFilter = filteredProducts.length;
+        console.log(`Shop: User is ${!currentUserData ? 'not logged in' : 'not a member'} - filtered out ${beforeFilter - afterFilter} members-only products`);
+        
+        // Log specific products that were filtered out for debugging
+        if (membersOnlyProducts.length > 0) {
+            console.log('Shop: Members-only products that were hidden:', membersOnlyProducts.map(p => ({
+                nameEn: p.nameEn,
+                nameIs: p.nameIs,
+                membersOnly: p.membersOnly
+            })));
+        }
+    } else {
+        console.log('Shop: User is a member, showing all products including members-only items');
     }
 
     if (filteredProducts.length === 0) {
@@ -994,11 +1047,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // Wait a moment for Firebase to initialize
-    setTimeout(() => {
-        loadProducts();
-        updateCartUI();
-    }, 500);
+    // Wait for Firebase auth to initialize before loading products
+    // This ensures we have the correct member status before filtering
+    let authInitialized = false;
+    
+    // Check if auth is already initialized
+    if (window.firebase && window.firebase.auth && window.firebase.auth().currentUser !== undefined) {
+        authInitialized = true;
+    }
+    
+    // If auth is already initialized, load products after a short delay
+    // Otherwise, wait for the first auth state change
+    if (authInitialized) {
+        setTimeout(() => {
+            console.log('Shop: Loading products (auth already initialized)');
+            loadProducts();
+            updateCartUI();
+        }, 500);
+    } else {
+        // Set up a one-time listener for auth initialization
+        const authListener = (event) => {
+            console.log('Shop: Auth initialized, loading products');
+            window.removeEventListener('authStateChanged', authListener);
+            loadProducts();
+            updateCartUI();
+        };
+        window.addEventListener('authStateChanged', authListener);
+        
+        // Fallback: load products after 2 seconds if auth doesn't initialize
+        setTimeout(() => {
+            if (products.length === 0) {
+                console.log('Shop: Loading products (fallback timeout)');
+                window.removeEventListener('authStateChanged', authListener);
+                loadProducts();
+                updateCartUI();
+            }
+        }, 2000);
+    }
     
     // Also load when auth state changes
     firebase.auth().onAuthStateChanged(() => {

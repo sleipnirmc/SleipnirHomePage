@@ -29,5 +29,10 @@ open_sessions.py
 persona.txt
 tasks.txt
 
+# Environment variables
+.env
+.env.local
+.env.production
+
 # CSS development (if modular approach not ready)
 # css/

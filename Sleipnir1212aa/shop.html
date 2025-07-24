@@ -5,6 +5,192 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sleipnir MC Reykjavík - Verslun</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Ghost Minimal Button Styles - Natural Integration */
+        .ghost-btn {
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            padding: 10px 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .ghost-btn:hover {
+            opacity: 1;
+            color: var(--mc-red);
+        }
+
+        .ghost-btn svg {
+            width: 18px;
+            height: 18px;
+            transition: all 0.2s ease;
+        }
+
+        /* Language Toggle - Ghost Style */
+        .language-ghost {
+            min-width: 40px;
+            text-align: center;
+        }
+
+        /* Cart Button - Ghost Style */
+        .cart-ghost {
+            position: relative;
+        }
+
+        .cart-ghost .cart-count {
+            position: absolute;
+            top: -2px;
+            right: 5px;
+            background: var(--mc-red);
+            color: var(--white);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .cart-ghost:hover .cart-count {
+            background: var(--mc-red-hover);
+        }
+
+        .cart-ghost .cart-count.empty,
+        .cart-ghost .cart-count[data-count="0"] {
+            background: var(--charcoal);
+            opacity: 0.6;
+        }
+
+        /* Login Button - Ghost Style */
+        .login-ghost svg {
+            stroke-width: 2.5;
+        }
+
+        /* User Menu - Ghost Style */
+        .user-menu-ghost {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-menu-ghost .ghost-btn {
+            gap: 5px;
+        }
+
+        /* Override the default user-menu-toggle hover styles */
+        .user-menu-ghost .user-menu-toggle:hover {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        .user-menu-ghost .dropdown-arrow {
+            font-size: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        .user-menu-ghost.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* Navigation Controls - Natural Spacing */
+        .nav-controls-ghost {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Subtle divider between nav items and controls */
+        .nav-controls-ghost::before {
+            content: '';
+            width: 1px;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            margin: 0 15px;
+        }
+
+        /* Member Status Badge - Subtle styling */
+        .member-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+
+        .member-status-badge:hover {
+            opacity: 1;
+        }
+
+        .badge-member {
+            color: var(--mc-red);
+            font-family: 'Cinzel', serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .badge-member::before {
+            content: '⭐';
+            font-size: 10px;
+            filter: brightness(1.2);
+        }
+
+        .badge-non-member {
+            color: rgba(255, 255, 255, 0.6);
+            font-family: 'Cinzel', serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .ghost-btn {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            .ghost-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            .cart-ghost .cart-text {
+                display: none;
+            }
+
+            .language-ghost .btn-text {
+                display: none;
+            }
+
+            .nav-controls-ghost::before {
+                margin: 0 10px;
+            }
+
+            .member-status-badge {
+                font-size: 10px;
+            }
+        }
+    </style>
+
 </head>
 <body>
     <!-- Header -->
@@ -35,16 +221,20 @@
                 </li>
                 <li><a href="contact.html"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
             </ul>
-            <div class="nav-controls">
+            <div class="nav-controls nav-controls-ghost">
                 <div class="language-toggle">
-                    <button class="btn btn-dark btn-sm" onclick="toggleLanguage()">
-                        <span class="is">EN</span>
-                        <span class="en">IS</span>
-                    </button>
+                    <button class="ghost-btn language-ghost" onclick="toggleLanguage()">
+                    <span class="is">EN</span>
+                    <span class="en">IS</span>
+                </button>
                 </div>
                 <div class="cart-toggle">
-                    <button class="btn btn-dark btn-sm cart-nav-btn" id="cartBtn">
-                        <span class="cart-icon">🛒</span>
+                    <button class="ghost-btn cart-ghost" id="cartBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z"/>
+                            <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z"/>
+                            <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6"/>
+                        </svg>
                         <span class="cart-text">
                             <span class="is">Karfa</span>
                             <span class="en">Cart</span>
@@ -55,13 +245,18 @@
                 <!-- Login/Account Button -->
                 <div class="auth-buttons">
                     <!-- Login button (shown when not authenticated) -->
-                    <a href="login.html" class="btn btn-dark btn-sm login-link">
+                    <a href="login.html" class="ghost-btn login-ghost login-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        
                         <span class="is">Innskrá</span>
                         <span class="en">Login</span>
                     </a>
                     <!-- User menu (shown when authenticated) -->
-                    <div class="user-menu">
-                        <div class="user-menu-toggle btn btn-dark btn-sm">
+                    <div class="user-menu user-menu-ghost">
+                        <div class="user-menu-toggle ghost-btn">
                             <span class="user-icon">👤</span>
                             <span class="user-name">User</span>
                             <span>▾</span>
@@ -102,6 +297,19 @@
             <span class="en">Sleipnir Store</span>
         </h1>
     </section>
+
+    <!-- Member Status Indicator -->
+    <div id="memberStatusIndicator" style="display: none; background: #333; color: white; padding: 10px 20px; text-align: center; border-bottom: 2px solid #cf2342;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <span id="statusMessage"></span>
+            <button id="checkStatusBtn" class="btn btn-sm" style="margin-left: 20px; background: #cf2342; color: white; border: none; padding: 5px 15px; cursor: pointer;" onclick="sleipnirAuth.checkMemberStatus()">
+                Check Status
+            </button>
+            <button id="fixStatusBtn" class="btn btn-sm" style="margin-left: 10px; background: #4CAF50; color: white; border: none; padding: 5px 15px; cursor: pointer; display: none;" onclick="fixMemberStatusUI()">
+                Fix Member Status
+            </button>
+        </div>
+    </div>
 
     <!-- Category Filter -->
     <section class="category-filter">
@@ -310,6 +518,62 @@
                 }
             });
         });
+
+        // Member Status Indicator
+        function updateMemberStatusIndicator() {
+            const indicator = document.getElementById('memberStatusIndicator');
+            const statusMessage = document.getElementById('statusMessage');
+            const fixBtn = document.getElementById('fixStatusBtn');
+            
+            if (!currentUserData || !currentUserData.user) {
+                indicator.style.display = 'none';
+                return;
+            }
+            
+            if (!currentUserData.isMember) {
+                indicator.style.display = 'block';
+                statusMessage.innerHTML = `
+                    <strong>⚠️ Member Status Issue:</strong> 
+                    You are logged in as ${currentUserData.user.email} but the system doesn't recognize you as a member. 
+                    Member value: ${currentUserData.userDoc?.members} (${typeof currentUserData.userDoc?.members})
+                `;
+                fixBtn.style.display = 'inline-block';
+            } else {
+                // Hide the indicator completely for members - they don't need the green bar
+                indicator.style.display = 'none';
+            }
+        }
+
+        // Fix member status UI function
+        async function fixMemberStatusUI() {
+            const fixBtn = document.getElementById('fixStatusBtn');
+            const originalText = fixBtn.textContent;
+            fixBtn.textContent = 'Fixing...';
+            fixBtn.disabled = true;
+            
+            try {
+                const result = await sleipnirAuth.fixMemberStatus(true);
+                if (result.success) {
+                    alert('Member status has been fixed! The page will refresh.');
+                    window.location.reload();
+                } else {
+                    alert('Error fixing member status: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                fixBtn.textContent = originalText;
+                fixBtn.disabled = false;
+            }
+        }
+
+        // Listen for auth state changes to update indicator
+        window.addEventListener('authStateChanged', () => {
+            setTimeout(updateMemberStatusIndicator, 100);
+        });
+
+        // Also update on page load
+        setTimeout(updateMemberStatusIndicator, 1000);
     </script>
 </body>
 </html>

@@ -63,23 +63,123 @@ async function initializeAdminPanel() {
 
 // Dashboard Stats Loading
 async function loadDashboardStats() {
+    console.log('Loading dashboard stats...');
+    
     try {
-        // Get orders count
-        const ordersSnapshot = await firebase.firestore().collection('orders').get();
-        const pendingOrders = ordersSnapshot.docs.filter(doc => doc.data().status !== 'completed').length;
+        // Check if DOM elements exist
+        const elementsExist = document.getElementById('totalUsers') && 
+                            document.getElementById('totalMembers') &&
+                            document.getElementById('totalOrders') &&
+                            document.getElementById('pendingOrders') &&
+                            document.getElementById('totalProducts') &&
+                            document.getElementById('totalEvents');
+                            
+        if (!elementsExist) {
+            console.error('Dashboard stat elements not found in DOM');
+            return;
+        }
         
-        document.getElementById('totalOrders').textContent = ordersSnapshot.size;
-        document.getElementById('pendingOrders').textContent = pendingOrders;
+        // Get users and members count
+        console.log('Fetching users collection...');
+        const usersSnapshot = await firebase.firestore().collection('users').get();
+        const totalUsers = usersSnapshot.size;
+        
+        // Count members - check for various possible formats
+        let totalMembers = 0;
+        let membersFromUsers = 0;
+        
+        // First check users collection for members field
+        usersSnapshot.docs.forEach(doc => {
+            const userData = doc.data();
+            // Check for boolean true, string 'true', or truthy value
+            if (userData.members === true || userData.members === 'true' || userData.members) {
+                membersFromUsers++;
+            }
+            // Debug first few users
+            if (doc.id && membersFromUsers < 3) {
+                console.log(`User ${doc.id} members field:`, userData.members, 'Type:', typeof userData.members);
+            }
+        });
+        
+        // Also check displayMembers collection (actual member profiles)
+        try {
+            console.log('Fetching displayMembers collection...');
+            const displayMembersSnapshot = await firebase.firestore().collection('displayMembers').get();
+            const displayMembersCount = displayMembersSnapshot.size;
+            
+            console.log('Member counts:', {
+                fromUsersCollection: membersFromUsers,
+                fromDisplayMembersCollection: displayMembersCount
+            });
+            
+            // Use the displayMembers count as the primary source if it exists
+            // Otherwise fall back to counting from users collection
+            totalMembers = displayMembersCount > 0 ? displayMembersCount : membersFromUsers;
+            
+        } catch (error) {
+            console.log('Could not fetch displayMembers collection, using users collection count:', error.message);
+            totalMembers = membersFromUsers;
+        }
+        
+        // Update DOM elements with null checks
+        const totalUsersEl = document.getElementById('totalUsers');
+        const totalMembersEl = document.getElementById('totalMembers');
+        
+        if (totalUsersEl) totalUsersEl.textContent = totalUsers;
+        if (totalMembersEl) totalMembersEl.textContent = totalMembers;
+        
+        // Get orders count
+        console.log('Fetching orders collection...');
+        const ordersSnapshot = await firebase.firestore().collection('orders').get();
+        const pendingOrders = ordersSnapshot.docs.filter(doc => {
+            const status = doc.data().status;
+            return status !== 'completed';
+        }).length;
+        
+        const totalOrdersEl = document.getElementById('totalOrders');
+        const pendingOrdersEl = document.getElementById('pendingOrders');
+        
+        if (totalOrdersEl) totalOrdersEl.textContent = ordersSnapshot.size;
+        if (pendingOrdersEl) pendingOrdersEl.textContent = pendingOrders;
         
         // Get products count
+        console.log('Fetching products collection...');
         const productsSnapshot = await firebase.firestore().collection('products').get();
-        document.getElementById('totalProducts').textContent = productsSnapshot.size;
+        const totalProductsEl = document.getElementById('totalProducts');
+        if (totalProductsEl) totalProductsEl.textContent = productsSnapshot.size;
         
         // Get events count
+        console.log('Fetching events collection...');
         const eventsSnapshot = await firebase.firestore().collection('events').get();
-        document.getElementById('totalEvents').textContent = eventsSnapshot.size;
+        const totalEventsEl = document.getElementById('totalEvents');
+        if (totalEventsEl) totalEventsEl.textContent = eventsSnapshot.size;
+        
+        console.log('Dashboard stats loaded successfully:', {
+            users: totalUsers,
+            members: totalMembers,
+            orders: ordersSnapshot.size,
+            pendingOrders: pendingOrders,
+            products: productsSnapshot.size,
+            events: eventsSnapshot.size
+        });
     } catch (error) {
         console.error('Error loading dashboard stats:', error);
+        console.error('Error details:', {
+            code: error.code,
+            message: error.message,
+            stack: error.stack
+        });
+        
+        // Handle specific errors
+        if (error.code === 'permission-denied') {
+            console.error('Permission denied loading stats. Ensure admin privileges are properly set.');
+            // Try to update UI to show error
+            const elements = ['totalUsers', 'totalMembers', 'totalOrders', 'pendingOrders', 'totalProducts', 'totalEvents'];
+            elements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '!';
+            });
+        }
     }
 }
 

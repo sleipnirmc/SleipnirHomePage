@@ -20,7 +20,18 @@ service cloud.firestore {
     }
     
     function isAdmin() {
-      return isAuthenticated() && userExists() && getUserData().role == "admin";
+      // Enhanced admin check: both token claim and Firestore role
+      return isAuthenticated() && (
+        // Check for admin custom claim (most secure)
+        request.auth.token.admin == true ||
+        // Fallback to Firestore role check for backwards compatibility
+        (userExists() && getUserData().role == "admin")
+      );
+    }
+    
+    function hasAdminToken() {
+      // Strict check for admin token claim only
+      return isAuthenticated() && request.auth.token.admin == true;
     }
     
     function isMember() {
@@ -31,9 +42,11 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId);
-      allow update: if isOwner(userId) && 
+      allow update: if (isOwner(userId) && 
         // Users can't change their own role or member status
-        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'members']) || isAdmin());
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'members', 'adminClaimSet'])) ||
+        // Only token-verified admins can update any user including sensitive fields
+        hasAdminToken();
       allow delete: if false; // Never allow user deletion through client
     }
     

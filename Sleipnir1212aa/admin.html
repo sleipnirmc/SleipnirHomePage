@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sleipnir MC - Admin</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="javascript/member-card-templates.js"></script>
     <style>
         /* Admin Layout */
         .admin-container {
@@ -332,6 +333,73 @@
             display: block;
         }
 
+        /* Mode Toggle Switch */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4CAF50;
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #f44336;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+
+        .mode-label {
+            font-weight: 600;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
         /* File Upload */
         .drop-zone {
             border: 2px dashed var(--mc-red);
@@ -387,6 +455,92 @@
         .member-actions {
             display: flex;
             gap: 10px;
+        }
+
+        /* Template Preview Modal */
+        .template-preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .template-preview-modal.active {
+            display: flex;
+        }
+
+        .template-preview-content {
+            background: var(--norse-black);
+            border: 2px solid var(--mc-red);
+            padding: 30px;
+            max-width: 1200px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .template-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--mc-red);
+            padding-bottom: 20px;
+        }
+
+        .template-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .template-option {
+            border: 2px solid transparent;
+            padding: 20px;
+            background: rgba(26,26,26,0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .template-option:hover {
+            border-color: var(--mc-red);
+            transform: translateY(-5px);
+        }
+
+        .template-option.selected {
+            border-color: var(--mc-red);
+            background: rgba(207, 35, 66, 0.1);
+        }
+
+        .template-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--white);
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: var(--white);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: var(--mc-red);
         }
 
         /* Size checkboxes */
@@ -561,6 +715,13 @@
         <div class="admin-section" id="usersSection">
             <div class="section-header">
                 <h2 class="section-title">Registered Users</h2>
+                <div class="mode-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="userManagementMode" onchange="toggleUserManagementMode()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span id="modeLabel" class="mode-label">Member Management Mode</span>
+                </div>
             </div>
 
             <div style="margin-bottom: 20px;">
@@ -570,6 +731,12 @@
                     <option value="members">Members Only</option>
                     <option value="non-members">Non-Members</option>
                 </select>
+                <button class="admin-btn secondary" onclick="showBulkMemberModal()" style="margin-left: 10px;">
+                    Bulk Member Management
+                </button>
+                <button class="admin-btn secondary" onclick="syncRealMembers()" style="margin-left: 10px;">
+                    Sync Real Members
+                </button>
             </div>
 
             <table class="orders-table">
@@ -792,6 +959,57 @@
         </div>
     </div>
 
+    <!-- Template Preview Modal -->
+    <div class="template-preview-modal" id="templateModal">
+        <div class="template-preview-content">
+            <span class="close-modal" onclick="closeTemplateModal()">&times;</span>
+            <div class="template-preview-header">
+                <h2 style="color: var(--white); margin: 0;">Select Member Card Template</h2>
+            </div>
+            <div class="template-preview-grid" id="templateGrid">
+                <!-- Templates will be inserted here -->
+            </div>
+            <div style="text-align: center;">
+                <button class="admin-btn" onclick="saveTemplateSelection()">Save Template Selection</button>
+                <button class="admin-btn secondary" onclick="closeTemplateModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Member Management Modal -->
+    <div id="bulkMemberModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--norse-black); border: 2px solid var(--mc-red); padding: 30px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--white); margin: 0;">Bulk Member Management</h2>
+                <button onclick="closeBulkMemberModal()" style="background: none; border: none; color: var(--white); font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            
+            <div class="admin-form">
+                <div class="form-group">
+                    <label>Add Members by Email (one per line)</label>
+                    <textarea id="bulkMemberEmails" class="admin-textarea" rows="10" placeholder="user1@example.com&#10;user2@example.com&#10;user3@example.com"></textarea>
+                    <small style="color: #888;">Enter email addresses of users who should be members. Only existing users will be updated.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Or Add Members by Email Domain</label>
+                    <input type="text" id="memberDomain" class="admin-input" placeholder="@sleipnirmc.is">
+                    <small style="color: #888;">All users with this email domain will be made members.</small>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="admin-btn" onclick="processBulkMembers()">Add Members</button>
+                    <button class="admin-btn secondary" onclick="closeBulkMemberModal()">Cancel</button>
+                </div>
+                
+                <div id="bulkMemberResults" style="margin-top: 20px; display: none;">
+                    <h3 style="color: var(--white);">Results:</h3>
+                    <div id="bulkMemberResultsContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Edit Product Modal -->
     <div id="editProductModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999;">
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--norse-black); border: 2px solid var(--mc-red); padding: 30px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
@@ -882,6 +1100,9 @@
     <script>
         // Authentication is handled by admin.js through protectAdminPage()
         let isAdminAuthenticated = false;
+        
+        // User Management Mode (false = Member Management, true = User Removal)
+        let isUserRemovalMode = false;
 
         // Wait for auth state to be established by admin.js
         window.addEventListener('authStateChanged', (event) => {
@@ -1043,28 +1264,31 @@
                     const member = doc.data();
                     const memberCard = document.createElement('div');
                     memberCard.className = 'member-card';
+                    
+                    // Format motorcycle type for display
+                    let motorcycleType = 'Not specified';
+                    if (member.motorcycleType) {
+                        motorcycleType = member.motorcycleType;
+                    } else if (member.motorcycle) {
+                        const parts = [];
+                        if (member.motorcycle.year) parts.push(member.motorcycle.year);
+                        if (member.motorcycle.make) parts.push(member.motorcycle.make);
+                        if (member.motorcycle.model) parts.push(member.motorcycle.model);
+                        if (parts.length > 0) motorcycleType = parts.join(' ');
+                    }
+                    
                     memberCard.innerHTML = `
-                        <img src="${member.photo || 'https://via.placeholder.com/60'}" alt="${member.name}" class="member-photo-small">
+                        <img src="${member.photoUrl || member.photo || 'https://via.placeholder.com/60'}" alt="${member.name}" class="member-photo-small">
                         <div class="member-info">
                             <h3 style="margin: 0; color: var(--white);">${member.name}</h3>
                             <p style="margin: 5px 0; color: var(--gray);">${member.role || 'Member'}</p>
-                            ${member.email ? `<p style="margin: 0; font-size: 0.9rem; color: var(--gray);">Email: ${member.email}</p>` : ''}
-                            ${member.phone ? `<p style="margin: 0; font-size: 0.9rem; color: var(--gray);">Phone: ${member.phone}</p>` : ''}
-                            ${member.joined ? `<p style="margin: 0; font-size: 0.9rem; color: var(--gray);">Member since: ${member.joined}</p>` : ''}
-
-                            <!-- Motorcycle Information -->
-                            ${member.motorcycle ? `
-                                <div style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px;">
-                                    <h4 style="margin: 0 0 5px 0; color: var(--mc-red); font-size: 1rem;">🏍️ Motorcycle</h4>
-                                    ${member.motorcycle.make ? `<p style="margin: 2px 0; font-size: 0.85rem;">Make: ${member.motorcycle.make}</p>` : ''}
-                                    ${member.motorcycle.model ? `<p style="margin: 2px 0; font-size: 0.85rem;">Model: ${member.motorcycle.model}</p>` : ''}
-                                    ${member.motorcycle.year ? `<p style="margin: 2px 0; font-size: 0.85rem;">Year: ${member.motorcycle.year}</p>` : ''}
-                                    ${member.motorcycle.licensePlate ? `<p style="margin: 2px 0; font-size: 0.85rem;">Plate: ${member.motorcycle.licensePlate}</p>` : ''}
-                                </div>
-                            ` : ''}
+                            <p style="margin: 5px 0; color: var(--gray);">🏍️ ${motorcycleType}</p>
+                            ${member.joinDate ? `<p style="margin: 0; font-size: 0.9rem; color: var(--gray);">Member since: ${new Date(member.joinDate.seconds * 1000).getFullYear()}</p>` : ''}
+                            <p style="margin: 5px 0; color: var(--mc-red); font-size: 0.9rem;">Template: ${member.cardTemplate || 'classic'}</p>
                         </div>
                         <div class="member-actions">
                             <button class="admin-btn edit" onclick="editMember('${doc.id}')">Edit</button>
+                            <button class="admin-btn secondary" onclick="selectTemplate('${doc.id}')">Template</button>
                         </div>
                     `;
                     container.appendChild(memberCard);
@@ -1125,9 +1349,12 @@
                         <td>${user.lastLogin ? new Date(user.lastLogin.toDate()).toLocaleDateString() : 'Never'}</td>
                         <td>
                             ${user.role !== 'admin' ? 
-                                (user.members ?
-                                    '<button class="admin-btn delete" onclick="toggleMemberStatus(\'' + user.id + '\', false)">Remove Member</button>' :
-                                    '<button class="admin-btn secondary" onclick="toggleMemberStatus(\'' + user.id + '\', true)">Make Member</button>')
+                                (isUserRemovalMode ?
+                                    '<button class="admin-btn delete" onclick="deleteUserAccount(\'' + user.id + '\', \'' + user.email + '\')">Remove User</button>' :
+                                    (user.members ?
+                                        '<button class="admin-btn delete" onclick="toggleMemberStatus(\'' + user.id + '\', false)">Remove Member</button>' :
+                                        '<button class="admin-btn secondary" onclick="toggleMemberStatus(\'' + user.id + '\', true)">Make Member</button>')
+                                )
                                 : '<span style="color: #888;">Admin User</span>'
                             }
                         </td>
@@ -1142,6 +1369,25 @@
                 console.error('Error loading users:', error);
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #ff0000;">Error loading users. Check admin permissions.</td></tr>';
             }
+        }
+
+        // Toggle User Management Mode
+        function toggleUserManagementMode() {
+            const checkbox = document.getElementById('userManagementMode');
+            const modeLabel = document.getElementById('modeLabel');
+            
+            isUserRemovalMode = checkbox.checked;
+            
+            if (isUserRemovalMode) {
+                modeLabel.textContent = 'User Removal Mode';
+                modeLabel.style.color = '#f44336';
+            } else {
+                modeLabel.textContent = 'Member Management Mode';
+                modeLabel.style.color = '#4CAF50';
+            }
+            
+            // Reload users to update buttons
+            loadUsers();
         }
 
         // Toggle Member Status
@@ -1170,6 +1416,67 @@
             }
         }
 
+        // Delete User Account
+        async function deleteUserAccount(userId, userEmail) {
+            // Enhanced confirmation dialog
+            const confirmMessage = `⚠️ WARNING: User Deletion ⚠️\n\n` +
+                `You are about to permanently delete the user:\n` +
+                `Email: ${userEmail}\n` +
+                `User ID: ${userId}\n\n` +
+                `This action will:\n` +
+                `• Remove the user from Firebase Authentication\n` +
+                `• Delete their user profile\n` +
+                `• Archive their orders and data\n\n` +
+                `This action CANNOT be undone!\n\n` +
+                `Are you absolutely sure you want to delete this user?`;
+            
+            if (confirm(confirmMessage)) {
+                // Double confirmation for safety
+                const finalConfirm = prompt(`To confirm deletion, please type the user's email address:\n${userEmail}`);
+                
+                if (finalConfirm !== userEmail) {
+                    sleipnirAuth.showAuthMessage({
+                        is: 'Hætt við - netfang passaði ekki',
+                        en: 'Cancelled - email address did not match'
+                    }, true);
+                    return;
+                }
+                
+                try {
+                    // Show loading state
+                    const button = event.target;
+                    const originalText = button.textContent;
+                    button.textContent = 'Deleting...';
+                    button.disabled = true;
+                    
+                    // Call the delete user function with archival option
+                    const result = await sleipnirAuth.deleteUser(userId, true);
+                    
+                    if (result.success) {
+                        loadUsers(); // Reload the users table
+                        sleipnirAuth.showAuthMessage({
+                            is: `Notandi ${userEmail} hefur verið fjarlægður. ${result.ordersHandled} pantanir voru geymdar.`,
+                            en: `User ${userEmail} has been deleted. ${result.ordersHandled} orders were archived.`
+                        });
+                    } else {
+                        throw new Error(result.error || 'Failed to delete user');
+                    }
+                } catch (error) {
+                    console.error('Error deleting user:', error);
+                    sleipnirAuth.showAuthMessage({
+                        is: `Villa við að eyða notanda: ${error.message}`,
+                        en: `Error deleting user: ${error.message}`
+                    }, true);
+                    
+                    // Restore button
+                    if (event.target) {
+                        event.target.textContent = 'Remove User';
+                        event.target.disabled = false;
+                    }
+                }
+            }
+        }
+
         // Edit Member
         function editMember(memberId) {
             // TODO: Implement member editing modal
@@ -1186,6 +1493,305 @@
                 card.style.display = text.includes(searchTerm) ? 'flex' : 'none';
             });
         });
+
+        // Template Selection Functions
+        let currentMemberId = null;
+        let selectedTemplate = 'classic';
+
+        async function selectTemplate(memberId) {
+            currentMemberId = memberId;
+            
+            // Get member data
+            try {
+                const doc = await firebase.firestore().collection('displayMembers').doc(memberId).get();
+                if (!doc.exists) {
+                    alert('Member not found');
+                    return;
+                }
+                
+                const member = doc.data();
+                selectedTemplate = member.cardTemplate || 'classic';
+                
+                // Show modal
+                document.getElementById('templateModal').classList.add('active');
+                
+                // Populate template grid
+                const templateGrid = document.getElementById('templateGrid');
+                templateGrid.innerHTML = '';
+                
+                const templates = ['classic', 'horizontal', 'minimal', 'featured', 'badge'];
+                const templateNames = {
+                    classic: 'Classic Vertical',
+                    horizontal: 'Horizontal Layout',
+                    minimal: 'Minimal Design',
+                    featured: 'Featured Display',
+                    badge: 'Badge Style'
+                };
+                
+                templates.forEach(templateName => {
+                    const templateOption = document.createElement('div');
+                    templateOption.className = 'template-option' + (templateName === selectedTemplate ? ' selected' : '');
+                    templateOption.onclick = () => previewTemplate(templateName);
+                    
+                    templateOption.innerHTML = `
+                        <h3 class="template-name">${templateNames[templateName]}</h3>
+                        <div class="template-preview">
+                            ${renderMemberCard({
+                                ...member,
+                                joinDate: member.joinDate || { seconds: Date.now() / 1000 },
+                                motorcycleType: member.motorcycleType || 'Harley-Davidson'
+                            }, templateName)}
+                        </div>
+                    `;
+                    
+                    templateGrid.appendChild(templateOption);
+                });
+                
+            } catch (error) {
+                console.error('Error loading member for template selection:', error);
+                alert('Error loading member data');
+            }
+        }
+
+        function previewTemplate(templateName) {
+            selectedTemplate = templateName;
+            
+            // Update selection
+            document.querySelectorAll('.template-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+
+        function closeTemplateModal() {
+            document.getElementById('templateModal').classList.remove('active');
+            currentMemberId = null;
+            selectedTemplate = 'classic';
+        }
+
+        async function saveTemplateSelection() {
+            if (!currentMemberId) return;
+            
+            try {
+                await firebase.firestore().collection('displayMembers').doc(currentMemberId).update({
+                    cardTemplate: selectedTemplate
+                });
+                
+                alert('Template updated successfully!');
+                closeTemplateModal();
+                loadMembers(); // Reload members to show updated template
+                
+            } catch (error) {
+                console.error('Error saving template selection:', error);
+                alert('Error saving template selection');
+            }
+        }
+
+        // Show Bulk Member Management Modal
+        function showBulkMemberModal() {
+            document.getElementById('bulkMemberModal').style.display = 'block';
+            document.getElementById('bulkMemberEmails').value = '';
+            document.getElementById('memberDomain').value = '';
+            document.getElementById('bulkMemberResults').style.display = 'none';
+        }
+
+        // Close Bulk Member Management Modal
+        function closeBulkMemberModal() {
+            document.getElementById('bulkMemberModal').style.display = 'none';
+        }
+
+        // Process Bulk Member Updates
+        async function processBulkMembers() {
+            const emailsText = document.getElementById('bulkMemberEmails').value.trim();
+            const domain = document.getElementById('memberDomain').value.trim();
+            
+            if (!emailsText && !domain) {
+                alert('Please provide either email addresses or a domain.');
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('bulkMemberResults');
+            const resultsContent = document.getElementById('bulkMemberResultsContent');
+            resultsDiv.style.display = 'block';
+            resultsContent.innerHTML = '<p style="color: #888;">Processing...</p>';
+            
+            try {
+                // Get all users first
+                const allUsers = await sleipnirAuth.getAllUsers();
+                const results = {
+                    updated: [],
+                    notFound: [],
+                    failed: [],
+                    alreadyMembers: []
+                };
+                
+                // Process email list
+                if (emailsText) {
+                    const emails = emailsText.split('\n')
+                        .map(e => e.trim().toLowerCase())
+                        .filter(e => e && e.includes('@'));
+                    
+                    for (const email of emails) {
+                        const user = allUsers.find(u => u.email && u.email.toLowerCase() === email);
+                        
+                        if (!user) {
+                            results.notFound.push(email);
+                        } else if (user.members === true) {
+                            results.alreadyMembers.push(email);
+                        } else {
+                            try {
+                                const result = await sleipnirAuth.toggleUserMembership(user.id, true);
+                                if (result.success) {
+                                    results.updated.push(email);
+                                } else {
+                                    results.failed.push({ email, error: result.error });
+                                }
+                            } catch (error) {
+                                results.failed.push({ email, error: error.message });
+                            }
+                        }
+                    }
+                }
+                
+                // Process domain
+                if (domain) {
+                    const domainLower = domain.toLowerCase();
+                    const domainUsers = allUsers.filter(u => 
+                        u.email && u.email.toLowerCase().endsWith(domainLower) && u.members !== true
+                    );
+                    
+                    for (const user of domainUsers) {
+                        try {
+                            const result = await sleipnirAuth.toggleUserMembership(user.id, true);
+                            if (result.success) {
+                                results.updated.push(user.email);
+                            } else {
+                                results.failed.push({ email: user.email, error: result.error });
+                            }
+                        } catch (error) {
+                            results.failed.push({ email: user.email, error: error.message });
+                        }
+                    }
+                }
+                
+                // Display results
+                let html = '';
+                
+                if (results.updated.length > 0) {
+                    html += `<div style="color: #4CAF50; margin-bottom: 15px;">
+                        <strong>✓ Successfully made members (${results.updated.length}):</strong><br>
+                        ${results.updated.join('<br>')}
+                    </div>`;
+                }
+                
+                if (results.alreadyMembers.length > 0) {
+                    html += `<div style="color: #FF9800; margin-bottom: 15px;">
+                        <strong>ℹ Already members (${results.alreadyMembers.length}):</strong><br>
+                        ${results.alreadyMembers.join('<br>')}
+                    </div>`;
+                }
+                
+                if (results.notFound.length > 0) {
+                    html += `<div style="color: #F44336; margin-bottom: 15px;">
+                        <strong>✗ Users not found (${results.notFound.length}):</strong><br>
+                        ${results.notFound.join('<br>')}
+                    </div>`;
+                }
+                
+                if (results.failed.length > 0) {
+                    html += `<div style="color: #F44336; margin-bottom: 15px;">
+                        <strong>✗ Failed to update (${results.failed.length}):</strong><br>
+                        ${results.failed.map(f => `${f.email}: ${f.error}`).join('<br>')}
+                    </div>`;
+                }
+                
+                resultsContent.innerHTML = html;
+                
+                // Reload users table if any updates were made
+                if (results.updated.length > 0) {
+                    loadUsers();
+                    loadDashboardStats();
+                }
+                
+            } catch (error) {
+                console.error('Error processing bulk members:', error);
+                resultsContent.innerHTML = `<p style="color: #F44336;">Error: ${error.message}</p>`;
+            }
+        }
+
+        // Sync Real Members
+        async function syncRealMembers() {
+            const confirmMsg = `This will analyze the displayMembers collection (member profiles) and sync the member status 
+for all users who have profiles there. This ensures real club members are recognized in the system.
+
+Continue?`;
+            
+            if (!confirm(confirmMsg)) return;
+            
+            try {
+                // Get displayMembers collection
+                const displayMembersSnapshot = await firebase.firestore().collection('displayMembers').get();
+                const memberUserIds = new Set();
+                
+                displayMembersSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.userId) {
+                        memberUserIds.add(data.userId);
+                    }
+                });
+                
+                if (memberUserIds.size === 0) {
+                    alert('No member profiles found in displayMembers collection.');
+                    return;
+                }
+                
+                // Update each user's member status
+                let updated = 0;
+                let alreadyMembers = 0;
+                let failed = 0;
+                
+                for (const userId of memberUserIds) {
+                    try {
+                        // Get user document
+                        const userDoc = await firebase.firestore().collection('users').doc(userId).get();
+                        
+                        if (userDoc.exists) {
+                            const userData = userDoc.data();
+                            if (userData.members !== true) {
+                                await firebase.firestore().collection('users').doc(userId).update({
+                                    members: true,
+                                    memberStatusSyncedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                    memberStatusSyncReason: 'Synced from displayMembers collection'
+                                });
+                                updated++;
+                            } else {
+                                alreadyMembers++;
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`Error updating user ${userId}:`, error);
+                        failed++;
+                    }
+                }
+                
+                const message = `Real Members Sync Complete:
+- Updated: ${updated} users
+- Already members: ${alreadyMembers} users
+- Failed: ${failed} users
+- Total profiles: ${memberUserIds.size}`;
+                
+                alert(message);
+                
+                if (updated > 0) {
+                    loadUsers();
+                    loadDashboardStats();
+                }
+                
+            } catch (error) {
+                console.error('Error syncing real members:', error);
+                alert('Error syncing members: ' + error.message);
+            }
+        }
     </script>
 </body>
 </html>

@@ -239,7 +239,15 @@ async function sendPasswordResetEmail(email) {
 
 // Get user membership status
 function isUserMember() {
-    return userDocument && userDocument.members === true;
+    if (!userDocument || userDocument.members === undefined) {
+        return false;
+    }
+    
+    // Check for multiple possible formats
+    return userDocument.members === true || 
+           userDocument.members === 'true' || 
+           userDocument.members === 1 ||
+           userDocument.members === '1';
 }
 
 // Check if user's email is verified
@@ -474,10 +482,13 @@ function updateMemberBadge() {
     memberBadges.forEach(badge => {
         if (isUserMember()) {
             badge.innerHTML = '<span class="badge-member">Member</span>';
-            badge.style.display = 'block';
+            badge.style.display = 'inline-flex';
+            badge.style.removeProperty('color'); // Let CSS handle the color
         } else if (currentUser) {
+            // Simple guest indicator
             badge.innerHTML = '<span class="badge-non-member">Guest</span>';
-            badge.style.display = 'block';
+            badge.style.display = 'inline-flex';
+            badge.style.removeProperty('color'); // Let CSS handle the color
         } else {
             badge.style.display = 'none';
         }
@@ -614,6 +625,64 @@ async function toggleUserMembership(userId, newStatus) {
     } catch (error) {
         console.error('Error updating membership:', error);
         return { success: false, error: error.message };
+    }
+}
+
+// Delete user account (admin only)
+async function deleteUser(userId, archiveData = true) {
+    console.log('deleteUser: Starting deletion process', { userId, archiveData });
+    
+    if (!isUserAdmin()) {
+        console.error('Unauthorized: Admin access required');
+        return { success: false, error: 'Unauthorized' };
+    }
+    
+    // Additional client-side validation
+    if (!userId) {
+        return { success: false, error: 'User ID is required' };
+    }
+    
+    if (userId === currentUser.uid) {
+        return { success: false, error: 'Cannot delete your own account' };
+    }
+    
+    try {
+        // First validate admin access with server
+        const validateAdmin = firebase.functions().httpsCallable('validateAdminAction');
+        const validation = await validateAdmin({ 
+            action: 'deleteUser',
+            details: { targetUserId: userId }
+        });
+        
+        if (!validation.data.adminVerified) {
+            throw new Error('Admin validation failed');
+        }
+        
+        // Call the delete user function
+        const deleteUserFn = firebase.functions().httpsCallable('deleteUser');
+        const result = await deleteUserFn({ 
+            userId: userId,
+            archiveData: archiveData 
+        });
+        
+        console.log('deleteUser: Server response', result.data);
+        
+        if (result.data.success) {
+            return { 
+                success: true, 
+                message: result.data.message,
+                ordersHandled: result.data.ordersHandled,
+                dataArchived: result.data.dataArchived
+            };
+        } else {
+            throw new Error(result.data.message || 'Failed to delete user');
+        }
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        return { 
+            success: false, 
+            error: error.message || 'Failed to delete user' 
+        };
     }
 }
 
@@ -864,6 +933,101 @@ async function protectAdminPage() {
     return true;
 }
 
+// Diagnostic function to check member status
+async function checkMemberStatus() {
+    console.log('=== Member Status Diagnostic ===');
+    
+    if (!currentUser) {
+        console.log('No user logged in');
+        return null;
+    }
+    
+    console.log('Current User:', {
+        uid: currentUser.uid,
+        email: currentUser.email,
+        emailVerified: currentUser.emailVerified
+    });
+    
+    // Check local userDocument
+    console.log('Local userDocument:', userDocument);
+    console.log('isUserMember() result:', isUserMember());
+    
+    // Fetch fresh data from Firestore
+    try {
+        const freshDoc = await db.collection('users').doc(currentUser.uid).get();
+        if (freshDoc.exists) {
+            const freshData = freshDoc.data();
+            console.log('Fresh Firestore data:', {
+                email: freshData.email,
+                members: freshData.members,
+                membersType: typeof freshData.members,
+                role: freshData.role,
+                displayName: freshData.displayName
+            });
+            
+            // Check if user exists in displayMembers
+            const displayMemberQuery = await db.collection('displayMembers')
+                .where('userId', '==', currentUser.uid)
+                .get();
+            
+            console.log('DisplayMembers collection:', {
+                hasProfile: !displayMemberQuery.empty,
+                profileCount: displayMemberQuery.size
+            });
+            
+            return {
+                uid: currentUser.uid,
+                email: currentUser.email,
+                localMemberStatus: userDocument?.members,
+                firestoreMemberStatus: freshData.members,
+                isRecognizedAsMember: isUserMember(),
+                hasDisplayProfile: !displayMemberQuery.empty
+            };
+        } else {
+            console.log('No user document found in Firestore!');
+            return null;
+        }
+    } catch (error) {
+        console.error('Error checking member status:', error);
+        return null;
+    }
+}
+
+// Function to fix member status
+async function fixMemberStatus(makeMember = true) {
+    console.log('=== Fixing Member Status ===');
+    
+    if (!currentUser) {
+        console.error('No user logged in');
+        return { success: false, error: 'Not logged in' };
+    }
+    
+    try {
+        // Update Firestore
+        await db.collection('users').doc(currentUser.uid).update({
+            members: makeMember,
+            memberStatusFixed: firebase.firestore.FieldValue.serverTimestamp(),
+            memberStatusFixReason: 'Manual fix via diagnostic function'
+        });
+        
+        console.log(`Member status updated to: ${makeMember}`);
+        
+        // Reload user document
+        await loadUserDocument(currentUser.uid);
+        
+        // Trigger auth state change event
+        window.dispatchEvent(new CustomEvent('authStateChanged', { 
+            detail: { user: currentUser, userDoc: userDocument } 
+        }));
+        
+        console.log('Member status fixed successfully');
+        return { success: true, newStatus: makeMember };
+    } catch (error) {
+        console.error('Error fixing member status:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 // Export functions for use in other scripts
 window.sleipnirAuth = {
     signUp,
@@ -882,11 +1046,14 @@ window.sleipnirAuth = {
     showAuthMessage,
     getAllUsers,
     toggleUserMembership,
+    deleteUser,
     verifyAdminAccess,
     adminSignIn,
     adminSignOut,
     protectAdminPage,
     logAdminActivity,
     initializeAdminSession,
-    clearAdminSession
+    clearAdminSession,
+    checkMemberStatus,
+    fixMemberStatus
 };

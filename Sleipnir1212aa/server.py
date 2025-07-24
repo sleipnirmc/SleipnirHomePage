@@ -11,7 +11,7 @@ import threading
 import time
 
 # Configuration
-PORT = 8000
+PORT = 8080
 DIRECTORY = "."  # Current directory, change this to serve files from a different location
 
 
