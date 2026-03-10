@@ -645,14 +645,37 @@ function saveCartToLocalStorage() {
     // In production, you would implement this differently
 }
 
-// Cart sidebar functionality
-document.getElementById('cartBtn').addEventListener('click', () => {
-    document.getElementById('cartSidebar').classList.add('open');
+// Event delegation for cart button (survives navbar re-renders)
+document.addEventListener('click', function(e) {
+    if (e.target.closest('#cartBtn')) {
+        var cartSidebar = document.getElementById('cartSidebar');
+        if (cartSidebar) cartSidebar.classList.add('open');
+    }
+    if (e.target.closest('#closeCart')) {
+        var cartSidebar = document.getElementById('cartSidebar');
+        if (cartSidebar) cartSidebar.classList.remove('open');
+    }
 });
 
-document.getElementById('closeCart').addEventListener('click', () => {
-    document.getElementById('cartSidebar').classList.remove('open');
+// Re-apply cart count after navbar re-render
+window.addEventListener('navbarRendered', function() {
+    if (typeof updateCartUI === 'function') updateCartUI();
 });
+
+// Cart sidebar functionality (direct binding as backup)
+var cartBtnEl = document.getElementById('cartBtn');
+if (cartBtnEl) {
+    cartBtnEl.addEventListener('click', () => {
+        document.getElementById('cartSidebar').classList.add('open');
+    });
+}
+
+var closeCartEl = document.getElementById('closeCart');
+if (closeCartEl) {
+    closeCartEl.addEventListener('click', () => {
+        document.getElementById('cartSidebar').classList.remove('open');
+    });
+}
 
 // Checkout button
 document.getElementById('checkoutBtn').addEventListener('click', async () => {
@@ -664,7 +687,7 @@ document.getElementById('checkoutBtn').addEventListener('click', async () => {
             ? 'Þú þarft að skrá þig inn til að panta. Viltu skrá þig inn núna?' 
             : 'You need to be logged in to place an order. Would you like to login now?';
         if (confirm(msg)) {
-            window.location.href = 'login.html';
+            window.location.href = '/pages/login.html';
         }
         return;
     }
@@ -755,7 +778,7 @@ function showOrderConfirmation(orderId) {
                 <span class="is">Við höfum móttekið pöntunina þína og munum hafa samband fljótlega.</span>
                 <span class="en">We have received your order and will contact you soon.</span>
             </p>
-            <button class="cta-button" onclick="window.location.href='shop.html'">
+            <button class="cta-button" onclick="window.location.href='/pages/shop.html'">
                 <span class="is">Halda áfram að versla</span>
                 <span class="en">Continue Shopping</span>
             </button>

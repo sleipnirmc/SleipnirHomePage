@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC Reykjav&iacute;k - Samband</title>
+    <link rel="stylesheet" href="/css/styles.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:wght@300;400;600&family=Iceland&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="navbar-root"></div>
+
+    <!-- Hero Section -->
+    <section class="hero hero-small contact-hero">
+        <div class="northern-lights"></div>
+        <div class="contact-hero-content">
+            <h1 class="contact-title" data-i18n="contact.hero.title">Haf&eth;u Samband</h1>
+            <p class="contact-subtitle" data-i18n="contact.hero.subtitle">R&iacute;&eth;um saman &iacute; gegnum lj&oacute;san&oacute;tt</p>
+        </div>
+    </section>
+
+    <!-- Main Contact Section -->
+    <section class="contact-main">
+        <div class="contact-container">
+            <!-- Contact Form Card -->
+            <div class="contact-card">
+                <div class="card-header">
+                    <span class="rune">&#5225;</span>
+                    <h3 data-i18n="contact.form.title">Sendu Skilabo&eth;</h3>
+                </div>
+
+                <form class="contact-form" id="contactForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">
+                                <span data-i18n="contact.form.name">Nafn</span> *
+                            </label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">
+                                <span data-i18n="contact.form.email">Netfang</span> *
+                            </label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">
+                                <span data-i18n="contact.form.phone">S&iacute;mi</span>
+                            </label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">
+                                <span data-i18n="contact.form.subject">Efni</span> *
+                            </label>
+                            <select id="subject" name="subject" required>
+                                <option value="" data-i18n="contact.form.subject.default">-- Veldu efni --</option>
+                                <option value="general" data-i18n="contact.form.subject.general">Almennar fyrirspurnir</option>
+                                <option value="membership" data-i18n="contact.form.subject.membership">A&eth;ild a&eth; kl&uacute;bbnum</option>
+                                <option value="shop" data-i18n="contact.form.subject.shop">Verslun</option>
+                                <option value="events" data-i18n="contact.form.subject.events">Vi&eth;bur&eth;ir</option>
+                                <option value="other" data-i18n="contact.form.subject.other">Anna&eth;</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">
+                            <span data-i18n="contact.form.message">Skilabo&eth;</span> *
+                        </label>
+                        <textarea id="message" name="message" rows="6" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full contact-submit-btn" id="sendButton">
+                        <span class="btn-text" data-i18n="contact.form.submit">Senda Skilabo&eth;</span>
+                        <span class="btn-loading" style="display: none;">
+                            <span class="spinner"></span>
+                        </span>
+                    </button>
+
+                    <!-- Success/Error Messages -->
+                    <div id="formSuccess" class="form-message success" data-i18n="contact.form.success">Skilabo&eth; send! Vi&eth; munum svara &thorn;&eacute;r flj&oacute;tlega.</div>
+                    <div id="formError" class="form-message error" data-i18n="contact.form.error">Villa vi&eth; a&eth; senda skilabo&eth;. Vinsamlegast reyndu aftur.</div>
+                </form>
+            </div>
+
+            <!-- Map Card -->
+            <div class="contact-card map-container">
+                <div class="map-header">
+                    <h3 data-i18n="contact.map.title">Finndu okkur</h3>
+                    <p data-i18n="contact.map.subtitle">Komdu &iacute; heims&oacute;kn</p>
+                </div>
+
+                <div id="map"></div>
+
+                <div class="contact-info-grid">
+                    <div class="info-item">
+                        <span class="info-icon">&#128205;</span>
+                        <div>
+                            <h4 data-i18n="contact.info.location.title">Sta&eth;setning</h4>
+                            <p data-i18n="contact.info.location.text">Reykjav&iacute;k, &Iacute;sland</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">&#128336;</span>
+                        <div>
+                            <h4 data-i18n="contact.info.hours.title">Opnunart&iacute;mi</h4>
+                            <p data-i18n="contact.info.hours.text">Eftir samkomulagi</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">&#128231;</span>
+                        <div>
+                            <h4 data-i18n="contact.info.email.title">Netfang</h4>
+                            <p>contact@sleipnirmc.is</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">&#9889;</span>
+                        <div>
+                            <h4 data-i18n="contact.info.emergency.title">Ney&eth;artilfelli</h4>
+                            <p data-i18n="contact.info.emergency.text">Br&aelig;&eth;ur alltaf</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-root"></div>
+
+    <!-- Core scripts -->
+    <script src="/js/i18n.js"></script>
+    <script src="/js/translations/core.js"></script>
+    <script src="/js/translations/contact.js"></script>
+    <script src="/js/nav-config.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/js/main.js"></script>
+
+    <!-- Firebase + Auth -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="/js/firebase-config.js"></script>
+    <script src="/js/authentication.js"></script>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Initialize the map with dark theme
+        var map = L.map('map').setView([64.037402, -21.987437], 13);
+
+        // Add dark tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Create custom Sleipnir icon (Norse-themed)
+        var sleipnirIcon = L.divIcon({
+            html: '<div style="background: #cf2342; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #000; box-shadow: 0 0 20px rgba(207, 35, 66, 0.8);"><span style="color: white; font-size: 20px; font-weight: bold;">S</span></div>',
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -40],
+            className: 'sleipnir-marker'
+        });
+
+        // Add marker
+        var marker = L.marker([64.037402, -21.987437], {icon: sleipnirIcon}).addTo(map);
+
+        // Add popup
+        marker.bindPopup('<b>Sleipnir MC Reykjav\u00edk</b><br>Home of the Three-Legged Brotherhood').openPopup();
+
+        // Contact form handler
+        document.getElementById('contactForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            var button = document.getElementById('sendButton');
+            var btnText = button.querySelector('.btn-text');
+            var btnLoading = button.querySelector('.btn-loading');
+
+            var formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            var successMsg = document.getElementById('formSuccess');
+            var errorMsg = document.getElementById('formError');
+
+            // Hide any existing messages
+            successMsg.style.display = 'none';
+            errorMsg.style.display = 'none';
+
+            // Show loading state
+            button.classList.add('loading');
+            button.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'block';
+
+            try {
+                // Save to Firestore
+                await firebase.firestore().collection('contactMessages').add(formData);
+
+                // Show success state
+                button.classList.remove('loading');
+                button.classList.add('success');
+                btnLoading.style.display = 'none';
+                btnText.style.display = 'block';
+                btnText.textContent = SleipnirI18n.t('contact.form.sent');
+
+                // Show success message
+                successMsg.style.display = 'block';
+
+                // Reset form
+                e.target.reset();
+
+                // Reset button after 3 seconds
+                setTimeout(function () {
+                    button.classList.remove('success');
+                    button.disabled = false;
+                    btnText.textContent = SleipnirI18n.t('contact.form.submit');
+                    successMsg.style.display = 'none';
+                }, 3000);
+
+            } catch (error) {
+                console.error('Error sending message:', error);
+
+                // Reset button to error state
+                button.classList.remove('loading');
+                button.disabled = false;
+                btnLoading.style.display = 'none';
+                btnText.style.display = 'block';
+
+                errorMsg.style.display = 'block';
+
+                // Hide error message after 5 seconds
+                setTimeout(function () {
+                    errorMsg.style.display = 'none';
+                }, 5000);
+            }
+        });
+
+        // Add animation on scroll
+        var observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '0';
+                    entry.target.style.transform = 'translateY(30px)';
+                    setTimeout(function () {
+                        entry.target.style.transition = 'all 0.6s ease-out';
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, 100);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.contact-card').forEach(function (el) {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

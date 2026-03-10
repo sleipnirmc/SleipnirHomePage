@@ -1,0 +1,30 @@
+{
+  "firestore": {
+    "database": "(default)",
+    "location": "eur3",
+    "rules": "firebase/firestore.rules",
+    "indexes": "firebase/firestore.indexes.json"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "firebase/**",
+      "docs/**",
+      "server.py",
+      "public/**",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      { "source": "/shop.html", "destination": "/pages/shop.html" },
+      { "source": "/admin.html", "destination": "/pages/admin.html" },
+      { "source": "/login.html", "destination": "/pages/login.html" },
+      { "source": "/about.html", "destination": "/pages/about.html" },
+      { "source": "/sagan.html", "destination": "/pages/sagan.html" },
+      { "source": "/contact.html", "destination": "/pages/contact.html" },
+      { "source": "/Reykjav%C3%ADk.html", "destination": "/pages/reykjavik.html" },
+      { "source": "/Akureyri.html", "destination": "/pages/akureyri.html" }
+    ]
+  }
+}

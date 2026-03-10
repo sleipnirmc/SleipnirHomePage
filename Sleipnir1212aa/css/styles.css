@@ -11,7 +11,7 @@
 
 @font-face {
     font-family: 'VIKING-N';
-    src: url('fonts/VIKING-N.woff');
+    src: url('../assets/fonts/VIKING-N.woff');
 }
 
 /* CSS Variables for MC Theme - BLACK & RED ONLY */
@@ -75,7 +75,7 @@ body::before {
     transform: translate(-50%, -50%);
     width: 75%;
     height: 75%;
-    background: url('Images/SleipnirLogo.png') no-repeat center center;
+    background: url('../assets/images/SleipnirLogo.png') no-repeat center center;
     background-size: contain;
     opacity: 0.3;
     z-index: -1;
@@ -959,6 +959,33 @@ nav {
     margin-left: 20px;
     display: flex;
     align-items: center;
+    position: relative;
+    min-width: 100px;
+    min-height: 40px;
+}
+
+/* Auth loading state to prevent layout shift */
+.auth-buttons.auth-loading {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.auth-buttons.auth-loaded {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+/* Hide both login and user menu initially */
+.auth-loading .login-link,
+.auth-loading .user-menu {
+    visibility: hidden;
+    position: absolute;
+}
+
+/* Ensure smooth transitions when switching auth states */
+.login-link,
+.user-menu {
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 /* Login button now uses utility classes: .btn .btn-dark .btn-sm */
@@ -1411,7 +1438,7 @@ body.homepage {
     transform: translate(-50%, -50%);
     width: 1200px;
     height: 1200px;
-    background: url('Images/SleipnirLogo.png') no-repeat center center;
+    background: url('../assets/images/SleipnirLogo.png') no-repeat center center;
     background-size: contain;
     opacity: 0.4;
     z-index: 1;
@@ -4015,5 +4042,183 @@ body.homepage {
 
     .timeline-year {
         font-size: 1.5rem;
+    }
+}
+
+/* ===================================================================
+   GHOST BUTTON STYLES (consolidated from inline styles)
+   =================================================================== */
+
+.ghost-btn {
+    background: transparent;
+    border: none;
+    color: var(--white);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    padding: 10px 15px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    position: relative;
+    text-decoration: none;
+    opacity: 0.9;
+}
+
+.ghost-btn:hover {
+    opacity: 1;
+    color: var(--mc-red);
+}
+
+.ghost-btn svg {
+    width: 18px;
+    height: 18px;
+    transition: all 0.2s ease;
+}
+
+.language-ghost {
+    min-width: 40px;
+    text-align: center;
+}
+
+.cart-ghost {
+    position: relative;
+}
+
+.cart-ghost .cart-count {
+    position: absolute;
+    top: -2px;
+    right: 5px;
+    background: var(--mc-red);
+    color: var(--white);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.cart-ghost:hover .cart-count {
+    background: var(--mc-red-hover);
+}
+
+.cart-ghost .cart-count.empty,
+.cart-ghost .cart-count[data-count="0"] {
+    background: var(--charcoal);
+    opacity: 0.6;
+}
+
+.login-ghost svg {
+    stroke-width: 2.5;
+}
+
+.user-menu-ghost {
+    position: relative;
+    display: inline-block;
+}
+
+.user-menu-ghost .ghost-btn {
+    gap: 5px;
+}
+
+.user-menu-ghost .user-menu-toggle:hover {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.user-menu-ghost .dropdown-arrow {
+    font-size: 10px;
+    transition: transform 0.2s ease;
+}
+
+.user-menu-ghost.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.nav-controls-ghost {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.nav-controls-ghost::before {
+    content: '';
+    width: 1px;
+    height: 20px;
+    background: rgba(255,255,255,0.1);
+    margin: 0 15px;
+}
+
+.member-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.member-status-badge:hover {
+    opacity: 1;
+}
+
+.badge-member {
+    color: var(--mc-red);
+    font-family: 'Cinzel', serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.badge-member::before {
+    content: '\2B50';
+    font-size: 10px;
+    filter: brightness(1.2);
+}
+
+.badge-non-member {
+    color: rgba(255, 255, 255, 0.6);
+    font-family: 'Cinzel', serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    .ghost-btn {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .ghost-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .cart-ghost .cart-text {
+        display: none;
+    }
+
+    .language-ghost .btn-text {
+        display: none;
+    }
+
+    .nav-controls-ghost::before {
+        margin: 0 10px;
+    }
+
+    .member-status-badge {
+        font-size: 10px;
     }
 }

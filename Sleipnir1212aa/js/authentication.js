@@ -12,6 +12,14 @@ const auth = firebase.auth();
 auth.onAuthStateChanged(async (user) => {
     currentUser = user;
     
+    // Add auth-loading class to all auth-buttons elements when starting
+    const authButtons = document.querySelectorAll('.auth-buttons');
+    authButtons.forEach(btn => {
+        if (!btn.classList.contains('auth-loaded')) {
+            btn.classList.add('auth-loading');
+        }
+    });
+    
     if (user) {
         // User is signed in
         console.log('User signed in:', user.email);
@@ -108,7 +116,7 @@ async function signUp(email, password, additionalData = {}) {
         // Send email verification
         try {
             await credential.user.sendEmailVerification({
-                url: 'https://sleipnirmc.com/Sleipnir1212aa/login.html',
+                url: 'https://sleipnirmc.com/pages/login.html',
                 handleCodeInApp: false
             });
             console.log('Verification email sent to:', credential.user.email);
@@ -273,7 +281,7 @@ async function resendVerificationEmail() {
     
     try {
         await currentUser.sendEmailVerification({
-            url: 'https://sleipnirmc.com/Sleipnir1212aa/login.html',
+            url: 'https://sleipnirmc.com/pages/login.html',
             handleCodeInApp: false
         });
         
@@ -417,10 +425,10 @@ function requireEmailVerification() {
             is: 'Vinsamlegast skráðu þig inn',
             en: 'Please sign in'
         }, true);
-        window.location.href = '/login.html';
+        window.location.href = '/pages/login.html';
         return false;
     }
-    
+
     if (!currentUser.emailVerified) {
         showAuthMessage({
             is: 'Vinsamlegast staðfestu netfangið þitt til að halda áfram',
@@ -442,6 +450,13 @@ function updateUIForAuthenticatedUser() {
     const loginLinks = document.querySelectorAll('.login-link');
     const userMenus = document.querySelectorAll('.user-menu');
     const adminLinks = document.querySelectorAll('.admin-link');
+    const authButtons = document.querySelectorAll('.auth-buttons');
+    
+    // Remove loading state and add loaded state
+    authButtons.forEach(btn => {
+        btn.classList.remove('auth-loading');
+        btn.classList.add('auth-loaded');
+    });
     
     if (isVerified) {
         // Full access for verified users
@@ -480,6 +495,13 @@ function updateUIForUnauthenticatedUser() {
     const loginLinks = document.querySelectorAll('.login-link');
     const userMenus = document.querySelectorAll('.user-menu');
     const adminLinks = document.querySelectorAll('.admin-link');
+    const authButtons = document.querySelectorAll('.auth-buttons');
+    
+    // Remove loading state and add loaded state
+    authButtons.forEach(btn => {
+        btn.classList.remove('auth-loading');
+        btn.classList.add('auth-loaded');
+    });
     
     loginLinks.forEach(link => link.style.display = 'block');
     userMenus.forEach(menu => menu.style.display = 'none');
@@ -665,36 +687,68 @@ async function deleteUser(userId, archiveData = true) {
     }
     
     try {
-        // First validate admin access with server
-        const validateAdmin = firebase.functions().httpsCallable('validateAdminAction');
-        const validation = await validateAdmin({ 
-            action: 'deleteUser',
-            details: { targetUserId: userId }
-        });
+        const db = firebase.firestore();
+        let ordersHandled = 0;
         
-        if (!validation.data.adminVerified) {
-            throw new Error('Admin validation failed');
+        // Archive user's orders if requested
+        if (archiveData) {
+            const ordersSnapshot = await db.collection('orders')
+                .where('userId', '==', userId)
+                .get();
+            
+            // Update orders to archived status
+            const batch = db.batch();
+            ordersSnapshot.forEach(doc => {
+                batch.update(doc.ref, {
+                    archived: true,
+                    archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    archivedReason: 'User account deleted',
+                    originalUserId: userId
+                });
+                ordersHandled++;
+            });
+            
+            if (ordersHandled > 0) {
+                await batch.commit();
+                console.log(`Archived ${ordersHandled} orders for user ${userId}`);
+            }
         }
         
-        // Call the delete user function
-        const deleteUserFn = firebase.functions().httpsCallable('deleteUser');
-        const result = await deleteUserFn({ 
-            userId: userId,
-            archiveData: archiveData 
-        });
+        // Delete user document from Firestore
+        await db.collection('users').doc(userId).delete();
+        console.log(`Deleted user document for ${userId}`);
         
-        console.log('deleteUser: Server response', result.data);
-        
-        if (result.data.success) {
-            return { 
-                success: true, 
-                message: result.data.message,
-                ordersHandled: result.data.ordersHandled,
-                dataArchived: result.data.dataArchived
-            };
-        } else {
-            throw new Error(result.data.message || 'Failed to delete user');
+        // Check if user has a display member profile and remove it
+        try {
+            const memberSnapshot = await db.collection('displayMembers')
+                .where('userId', '==', userId)
+                .get();
+            
+            if (!memberSnapshot.empty) {
+                const deleteBatch = db.batch();
+                memberSnapshot.forEach(doc => {
+                    deleteBatch.delete(doc.ref);
+                });
+                await deleteBatch.commit();
+                console.log(`Deleted display member profile for ${userId}`);
+            }
+        } catch (memberError) {
+            console.warn('Error deleting display member profile:', memberError);
+            // Continue even if display member deletion fails
         }
+        
+        // Note: We cannot delete the user from Firebase Auth from the client side
+        // This would require a Cloud Function or Admin SDK
+        console.warn('Note: User authentication record remains in Firebase Auth. Manual deletion may be required.');
+        
+        return { 
+            success: true, 
+            message: 'User data deleted successfully',
+            ordersHandled: ordersHandled,
+            dataArchived: archiveData,
+            warning: 'User authentication record remains in Firebase Auth'
+        };
+        
     } catch (error) {
         console.error('Error deleting user:', error);
         return { 
@@ -816,7 +870,7 @@ function startAdminSessionTimeout() {
     adminSessionTimeout = setTimeout(() => {
         clearAdminSession();
         // Redirect to login page
-        window.location.href = 'login.html?session_expired=true';
+        window.location.href = '/pages/login.html?session_expired=true';
     }, ADMIN_SESSION_DURATION);
 }
 
@@ -931,16 +985,16 @@ async function protectAdminPage() {
     // Check if user is authenticated
     if (!currentUser) {
         console.log('protectAdminPage: No current user, redirecting to login');
-        window.location.href = 'login.html?redirect=admin';
+        window.location.href = '/pages/login.html?redirect=admin';
         return false;
     }
-    
+
     // Verify admin access
     const verifyResult = await verifyAdminAccess();
     console.log('protectAdminPage: Verification result', verifyResult);
     if (!verifyResult.success) {
         console.log('protectAdminPage: Admin verification failed, redirecting to login');
-        window.location.href = 'login.html?error=' + encodeURIComponent(verifyResult.error);
+        window.location.href = '/pages/login.html?error=' + encodeURIComponent(verifyResult.error);
         return false;
     }
     
@@ -1047,7 +1101,7 @@ async function fixMemberStatus(makeMember = true) {
 }
 
 // Protect pages that require email verification
-async function protectVerifiedPage(redirectUrl = '/login.html') {
+async function protectVerifiedPage(redirectUrl = '/pages/login.html') {
     // Wait a bit for auth state to be established
     await new Promise(resolve => setTimeout(resolve, 500));
     
@@ -1108,3 +1162,25 @@ window.sleipnirAuth = {
     checkMemberStatus,
     fixMemberStatus
 };
+
+// Re-apply auth UI state after navbar re-render on language change
+window.addEventListener('langchange', function() {
+    setTimeout(function() {
+        if (currentUser) {
+            updateUIForAuthenticatedUser();
+        } else {
+            updateUIForUnauthenticatedUser();
+        }
+    }, 100);
+});
+
+// Re-apply auth UI state after navbar is rendered/re-rendered
+window.addEventListener('navbarRendered', function() {
+    setTimeout(function() {
+        if (currentUser) {
+            updateUIForAuthenticatedUser();
+        } else {
+            updateUIForUnauthenticatedUser();
+        }
+    }, 50);
+});

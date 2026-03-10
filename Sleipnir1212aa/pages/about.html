@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleipnir MC Reykjav&iacute;k - H&oacute;purinn</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Navbar injected by JS -->
+    <div id="navbar-root"></div>
+
+    <!-- Hero Section with Group Photo -->
+    <section class="hero hero-large about-hero">
+        <img src="/assets/images/HopMynd.png" alt="Sleipnir MC Group Photo">
+        <div class="about-hero-overlay">
+            <div class="about-hero-content">
+                <h1 data-i18n="about.hero.title">H&oacute;purinn</h1>
+                <p data-i18n="about.hero.subtitle">Br&aelig;&eth;ralag &aacute; tveimur hj&oacute;lum s&iacute;&eth;an 2015</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Members Section -->
+    <section class="members-section">
+        <div class="members-container">
+            <div class="section-header">
+                <h2 data-i18n="about.members.title">Me&eth;limir</h2>
+            </div>
+
+            <div class="members-grid" id="membersGrid">
+                <!-- Members will be loaded dynamically -->
+                <!-- Loading skeleton -->
+                <div class="member-skeleton">
+                    <div class="skeleton-photo"></div>
+                    <div class="skeleton-info">
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text small"></div>
+                    </div>
+                </div>
+                <div class="member-skeleton">
+                    <div class="skeleton-photo"></div>
+                    <div class="skeleton-info">
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text small"></div>
+                    </div>
+                </div>
+                <div class="member-skeleton">
+                    <div class="skeleton-photo"></div>
+                    <div class="skeleton-info">
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text small"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer injected by JS -->
+    <div id="footer-root"></div>
+
+    <!-- Core scripts -->
+    <script src="/js/i18n.js"></script>
+    <script src="/js/translations/core.js"></script>
+    <script src="/js/translations/about.js"></script>
+    <script src="/js/nav-config.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/js/main.js"></script>
+
+    <!-- Firebase + Auth -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="/js/firebase-config.js"></script>
+    <script src="/js/authentication.js"></script>
+
+    <!-- Page-specific scripts -->
+    <script src="/js/page-scripts/member-card-templates.js"></script>
+
+    <script>
+        // Load members from Firestore
+        async function loadMembers() {
+            const membersGrid = document.getElementById('membersGrid');
+
+            try {
+                const snapshot = await firebase.firestore()
+                    .collection('displayMembers')
+                    .where('isActive', '==', true)
+                    .orderBy('displayOrder', 'asc')
+                    .get();
+
+                // Clear loading skeletons
+                membersGrid.innerHTML = '';
+
+                if (snapshot.empty) {
+                    // Show empty state - no sample members
+                    const lang = window.currentLang || 'is';
+                    const emptyMsg = lang === 'is'
+                        ? 'Engar uppl\u00fdsingar um me\u00f0limi enn.'
+                        : 'No member information available yet.';
+                    membersGrid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                            <p style="color: var(--gray); font-size: 1.1rem;">${emptyMsg}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const member = doc.data();
+                    const memberCard = createMemberCard(member);
+                    membersGrid.appendChild(memberCard);
+                });
+
+            } catch (error) {
+                console.error('Error loading members:', error);
+                const lang = window.currentLang || 'is';
+                const errorMsg = lang === 'is'
+                    ? 'Villa vi\u00f0 a\u00f0 hla\u00f0a me\u00f0limum.'
+                    : 'Error loading members.';
+                membersGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                        <p style="color: var(--gray); font-size: 1.1rem;">${errorMsg}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Create member card element
+        function createMemberCard(member) {
+            const card = document.createElement('div');
+
+            // Determine which template to use based on member data or admin settings
+            let templateName = 'classic'; // Default template
+
+            if (member.featured) {
+                templateName = 'featured';
+            } else if (member.role && member.role.toLowerCase().includes('president')) {
+                templateName = 'featured';
+            } else if (member.role && member.role.toLowerCase().includes('officer')) {
+                templateName = 'horizontal';
+            } else if (member.displayOrder === 1) {
+                templateName = 'badge';
+            } else if (member.displayOrder % 3 === 0) {
+                templateName = 'minimal';
+            }
+
+            // Use template from member data if specified (for admin customization)
+            if (member.cardTemplate) {
+                templateName = member.cardTemplate;
+            }
+
+            // Generate card HTML using selected template
+            card.innerHTML = renderMemberCard(member, templateName);
+
+            // Return the inner card element (since templates include the wrapper)
+            return card.firstElementChild;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMembers();
+        });
+    </script>
+</body>
+</html>

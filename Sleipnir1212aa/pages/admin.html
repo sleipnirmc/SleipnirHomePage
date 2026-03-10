@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sleipnir MC - Admin</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="javascript/member-card-templates.js"></script>
+    <link rel="stylesheet" href="/css/styles.css">
     <style>
         /* Admin Layout */
         .admin-container {
@@ -599,55 +598,19 @@
             cursor: pointer;
             accent-color: var(--mc-red);
         }
-        
+
         .delete-checkbox-wrapper {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .delete-checkbox-label {
             color: var(--mc-red);
             font-size: 14px;
             cursor: pointer;
         }
-        
-        /* Email Confirmation Modal */
-        .email-confirm-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.1) ;
-            padding: 30px;
-            border-radius: 5px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            z-index: 1001;
-            max-width: 500px;
-            width: 90%;
-        }
-        
-        .email-confirm-modal h3 {
-            color: var(--mc-red);
-            margin-bottom: 20px;
-        }
-        
-        .email-confirm-modal input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--white);
-            border-radius: 5px;
-        }
-        
-        .email-confirm-modal .warning-text {
-            color: #FF9800;
-            font-size: 14px;
-            margin: 15px 0;
-            line-height: 1.5;
-        }
+
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -682,23 +645,22 @@
     <header>
         <nav>
             <div class="logo">
-                <a href="index.html" class="logo-link">
+                <a href="/index.html" class="logo-link">
                     <span class="logo-text">SLEIPNIR MC</span>
                     <span class="location">ADMIN</span>
                 </a>
             </div>
             <ul class="nav-links">
-                <li><a href="index.html"><span class="is">Heim</span><span class="en">Home</span></a></li>
-                <li><a href="shop.html"><span class="is">Verslun</span><span class="en">Shop</span></a></li>
-                <li><a href="about.html"><span class="is">Hópurinn</span><span class="en">Members</span></a></li>
-                <li><a href="contact.html"><span class="is">Hafa Samband</span><span class="en">Contact</span></a></li>
-                <li><a href="admin.html" class="active"><span class="is">ADMIN</span><span class="en">ADMIN</span></a></li>
+                <li><a href="/index.html" data-i18n="admin.nav.home">Heim</a></li>
+                <li><a href="/pages/shop.html" data-i18n="admin.nav.shop">Verslun</a></li>
+                <li><a href="/pages/about.html" data-i18n="admin.nav.members">H&#243;purinn</a></li>
+                <li><a href="/pages/contact.html" data-i18n="admin.nav.contact">Hafa Samband</a></li>
+                <li><a href="/pages/admin.html" class="active" data-i18n="admin.nav.admin">ADMIN</a></li>
             </ul>
             <div class="user-menu" style="display: none;">
                 <span class="user-name"></span>
-                <button class="btn btn-dark btn-sm" onclick="sleipnirAuth.adminSignOut().then(() => window.location.href = 'index.html')">
-                    <span class="is">Útskrá</span>
-                    <span class="en">Logout</span>
+                <button class="btn btn-dark btn-sm" onclick="sleipnirAuth.adminSignOut().then(() => window.location.href = '/index.html')">
+                    <span data-i18n="admin.nav.logout">&#218;tskr&#225;</span>
                 </button>
             </div>
             <div class="language-toggle">
@@ -714,18 +676,18 @@
     <div class="admin-container">
         <!-- Admin Header -->
         <div class="admin-header">
-            <h1 class="admin-title">Admin Dashboard</h1>
+            <h1 class="admin-title" data-i18n="admin.title">Admin Dashboard</h1>
             <div class="admin-options" id="adminOptions">
                 <button class="options-btn" onclick="toggleOptions()">
-                    Options ▼
+                    <span data-i18n="admin.options">Options</span> &#9660;
                 </button>
                 <div class="options-dropdown">
-                    <a href="#" onclick="showSection('members')">View Members</a>
-                    <a href="#" onclick="showSection('users')">View Users</a>
-                    <a href="#" onclick="showSection('products')">Manage Products</a>
-                    <a href="#" onclick="showSection('events')">Manage Events</a>
-                    <a href="#" onclick="showSection('orders')">View Orders</a>
-                    <a href="#" onclick="showSection('export')">Export Data</a>
+                    <a href="#" onclick="showSection('members')" data-i18n="admin.options.members">View Members</a>
+                    <a href="#" onclick="showSection('users')" data-i18n="admin.options.users">View Users</a>
+                    <a href="#" onclick="showSection('products')" data-i18n="admin.options.products">Manage Products</a>
+                    <a href="#" onclick="showSection('events')" data-i18n="admin.options.events">Manage Events</a>
+                    <a href="#" onclick="showSection('orders')" data-i18n="admin.options.orders">View Orders</a>
+                    <a href="#" onclick="showSection('export')" data-i18n="admin.options.export">Export Data</a>
                 </div>
             </div>
         </div>
@@ -734,38 +696,38 @@
         <div class="dashboard-stats" id="dashboardStats">
             <div class="stat-card">
                 <div class="stat-number" id="totalMembers">0</div>
-                <div class="stat-label">Total Members</div>
+                <div class="stat-label" data-i18n="admin.stats.members">Total Members</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalUsers">0</div>
-                <div class="stat-label">Registered Users</div>
+                <div class="stat-label" data-i18n="admin.stats.users">Registered Users</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalOrders">0</div>
-                <div class="stat-label">Total Orders</div>
+                <div class="stat-label" data-i18n="admin.stats.orders">Total Orders</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="pendingOrders">0</div>
-                <div class="stat-label">Pending Orders</div>
+                <div class="stat-label" data-i18n="admin.stats.pending">Pending Orders</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalProducts">0</div>
-                <div class="stat-label">Products</div>
+                <div class="stat-label" data-i18n="admin.stats.products">Products</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="totalEvents">0</div>
-                <div class="stat-label">Events</div>
+                <div class="stat-label" data-i18n="admin.stats.events">Events</div>
             </div>
         </div>
 
         <!-- Members Section -->
         <div class="admin-section" id="membersSection">
             <div class="section-header">
-                <h2 class="section-title">Club Members</h2>
+                <h2 class="section-title" data-i18n="admin.members.title">Club Members</h2>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <input type="text" class="admin-input" placeholder="Search members..." id="memberSearch" style="max-width: 400px;">
+                <input type="text" class="admin-input" data-i18n-placeholder="admin.members.search" placeholder="Search members..." id="memberSearch" style="max-width: 400px;">
             </div>
 
             <div id="membersContainer" style="display: grid; gap: 20px;">
@@ -776,41 +738,44 @@
         <!-- Users Section -->
         <div class="admin-section" id="usersSection">
             <div class="section-header">
-                <h2 class="section-title">Registered Users</h2>
+                <h2 class="section-title" data-i18n="admin.users.title">Registered Users</h2>
                 <div class="mode-toggle">
                     <label class="toggle-switch">
                         <input type="checkbox" id="userManagementMode" onchange="toggleUserManagementMode()">
                         <span class="toggle-slider"></span>
                     </label>
-                    <span id="modeLabel" class="mode-label">Member Management Mode</span>
+                    <span id="modeLabel" class="mode-label" data-i18n="admin.users.mode.member">Member Management Mode</span>
                 </div>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <input type="text" class="admin-input" placeholder="Search users..." id="userSearch" style="max-width: 400px;">
+                <input type="text" class="admin-input" data-i18n-placeholder="admin.users.search" placeholder="Search users..." id="userSearch" style="max-width: 400px;">
                 <select class="admin-select" id="userFilter" style="max-width: 200px; margin-left: 10px;">
-                    <option value="all">All Users</option>
-                    <option value="members">Members Only</option>
-                    <option value="non-members">Non-Members</option>
+                    <option value="all" data-i18n="admin.users.filter.all">All Users</option>
+                    <option value="members" data-i18n="admin.users.filter.members">Members Only</option>
+                    <option value="non-members" data-i18n="admin.users.filter.non_members">Non-Members</option>
                 </select>
-                <button class="admin-btn secondary" onclick="showBulkMemberModal()" style="margin-left: 10px;">
+                <button class="admin-btn secondary" onclick="showBulkMemberModal()" style="margin-left: 10px;" data-i18n="admin.users.bulk_member">
                     Bulk Member Management
                 </button>
-                <button class="admin-btn secondary" onclick="syncRealMembers()" style="margin-left: 10px;">
+                <button class="admin-btn secondary" onclick="syncRealMembers()" style="margin-left: 10px;" data-i18n="admin.users.sync_members">
                     Sync Real Members
+                </button>
+                <button class="admin-btn delete" onclick="bulkDeleteUsers()" style="margin-left: 10px; display: none;" id="bulkDeleteBtn" data-i18n="admin.users.delete_selected">
+                    Delete Selected Users
                 </button>
             </div>
 
             <table class="orders-table">
                 <thead>
                     <tr>
-                        <th>User ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Registration Date</th>
-                        <th>Member Status</th>
-                        <th>Last Login</th>
-                        <th>Actions</th>
+                        <th data-i18n="admin.users.th.id">User ID</th>
+                        <th data-i18n="admin.users.th.name">Name</th>
+                        <th data-i18n="admin.users.th.email">Email</th>
+                        <th data-i18n="admin.users.th.registered">Registration Date</th>
+                        <th data-i18n="admin.users.th.status">Member Status</th>
+                        <th data-i18n="admin.users.th.lastlogin">Last Login</th>
+                        <th data-i18n="admin.users.th.actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="usersTableBody">
@@ -822,33 +787,33 @@
         <!-- Products Section -->
         <div class="admin-section" id="productsSection">
             <div class="section-header">
-                <h2 class="section-title">Manage Products</h2>
+                <h2 class="section-title" data-i18n="admin.products.title">Manage Products</h2>
             </div>
 
             <div class="admin-tabs">
-                <button class="tab-btn active" onclick="switchTab('addProduct')">Add Product</button>
-                <button class="tab-btn" onclick="switchTab('viewProducts')">View Products</button>
+                <button class="tab-btn active" onclick="switchTab('addProduct')" data-i18n="admin.products.tab.add">Add Product</button>
+                <button class="tab-btn" onclick="switchTab('viewProducts')" data-i18n="admin.products.tab.view">View Products</button>
             </div>
 
             <!-- Add Product Tab -->
             <div class="tab-content active" id="addProductTab">
                 <form class="admin-form" id="addProductForm">
                     <div class="form-group">
-                        <label>Product Name (Icelandic)</label>
+                        <label data-i18n="admin.products.name_is">Product Name (Icelandic)</label>
                         <input type="text" class="admin-input" id="productNameIs" required>
                     </div>
                     <div class="form-group">
-                        <label>Product Name (English)</label>
+                        <label data-i18n="admin.products.name_en">Product Name (English)</label>
                         <input type="text" class="admin-input" id="productNameEn" required>
                     </div>
                     <div class="form-group">
-                        <label>Description</label>
+                        <label data-i18n="admin.products.description">Description</label>
                         <textarea class="admin-textarea" id="productDescription" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Category</label>
+                        <label data-i18n="admin.products.category">Category</label>
                         <select class="admin-select" id="productCategory" required>
-                            <option value="">Select Category</option>
+                            <option value="" data-i18n="admin.products.category.select">Select Category</option>
                             <option value="tshirt">T-Shirt</option>
                             <option value="hoodie">Hoodie</option>
                             <option value="jacket">Jacket</option>
@@ -857,29 +822,29 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Price (ISK)</label>
+                        <label data-i18n="admin.products.price">Price (ISK)</label>
                         <input type="number" class="admin-input" id="productPrice" required>
                     </div>
                     <div class="form-group">
-                        <label>Available Sizes</label>
+                        <label data-i18n="admin.products.sizes">Available Sizes</label>
                         <div id="sizesContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
                     </div>
                     <div class="form-group">
-                        <label>Members Only</label>
+                        <label data-i18n="admin.products.members_only">Members Only</label>
                         <select class="admin-select" id="productMembersOnly">
-                            <option value="false">No</option>
-                            <option value="true">Yes</option>
+                            <option value="false" data-i18n="admin.no">No</option>
+                            <option value="true" data-i18n="admin.yes">Yes</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Product Images</label>
+                        <label data-i18n="admin.products.images">Product Images</label>
                         <div class="drop-zone" id="productDropZone">
-                            <p>Drag & drop images here or click to upload</p>
+                            <p data-i18n="admin.products.drop_zone">Drag & drop images here or click to upload</p>
                             <input type="file" id="productImages" multiple accept="image/*" style="display: none;">
                         </div>
                         <div id="imagePreview" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
                     </div>
-                    <button type="submit" class="admin-btn">Add Product</button>
+                    <button type="submit" class="admin-btn" data-i18n="admin.products.btn.add">Add Product</button>
                 </form>
             </div>
 
@@ -894,41 +859,41 @@
         <!-- Events Section -->
         <div class="admin-section" id="eventsSection">
             <div class="section-header">
-                <h2 class="section-title">Manage Events</h2>
+                <h2 class="section-title" data-i18n="admin.events.title">Manage Events</h2>
             </div>
 
             <div class="admin-tabs">
-                <button class="tab-btn active" onclick="switchEventTab('addEvent')">Add Event</button>
-                <button class="tab-btn" onclick="switchEventTab('viewEvents')">View Events</button>
+                <button class="tab-btn active" onclick="switchEventTab('addEvent')" data-i18n="admin.events.tab.add">Add Event</button>
+                <button class="tab-btn" onclick="switchEventTab('viewEvents')" data-i18n="admin.events.tab.view">View Events</button>
             </div>
 
             <!-- Add Event Tab -->
             <div class="tab-content active" id="addEventTab">
                 <form class="admin-form" id="addEventForm">
                     <div class="form-group">
-                        <label>Event Name (Icelandic)</label>
+                        <label data-i18n="admin.events.name_is">Event Name (Icelandic)</label>
                         <input type="text" class="admin-input" id="eventNameIs" required>
                     </div>
                     <div class="form-group">
-                        <label>Event Name (English)</label>
+                        <label data-i18n="admin.events.name_en">Event Name (English)</label>
                         <input type="text" class="admin-input" id="eventNameEn" required>
                     </div>
                     <div class="form-group">
-                        <label>Description</label>
+                        <label data-i18n="admin.events.description">Description</label>
                         <textarea class="admin-textarea" id="eventDescription" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Date & Time</label>
+                        <label data-i18n="admin.events.date">Date & Time</label>
                         <input type="datetime-local" class="admin-input" id="eventDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Location</label>
+                        <label data-i18n="admin.events.location">Location</label>
                         <input type="text" class="admin-input" id="eventLocation" required>
                     </div>
                     <div class="form-group">
-                        <label>Event Type</label>
+                        <label data-i18n="admin.events.type">Event Type</label>
                         <select class="admin-select" id="eventCategory" required>
-                            <option value="">Select Type</option>
+                            <option value="" data-i18n="admin.events.type.select">Select Type</option>
                             <option value="ride">Ride</option>
                             <option value="meeting">Meeting</option>
                             <option value="social">Social</option>
@@ -936,7 +901,7 @@
                             <option value="maintenance">Maintenance</option>
                         </select>
                     </div>
-                    <button type="submit" class="admin-btn">Add Event</button>
+                    <button type="submit" class="admin-btn" data-i18n="admin.events.btn.add">Add Event</button>
                 </form>
             </div>
 
@@ -951,12 +916,12 @@
         <!-- Orders Section -->
         <div class="admin-section" id="ordersSection">
             <div class="section-header">
-                <h2 class="section-title">Manage Orders</h2>
+                <h2 class="section-title" data-i18n="admin.orders.title">Manage Orders</h2>
             </div>
 
             <div class="admin-tabs">
-                <button class="tab-btn active" onclick="switchOrderTab('pending')">Pending Orders</button>
-                <button class="tab-btn" onclick="switchOrderTab('completed')">Completed Orders</button>
+                <button class="tab-btn active" onclick="switchOrderTab('pending')" data-i18n="admin.orders.tab.pending">Pending Orders</button>
+                <button class="tab-btn" onclick="switchOrderTab('completed')" data-i18n="admin.orders.tab.completed">Completed Orders</button>
             </div>
 
             <!-- Orders Tables -->
@@ -964,13 +929,13 @@
                 <table class="orders-table">
                     <thead>
                         <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Items</th>
-                            <th>Total</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th data-i18n="admin.orders.th.id">Order ID</th>
+                            <th data-i18n="admin.orders.th.customer">Customer</th>
+                            <th data-i18n="admin.orders.th.items">Items</th>
+                            <th data-i18n="admin.orders.th.total">Total</th>
+                            <th data-i18n="admin.orders.th.date">Date</th>
+                            <th data-i18n="admin.orders.th.status">Status</th>
+                            <th data-i18n="admin.orders.th.actions">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="pendingOrdersBody">
@@ -983,12 +948,12 @@
                 <table class="orders-table">
                     <thead>
                         <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Items</th>
-                            <th>Total</th>
-                            <th>Date</th>
-                            <th>Completed</th>
+                            <th data-i18n="admin.orders.th.id">Order ID</th>
+                            <th data-i18n="admin.orders.th.customer">Customer</th>
+                            <th data-i18n="admin.orders.th.items">Items</th>
+                            <th data-i18n="admin.orders.th.total">Total</th>
+                            <th data-i18n="admin.orders.th.date">Date</th>
+                            <th data-i18n="admin.orders.th.completed">Completed</th>
                         </tr>
                     </thead>
                     <tbody id="completedOrdersBody">
@@ -1001,22 +966,22 @@
         <!-- Export Section -->
         <div class="admin-section" id="exportSection">
             <div class="section-header">
-                <h2 class="section-title">Export Data</h2>
+                <h2 class="section-title" data-i18n="admin.export.title">Export Data</h2>
             </div>
 
             <div class="form-group">
-                <label>Date Range</label>
+                <label data-i18n="admin.export.date_range">Date Range</label>
                 <div style="display: flex; gap: 10px;">
                     <input type="date" class="admin-input" id="exportStartDate">
-                    <span style="align-self: center;">to</span>
+                    <span style="align-self: center;" data-i18n="admin.export.to">to</span>
                     <input type="date" class="admin-input" id="exportEndDate">
                 </div>
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="admin-btn" onclick="exportOrders('all')">Export All Orders</button>
-                <button class="admin-btn secondary" onclick="exportOrders('pending')">Export Pending Orders</button>
-                <button class="admin-btn secondary" onclick="exportOrders('completed')">Export Completed Orders</button>
+                <button class="admin-btn" onclick="exportOrders('all')" data-i18n="admin.export.all">Export All Orders</button>
+                <button class="admin-btn secondary" onclick="exportOrders('pending')" data-i18n="admin.export.pending">Export Pending Orders</button>
+                <button class="admin-btn secondary" onclick="exportOrders('completed')" data-i18n="admin.export.completed">Export Completed Orders</button>
             </div>
         </div>
     </div>
@@ -1032,8 +997,8 @@
                 <!-- Templates will be inserted here -->
             </div>
             <div style="text-align: center;">
-                <button class="admin-btn" onclick="saveTemplateSelection()">Save Template Selection</button>
-                <button class="admin-btn secondary" onclick="closeTemplateModal()">Cancel</button>
+                <button class="admin-btn" onclick="saveTemplateSelection()" data-i18n="admin.save">Save Template Selection</button>
+                <button class="admin-btn secondary" onclick="closeTemplateModal()" data-i18n="admin.cancel">Cancel</button>
             </div>
         </div>
     </div>
@@ -1045,25 +1010,25 @@
                 <h2 style="color: var(--white); margin: 0;">Bulk Member Management</h2>
                 <button onclick="closeBulkMemberModal()" style="background: none; border: none; color: var(--white); font-size: 24px; cursor: pointer;">&times;</button>
             </div>
-            
+
             <div class="admin-form">
                 <div class="form-group">
                     <label>Add Members by Email (one per line)</label>
                     <textarea id="bulkMemberEmails" class="admin-textarea" rows="10" placeholder="user1@example.com&#10;user2@example.com&#10;user3@example.com"></textarea>
                     <small style="color: #888;">Enter email addresses of users who should be members. Only existing users will be updated.</small>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Or Add Members by Email Domain</label>
                     <input type="text" id="memberDomain" class="admin-input" placeholder="@sleipnirmc.is">
                     <small style="color: #888;">All users with this email domain will be made members.</small>
                 </div>
-                
+
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
                     <button class="admin-btn" onclick="processBulkMembers()">Add Members</button>
-                    <button class="admin-btn secondary" onclick="closeBulkMemberModal()">Cancel</button>
+                    <button class="admin-btn secondary" onclick="closeBulkMemberModal()" data-i18n="admin.cancel">Cancel</button>
                 </div>
-                
+
                 <div id="bulkMemberResults" style="margin-top: 20px; display: none;">
                     <h3 style="color: var(--white);">Results:</h3>
                     <div id="bulkMemberResultsContent"></div>
@@ -1084,24 +1049,24 @@
                 <input type="hidden" id="editProductId">
 
                 <div class="form-group">
-                    <label>Product Name (Icelandic)</label>
+                    <label data-i18n="admin.products.name_is">Product Name (Icelandic)</label>
                     <input type="text" class="admin-input" id="editProductNameIs" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Product Name (English)</label>
+                    <label data-i18n="admin.products.name_en">Product Name (English)</label>
                     <input type="text" class="admin-input" id="editProductNameEn" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Description</label>
+                    <label data-i18n="admin.products.description">Description</label>
                     <textarea class="admin-textarea" id="editProductDescription" required></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label>Category</label>
+                    <label data-i18n="admin.products.category">Category</label>
                     <select class="admin-select" id="editProductCategory" required>
-                        <option value="">Select Category</option>
+                        <option value="" data-i18n="admin.products.category.select">Select Category</option>
                         <option value="tshirt">T-Shirt</option>
                         <option value="hoodie">Hoodie</option>
                         <option value="jacket">Jacket</option>
@@ -1111,20 +1076,20 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Price (ISK)</label>
+                    <label data-i18n="admin.products.price">Price (ISK)</label>
                     <input type="number" class="admin-input" id="editProductPrice" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Available Sizes</label>
+                    <label data-i18n="admin.products.sizes">Available Sizes</label>
                     <div id="editSizesContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
                 </div>
 
                 <div class="form-group">
-                    <label>Members Only</label>
+                    <label data-i18n="admin.products.members_only">Members Only</label>
                     <select class="admin-select" id="editProductMembersOnly">
-                        <option value="false">No</option>
-                        <option value="true">Yes</option>
+                        <option value="false" data-i18n="admin.no">No</option>
+                        <option value="true" data-i18n="admin.yes">Yes</option>
                     </select>
                 </div>
 
@@ -1136,34 +1101,38 @@
                 <div class="form-group">
                     <label>Add New Images</label>
                     <div class="drop-zone" id="editProductDropZone">
-                        <p>Drag & drop images here or click to upload</p>
+                        <p data-i18n="admin.products.drop_zone">Drag & drop images here or click to upload</p>
                         <input type="file" id="editProductImages" multiple accept="image/*" style="display: none;">
                     </div>
                     <div id="editImagePreview" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
                 </div>
 
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button type="submit" class="admin-btn">Save Changes</button>
-                    <button type="button" class="admin-btn secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="admin-btn" data-i18n="admin.products.btn.save">Save Changes</button>
+                    <button type="button" class="admin-btn secondary" onclick="closeEditModal()" data-i18n="admin.products.btn.cancel">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
+
+    <!-- i18n Scripts -->
+    <script src="/js/i18n.js"></script>
+    <script src="/js/translations/core.js"></script>
+    <script src="/js/translations/admin.js"></script>
 
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
-    <script src="javascript/firebase-config.js"></script>
-    <script src="javascript/authentication.js"></script>
-    <script src="javascript/language.js"></script>
-    <script src="javascript/admin.js"></script>
+    <script src="/js/firebase-config.js"></script>
+    <script src="/js/authentication.js"></script>
+    <script src="/js/page-scripts/admin.js"></script>
 
     <script>
         // Authentication is handled by admin.js through protectAdminPage()
         let isAdminAuthenticated = false;
-        
+
         // User Management Mode (false = Member Management, true = User Removal)
         let isUserRemovalMode = false;
 
@@ -1172,14 +1141,14 @@
             const { user, userDoc } = event.detail;
             if (user && userDoc && userDoc.role === 'admin') {
                 isAdminAuthenticated = true;
-                
+
                 // Update UI
                 const loadingOverlay = document.getElementById('loadingOverlay');
                 if (loadingOverlay) {
                     loadingOverlay.style.display = 'none';
                 }
                 document.body.style.display = 'block';
-                
+
                 const userMenus = document.querySelectorAll('.user-menu');
                 userMenus.forEach(menu => {
                     menu.style.display = 'flex';
@@ -1196,7 +1165,7 @@
             // Add event listeners for user search and filter
             const userSearch = document.getElementById('userSearch');
             const userFilter = document.getElementById('userFilter');
-            
+
             if (userSearch) {
                 userSearch.addEventListener('input', debounce(() => {
                     if (document.getElementById('usersSection').classList.contains('active')) {
@@ -1204,7 +1173,7 @@
                     }
                 }, 300));
             }
-            
+
             if (userFilter) {
                 userFilter.addEventListener('change', () => {
                     if (document.getElementById('usersSection').classList.contains('active')) {
@@ -1213,7 +1182,7 @@
                 });
             }
         });
-        
+
         // Debounce function for search input
         function debounce(func, wait) {
             let timeout;
@@ -1245,7 +1214,7 @@
         function showSection(section) {
             // Verify admin is authenticated
             if (!isAdminAuthenticated) {
-                window.location.href = 'login.html?redirect=admin';
+                window.location.href = '/pages/login.html?redirect=admin';
                 return;
             }
 
@@ -1327,7 +1296,7 @@
                     const member = doc.data();
                     const memberCard = document.createElement('div');
                     memberCard.className = 'member-card';
-                    
+
                     // Format motorcycle type for display
                     let motorcycleType = 'Not specified';
                     if (member.motorcycleType) {
@@ -1339,13 +1308,13 @@
                         if (member.motorcycle.model) parts.push(member.motorcycle.model);
                         if (parts.length > 0) motorcycleType = parts.join(' ');
                     }
-                    
+
                     memberCard.innerHTML = `
                         <img src="${member.photoUrl || member.photo || 'https://via.placeholder.com/60'}" alt="${member.name}" class="member-photo-small">
                         <div class="member-info">
                             <h3 style="margin: 0; color: var(--white);">${member.name}</h3>
                             <p style="margin: 5px 0; color: var(--gray);">${member.role || 'Member'}</p>
-                            <p style="margin: 5px 0; color: var(--gray);">🏍️ ${motorcycleType}</p>
+                            <p style="margin: 5px 0; color: var(--gray);">${motorcycleType}</p>
                             ${member.joinDate ? `<p style="margin: 0; font-size: 0.9rem; color: var(--gray);">Member since: ${new Date(member.joinDate.seconds * 1000).getFullYear()}</p>` : ''}
                             <p style="margin: 5px 0; color: var(--mc-red); font-size: 0.9rem;">Template: ${member.cardTemplate || 'classic'}</p>
                         </div>
@@ -1380,17 +1349,17 @@
                 // Apply filters
                 const filter = document.getElementById('userFilter').value;
                 const searchTerm = document.getElementById('userSearch').value.toLowerCase();
-                
+
                 let filteredUsers = [...users];
-                
+
                 if (filter === 'members') {
                     filteredUsers = filteredUsers.filter(u => u.members === true);
                 } else if (filter === 'non-members') {
                     filteredUsers = filteredUsers.filter(u => u.members !== true);
                 }
-                
+
                 if (searchTerm) {
-                    filteredUsers = filteredUsers.filter(u => 
+                    filteredUsers = filteredUsers.filter(u =>
                         (u.displayName && u.displayName.toLowerCase().includes(searchTerm)) ||
                         (u.email && u.email.toLowerCase().includes(searchTerm))
                     );
@@ -1404,14 +1373,14 @@
                         <td>${user.email || 'N/A'}</td>
                         <td>${user.createdAt ? new Date(user.createdAt.toDate()).toLocaleDateString() : 'N/A'}</td>
                         <td>
-                            ${user.members ? 
-                                '<span style="color: #4CAF50; font-weight: bold;">✓ Member</span>' : 
+                            ${user.members ?
+                                '<span style="color: #4CAF50; font-weight: bold;">&#10003; Member</span>' :
                                 '<span style="color: #888;">Guest</span>'}
                             ${user.role === 'admin' ? ' <span style="color: var(--mc-red);">[Admin]</span>' : ''}
                         </td>
                         <td>${user.lastLogin ? new Date(user.lastLogin.toDate()).toLocaleDateString() : 'Never'}</td>
                         <td>
-                            ${user.role !== 'admin' ? 
+                            ${user.role !== 'admin' ?
                                 (isUserRemovalMode ?
                                     '<div class="delete-checkbox-wrapper">' +
                                         '<input type="checkbox" class="delete-user-checkbox" id="delete-' + user.id + '" data-user-id="' + user.id + '" data-user-email="' + user.email + '" onchange="handleDeleteCheckbox(this)">' +
@@ -1441,37 +1410,94 @@
         function toggleUserManagementMode() {
             const checkbox = document.getElementById('userManagementMode');
             const modeLabel = document.getElementById('modeLabel');
-            
+            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
             isUserRemovalMode = checkbox.checked;
-            
+
             if (isUserRemovalMode) {
-                modeLabel.textContent = 'User Removal Mode';
+                modeLabel.textContent = window.SleipnirI18n.t('admin.users.mode.removal', 'User Removal Mode');
                 modeLabel.style.color = '#f44336';
+                bulkDeleteBtn.style.display = 'inline-block';
             } else {
-                modeLabel.textContent = 'Member Management Mode';
+                modeLabel.textContent = window.SleipnirI18n.t('admin.users.mode.member', 'Member Management Mode');
                 modeLabel.style.color = '#4CAF50';
+                bulkDeleteBtn.style.display = 'none';
+                // Clear all checkboxes when switching back
+                document.querySelectorAll('.delete-user-checkbox').forEach(cb => cb.checked = false);
             }
-            
-            // Reload users to update buttons
-            loadUsers();
+
+            // Update action cells without reloading the entire table
+            updateUserActionCells();
+        }
+
+        // Update only the action cells in the user table without reloading
+        function updateUserActionCells() {
+            const tbody = document.getElementById('usersTableBody');
+            const rows = tbody.querySelectorAll('tr');
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length < 7) return; // Skip if not a data row
+
+                const userId = cells[0].textContent.replace('...', '');
+                const email = cells[2].textContent;
+                const isAdmin = cells[4].textContent.includes('[Admin]');
+                const isMember = cells[4].textContent.includes('Member');
+
+                const actionCell = cells[6];
+                let fullUserId = '';
+
+                const existingButton = actionCell.querySelector('button');
+                const existingCheckbox = actionCell.querySelector('input[type="checkbox"]');
+
+                if (existingButton && existingButton.onclick) {
+                    const onclickStr = existingButton.onclick.toString();
+                    const match = onclickStr.match(/toggleMemberStatus\('([^']+)'/);
+                    if (match) fullUserId = match[1];
+                } else if (existingCheckbox) {
+                    fullUserId = existingCheckbox.dataset.userId;
+                }
+
+                if (!fullUserId) return;
+
+                if (isAdmin) {
+                    actionCell.innerHTML = '<span style="color: #888;">Admin User</span>';
+                } else {
+                    if (isUserRemovalMode) {
+                        actionCell.innerHTML = `
+                            <div class="delete-checkbox-wrapper">
+                                <input type="checkbox" class="delete-user-checkbox" id="delete-${fullUserId}"
+                                       data-user-id="${fullUserId}" data-user-email="${email}"
+                                       onchange="handleDeleteCheckbox(this)">
+                                <label for="delete-${fullUserId}" class="delete-checkbox-label">Delete</label>
+                            </div>
+                        `;
+                    } else {
+                        if (isMember) {
+                            actionCell.innerHTML = `<button class="admin-btn delete" onclick="toggleMemberStatus('${fullUserId}', false)">Remove Member</button>`;
+                        } else {
+                            actionCell.innerHTML = `<button class="admin-btn secondary" onclick="toggleMemberStatus('${fullUserId}', true)">Make Member</button>`;
+                        }
+                    }
+                }
+            });
         }
 
         // Toggle Member Status
         async function toggleMemberStatus(userId, makeMember) {
             if (confirm(`Are you sure you want to ${makeMember ? 'make this user a member' : 'remove member status'}?`)) {
                 try {
-                    // Use authentication system to toggle membership
                     const result = await sleipnirAuth.toggleUserMembership(userId, makeMember);
-                    
+
                     if (result.success) {
-                        loadUsers(); // Reload the users table
+                        loadUsers();
                         sleipnirAuth.showAuthMessage({
-                            is: `Meðlimastöðu ${makeMember ? 'veitt' : 'fjarlægð'} með góðum árangri!`,
+                            is: `Me\u00f0limast\u00f6\u00f0u ${makeMember ? 'veitt' : 'fjarl\u00e6g\u00f0'} me\u00f0 g\u00f3\u00f0um \u00e1rangri!`,
                             en: `Member status ${makeMember ? 'granted' : 'removed'} successfully!`
                         });
                     } else {
                         sleipnirAuth.showAuthMessage({
-                            is: 'Villa við að uppfæra meðlimastöðu',
+                            is: 'Villa vi\u00f0 a\u00f0 uppf\u00e6ra me\u00f0limast\u00f6\u00f0u',
                             en: 'Error updating member status'
                         }, true);
                     }
@@ -1482,11 +1508,8 @@
             }
         }
 
-        // Old deleteUserAccount function removed - now using checkbox approach
-
         // Edit Member
         function editMember(memberId) {
-            // TODO: Implement member editing modal
             alert('Member editing functionality will be implemented soon.');
         }
 
@@ -1507,25 +1530,22 @@
 
         async function selectTemplate(memberId) {
             currentMemberId = memberId;
-            
-            // Get member data
+
             try {
                 const doc = await firebase.firestore().collection('displayMembers').doc(memberId).get();
                 if (!doc.exists) {
                     alert('Member not found');
                     return;
                 }
-                
+
                 const member = doc.data();
                 selectedTemplate = member.cardTemplate || 'classic';
-                
-                // Show modal
+
                 document.getElementById('templateModal').classList.add('active');
-                
-                // Populate template grid
+
                 const templateGrid = document.getElementById('templateGrid');
                 templateGrid.innerHTML = '';
-                
+
                 const templates = ['classic', 'horizontal', 'minimal', 'featured', 'badge'];
                 const templateNames = {
                     classic: 'Classic Vertical',
@@ -1534,26 +1554,26 @@
                     featured: 'Featured Display',
                     badge: 'Badge Style'
                 };
-                
+
                 templates.forEach(templateName => {
                     const templateOption = document.createElement('div');
                     templateOption.className = 'template-option' + (templateName === selectedTemplate ? ' selected' : '');
                     templateOption.onclick = () => previewTemplate(templateName);
-                    
+
                     templateOption.innerHTML = `
                         <h3 class="template-name">${templateNames[templateName]}</h3>
                         <div class="template-preview">
-                            ${renderMemberCard({
+                            ${typeof renderMemberCard === 'function' ? renderMemberCard({
                                 ...member,
                                 joinDate: member.joinDate || { seconds: Date.now() / 1000 },
                                 motorcycleType: member.motorcycleType || 'Harley-Davidson'
-                            }, templateName)}
+                            }, templateName) : '<p>Template preview</p>'}
                         </div>
                     `;
-                    
+
                     templateGrid.appendChild(templateOption);
                 });
-                
+
             } catch (error) {
                 console.error('Error loading member for template selection:', error);
                 alert('Error loading member data');
@@ -1562,8 +1582,7 @@
 
         function previewTemplate(templateName) {
             selectedTemplate = templateName;
-            
-            // Update selection
+
             document.querySelectorAll('.template-option').forEach(option => {
                 option.classList.remove('selected');
             });
@@ -1578,16 +1597,16 @@
 
         async function saveTemplateSelection() {
             if (!currentMemberId) return;
-            
+
             try {
                 await firebase.firestore().collection('displayMembers').doc(currentMemberId).update({
                     cardTemplate: selectedTemplate
                 });
-                
+
                 alert('Template updated successfully!');
                 closeTemplateModal();
-                loadMembers(); // Reload members to show updated template
-                
+                loadMembers();
+
             } catch (error) {
                 console.error('Error saving template selection:', error);
                 alert('Error saving template selection');
@@ -1611,19 +1630,18 @@
         async function processBulkMembers() {
             const emailsText = document.getElementById('bulkMemberEmails').value.trim();
             const domain = document.getElementById('memberDomain').value.trim();
-            
+
             if (!emailsText && !domain) {
                 alert('Please provide either email addresses or a domain.');
                 return;
             }
-            
+
             const resultsDiv = document.getElementById('bulkMemberResults');
             const resultsContent = document.getElementById('bulkMemberResultsContent');
             resultsDiv.style.display = 'block';
             resultsContent.innerHTML = '<p style="color: #888;">Processing...</p>';
-            
+
             try {
-                // Get all users first
                 const allUsers = await sleipnirAuth.getAllUsers();
                 const results = {
                     updated: [],
@@ -1631,16 +1649,15 @@
                     failed: [],
                     alreadyMembers: []
                 };
-                
-                // Process email list
+
                 if (emailsText) {
                     const emails = emailsText.split('\n')
                         .map(e => e.trim().toLowerCase())
                         .filter(e => e && e.includes('@'));
-                    
+
                     for (const email of emails) {
                         const user = allUsers.find(u => u.email && u.email.toLowerCase() === email);
-                        
+
                         if (!user) {
                             results.notFound.push(email);
                         } else if (user.members === true) {
@@ -1659,14 +1676,13 @@
                         }
                     }
                 }
-                
-                // Process domain
+
                 if (domain) {
                     const domainLower = domain.toLowerCase();
-                    const domainUsers = allUsers.filter(u => 
+                    const domainUsers = allUsers.filter(u =>
                         u.email && u.email.toLowerCase().endsWith(domainLower) && u.members !== true
                     );
-                    
+
                     for (const user of domainUsers) {
                         try {
                             const result = await sleipnirAuth.toggleUserMembership(user.id, true);
@@ -1680,46 +1696,44 @@
                         }
                     }
                 }
-                
-                // Display results
+
                 let html = '';
-                
+
                 if (results.updated.length > 0) {
                     html += `<div style="color: #4CAF50; margin-bottom: 15px;">
-                        <strong>✓ Successfully made members (${results.updated.length}):</strong><br>
+                        <strong>Successfully made members (${results.updated.length}):</strong><br>
                         ${results.updated.join('<br>')}
                     </div>`;
                 }
-                
+
                 if (results.alreadyMembers.length > 0) {
                     html += `<div style="color: #FF9800; margin-bottom: 15px;">
-                        <strong>ℹ Already members (${results.alreadyMembers.length}):</strong><br>
+                        <strong>Already members (${results.alreadyMembers.length}):</strong><br>
                         ${results.alreadyMembers.join('<br>')}
                     </div>`;
                 }
-                
+
                 if (results.notFound.length > 0) {
                     html += `<div style="color: #F44336; margin-bottom: 15px;">
-                        <strong>✗ Users not found (${results.notFound.length}):</strong><br>
+                        <strong>Users not found (${results.notFound.length}):</strong><br>
                         ${results.notFound.join('<br>')}
                     </div>`;
                 }
-                
+
                 if (results.failed.length > 0) {
                     html += `<div style="color: #F44336; margin-bottom: 15px;">
-                        <strong>✗ Failed to update (${results.failed.length}):</strong><br>
+                        <strong>Failed to update (${results.failed.length}):</strong><br>
                         ${results.failed.map(f => `${f.email}: ${f.error}`).join('<br>')}
                     </div>`;
                 }
-                
+
                 resultsContent.innerHTML = html;
-                
-                // Reload users table if any updates were made
+
                 if (results.updated.length > 0) {
                     loadUsers();
                     loadDashboardStats();
                 }
-                
+
             } catch (error) {
                 console.error('Error processing bulk members:', error);
                 resultsContent.innerHTML = `<p style="color: #F44336;">Error: ${error.message}</p>`;
@@ -1728,40 +1742,37 @@
 
         // Sync Real Members
         async function syncRealMembers() {
-            const confirmMsg = `This will analyze the displayMembers collection (member profiles) and sync the member status 
+            const confirmMsg = `This will analyze the displayMembers collection (member profiles) and sync the member status
 for all users who have profiles there. This ensures real club members are recognized in the system.
 
 Continue?`;
-            
+
             if (!confirm(confirmMsg)) return;
-            
+
             try {
-                // Get displayMembers collection
                 const displayMembersSnapshot = await firebase.firestore().collection('displayMembers').get();
                 const memberUserIds = new Set();
-                
+
                 displayMembersSnapshot.forEach(doc => {
                     const data = doc.data();
                     if (data.userId) {
                         memberUserIds.add(data.userId);
                     }
                 });
-                
+
                 if (memberUserIds.size === 0) {
                     alert('No member profiles found in displayMembers collection.');
                     return;
                 }
-                
-                // Update each user's member status
+
                 let updated = 0;
                 let alreadyMembers = 0;
                 let failed = 0;
-                
+
                 for (const userId of memberUserIds) {
                     try {
-                        // Get user document
                         const userDoc = await firebase.firestore().collection('users').doc(userId).get();
-                        
+
                         if (userDoc.exists) {
                             const userData = userDoc.data();
                             if (userData.members !== true) {
@@ -1780,153 +1791,114 @@ Continue?`;
                         failed++;
                     }
                 }
-                
+
                 const message = `Real Members Sync Complete:
 - Updated: ${updated} users
 - Already members: ${alreadyMembers} users
 - Failed: ${failed} users
 - Total profiles: ${memberUserIds.size}`;
-                
+
                 alert(message);
-                
+
                 if (updated > 0) {
                     loadUsers();
                     loadDashboardStats();
                 }
-                
+
             } catch (error) {
                 console.error('Error syncing real members:', error);
                 alert('Error syncing members: ' + error.message);
             }
         }
-        
+
         // Handle delete checkbox change
         function handleDeleteCheckbox(checkbox) {
-            if (checkbox.checked) {
-                const userId = checkbox.dataset.userId;
-                const userEmail = checkbox.dataset.userEmail;
-                
-                // Create and show email confirmation modal
-                showEmailConfirmationModal(userId, userEmail, checkbox);
+            updateBulkDeleteButtonText();
+        }
+
+        // Update bulk delete button text to show count of selected users
+        function updateBulkDeleteButtonText() {
+            const selectedCheckboxes = document.querySelectorAll('.delete-user-checkbox:checked');
+            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+            if (selectedCheckboxes.length > 0) {
+                bulkDeleteBtn.textContent = `Delete Selected Users (${selectedCheckboxes.length})`;
+                bulkDeleteBtn.classList.add('delete');
+            } else {
+                bulkDeleteBtn.textContent = 'Delete Selected Users';
             }
         }
-        
-        // Show email confirmation modal
-        function showEmailConfirmationModal(userId, userEmail, checkbox) {
-            // Remove any existing modal
-            const existingModal = document.getElementById('emailConfirmModal');
-            if (existingModal) {
-                existingModal.remove();
-            }
-            
-            // Create modal HTML
-            const modalHtml = `
-                <div class="modal-overlay" id="emailConfirmModal" onclick="closeEmailConfirmModal('${userId}')">
-                    <div class="email-confirm-modal" onclick="event.stopPropagation()">
-                        <h3>⚠️ Confirm User Deletion</h3>
-                        <p>You are about to permanently delete the user:</p>
-                        <p style="font-family: monospace; color: #fff; margin: 10px 0;">
-                            <strong>Email:</strong> ${userEmail}<br>
-                            <strong>ID:</strong> ${userId.substring(0, 8)}...
-                        </p>
-                        <div class="warning-text">
-                            This action will:
-                            <ul style="margin: 5px 0; padding-left: 20px;">
-                                <li>Remove the user from Firebase Authentication</li>
-                                <li>Delete their user profile</li>
-                                <li>Archive their orders and data</li>
-                            </ul>
-                            <strong>This action CANNOT be undone!</strong>
-                        </div>
-                        <p style="margin-top: 20px;">To confirm deletion, please type the user's email address:</p>
-                        <input type="email" id="emailConfirmInput" placeholder="Enter ${userEmail}" autocomplete="off">
-                        <div style="display: flex; gap: 10px; margin-top: 20px;">
-                            <button class="admin-btn delete" onclick="confirmUserDeletion('${userId}', '${userEmail}')">
-                                Confirm Delete
-                            </button>
-                            <button class="admin-btn secondary" onclick="closeEmailConfirmModal('${userId}')">
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Add modal to page
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            
-            // Focus on input
-            setTimeout(() => {
-                const input = document.getElementById('emailConfirmInput');
-                if (input) input.focus();
-            }, 100);
-        }
-        
-        // Close email confirmation modal
-        function closeEmailConfirmModal(userId) {
-            const modal = document.getElementById('emailConfirmModal');
-            if (modal) {
-                modal.remove();
-            }
-            
-            // Uncheck the checkbox
-            const checkbox = document.getElementById('delete-' + userId);
-            if (checkbox) {
-                checkbox.checked = false;
-            }
-        }
-        
-        // Confirm user deletion
-        async function confirmUserDeletion(userId, userEmail) {
-            const emailInput = document.getElementById('emailConfirmInput');
-            const enteredEmail = emailInput ? emailInput.value.trim() : '';
-            
-            if (enteredEmail !== userEmail) {
-                sleipnirAuth.showAuthMessage({
-                    is: 'Netfang passaði ekki. Hætt við eyðingu.',
-                    en: 'Email did not match. Deletion cancelled.'
-                }, true);
+
+        // Bulk delete users
+        async function bulkDeleteUsers() {
+            const selectedCheckboxes = document.querySelectorAll('.delete-user-checkbox:checked');
+
+            if (selectedCheckboxes.length === 0) {
+                alert('No users selected for deletion.');
                 return;
             }
-            
+
+            const selectedUsers = Array.from(selectedCheckboxes).map(cb => ({
+                id: cb.dataset.userId,
+                email: cb.dataset.userEmail
+            }));
+
+            const confirmMsg = `Are you sure you want to permanently delete ${selectedUsers.length} user(s)?\n\nThis action will:\n- Remove users from Firebase Authentication\n- Delete their user profiles\n- Archive their orders and data\n\nThis action CANNOT be undone!`;
+
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'flex';
+            }
+
+            let successCount = 0;
+            let failedCount = 0;
+            const errors = [];
+
             try {
-                // Show loading state
-                const confirmBtn = document.querySelector('.email-confirm-modal .admin-btn.delete');
-                if (confirmBtn) {
-                    confirmBtn.disabled = true;
-                    confirmBtn.textContent = 'Deleting...';
+                for (const user of selectedUsers) {
+                    try {
+                        const result = await sleipnirAuth.deleteUser(user.id);
+                        if (result.success) {
+                            successCount++;
+                        } else {
+                            failedCount++;
+                            errors.push(`${user.email}: ${result.error || 'Unknown error'}`);
+                        }
+                    } catch (error) {
+                        failedCount++;
+                        errors.push(`${user.email}: ${error.message}`);
+                    }
                 }
-                
-                // Use the existing deleteUser method from sleipnirAuth
-                const result = await sleipnirAuth.deleteUser(userId);
-                
-                if (result.success) {
-                    closeEmailConfirmModal(userId);
-                    loadUsers(); // Reload the users table
-                    sleipnirAuth.showAuthMessage({
-                        is: `Notandi ${userEmail} hefur verið fjarlægður. ${result.ordersHandled} pantanir voru geymdar.`,
-                        en: `User ${userEmail} has been deleted. ${result.ordersHandled} orders were archived.`
-                    });
-                    loadDashboardStats(); // Update stats
-                } else {
-                    sleipnirAuth.showAuthMessage({
-                        is: 'Villa við að eyða notanda: ' + (result.error || 'Óþekkt villa'),
-                        en: 'Error deleting user: ' + (result.error || 'Unknown error')
-                    }, true);
+
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
                 }
+
+                let message = `Deletion complete:\n- Successfully deleted: ${successCount} users`;
+                if (failedCount > 0) {
+                    message += `\n- Failed: ${failedCount} users`;
+                    if (errors.length > 0) {
+                        message += '\n\nErrors:\n' + errors.join('\n');
+                    }
+                }
+
+                alert(message);
+
+                document.querySelectorAll('.delete-user-checkbox').forEach(cb => cb.checked = false);
+                updateBulkDeleteButtonText();
+                loadUsers();
+                loadDashboardStats();
+
             } catch (error) {
-                console.error('Error deleting user:', error);
-                sleipnirAuth.showAuthMessage({
-                    is: 'Villa við að eyða notanda. Vinsamlegast reyndu aftur.',
-                    en: 'Error deleting user. Please try again.'
-                }, true);
-            } finally {
-                // Reset button state if modal still exists
-                const confirmBtn = document.querySelector('.email-confirm-modal .admin-btn.delete');
-                if (confirmBtn) {
-                    confirmBtn.disabled = false;
-                    confirmBtn.textContent = 'Confirm Delete';
+                console.error('Error during bulk deletion:', error);
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
                 }
+                alert('An error occurred during bulk deletion. Please check the console for details.');
             }
         }
     </script>
