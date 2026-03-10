@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sleipnir MC Reykjav&iacute;k - Verslun</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/navbar.css">
 </head>
 <body>
     <div id="navbar-root"></div>
@@ -16,13 +17,13 @@
     </section>
 
     <!-- Member Status Indicator -->
-    <div id="memberStatusIndicator" style="display: none; background: #333; color: white; padding: 10px 20px; text-align: center; border-bottom: 2px solid #cf2342;">
-        <div style="max-width: 1200px; margin: 0 auto;">
+    <div id="memberStatusIndicator" class="member-status-bar" style="display: none;">
+        <div class="member-status-bar-inner">
             <span id="statusMessage"></span>
-            <button id="checkStatusBtn" class="btn btn-sm" style="margin-left: 20px; background: #cf2342; color: white; border: none; padding: 5px 15px; cursor: pointer;" onclick="sleipnirAuth.checkMemberStatus()">
+            <button id="checkStatusBtn" class="btn btn-sm member-status-check-btn" onclick="sleipnirAuth.checkMemberStatus()">
                 Check Status
             </button>
-            <button id="fixStatusBtn" class="btn btn-sm" style="margin-left: 10px; background: #4CAF50; color: white; border: none; padding: 5px 15px; cursor: pointer; display: none;" onclick="fixMemberStatusUI()">
+            <button id="fixStatusBtn" class="btn btn-sm member-status-fix-btn" style="display: none;" onclick="fixMemberStatusUI()">
                 Fix Member Status
             </button>
         </div>

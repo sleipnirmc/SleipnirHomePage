@@ -6,7 +6,7 @@ window.NAV_ITEMS = [
     { i18nKey: 'nav.home', label: 'Heim', href: '/index.html' },
     { i18nKey: 'nav.shop', label: 'Verslun', href: '/pages/shop.html' },
     {
-        i18nKey: 'nav.about', label: 'Um Okkur', href: '#',
+        i18nKey: 'nav.about', label: 'Um Okkur', href: '/pages/about.html',
         children: [
             { i18nKey: 'nav.about.members', label: 'H\u00f3purinn', href: '/pages/about.html' },
             { i18nKey: 'nav.about.story', label: 'Sagan', href: '/pages/sagan.html' },

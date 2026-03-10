@@ -18,6 +18,7 @@
         'nav.orders': 'Pantanir m\u00ednar',
         'nav.outstanding': '\u00d3afgreiddar pantanir',
         'nav.admin': 'Stj\u00f3rnbor\u00f0',
+        'nav.account': 'Minn a\u00f0gangur',
 
         // Footer
         'footer.tagline': 'R\u00ed\u00f0um \u00ed gegnum lj\u00f3san\u00f3tt s\u00ed\u00f0an 2015',
@@ -48,6 +49,7 @@
         'nav.orders': 'My Orders',
         'nav.outstanding': 'Outstanding Orders',
         'nav.admin': 'Admin Panel',
+        'nav.account': 'My Account',
 
         // Footer
         'footer.tagline': 'Riding through lj\u00f3san\u00f3tt since 2015',

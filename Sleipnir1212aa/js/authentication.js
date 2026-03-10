@@ -5,28 +5,53 @@
 let currentUser = null;
 let userDocument = null;
 
+// Auth cache key for localStorage
+var AUTH_CACHE_KEY = 'sleipnir_auth_cache';
+
+// Cache auth state in localStorage for instant UI on page load
+function cacheAuthState(isLoggedIn, displayName, isAdmin, isMember) {
+    try {
+        localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify({
+            isLoggedIn: isLoggedIn,
+            displayName: displayName || '',
+            isAdmin: isAdmin || false,
+            isMember: isMember || false,
+            timestamp: Date.now()
+        }));
+    } catch (e) { /* localStorage may be unavailable */ }
+}
+
+function getCachedAuthState() {
+    try {
+        var cached = localStorage.getItem(AUTH_CACHE_KEY);
+        if (!cached) return null;
+        var data = JSON.parse(cached);
+        if (Date.now() - data.timestamp > 86400000) {
+            localStorage.removeItem(AUTH_CACHE_KEY);
+            return null;
+        }
+        return data;
+    } catch (e) { return null; }
+}
+
+function clearAuthCache() {
+    try { localStorage.removeItem(AUTH_CACHE_KEY); } catch (e) {}
+}
+
 // Initialize Firebase Auth
 const auth = firebase.auth();
 
 // Auth state observer
 auth.onAuthStateChanged(async (user) => {
     currentUser = user;
-    
-    // Add auth-loading class to all auth-buttons elements when starting
-    const authButtons = document.querySelectorAll('.auth-buttons');
-    authButtons.forEach(btn => {
-        if (!btn.classList.contains('auth-loaded')) {
-            btn.classList.add('auth-loading');
-        }
-    });
-    
+
     if (user) {
         // User is signed in
         console.log('User signed in:', user.email);
         console.log('Email verified:', user.emailVerified);
-        
+
         await loadUserDocument(user.uid);
-        
+
         // Update email verification status in Firestore if changed
         if (userDocument && userDocument.emailVerified !== user.emailVerified) {
             await db.collection('users').doc(user.uid).update({
@@ -35,9 +60,12 @@ auth.onAuthStateChanged(async (user) => {
             });
             userDocument.emailVerified = user.emailVerified;
         }
-        
+
         updateUIForAuthenticatedUser();
-        
+
+        // Cache auth state for instant UI on next page load
+        cacheAuthState(true, userDocument?.displayName || user.email, isUserAdmin(), isUserMember());
+
         // Show email verification prompt if not verified
         if (!user.emailVerified) {
             showEmailVerificationPrompt();
@@ -47,11 +75,12 @@ auth.onAuthStateChanged(async (user) => {
         console.log('User signed out');
         userDocument = null;
         updateUIForUnauthenticatedUser();
+        clearAuthCache();
     }
-    
+
     // Trigger custom event for other scripts to listen to
-    window.dispatchEvent(new CustomEvent('authStateChanged', { 
-        detail: { user: currentUser, userDoc: userDocument } 
+    window.dispatchEvent(new CustomEvent('authStateChanged', {
+        detail: { user: currentUser, userDoc: userDocument }
     }));
 });
 
@@ -116,7 +145,7 @@ async function signUp(email, password, additionalData = {}) {
         // Send email verification
         try {
             await credential.user.sendEmailVerification({
-                url: 'https://sleipnirmc.com/pages/login.html',
+                url: 'https://sleipnirmc.com/login',
                 handleCodeInApp: false
             });
             console.log('Verification email sent to:', credential.user.email);
@@ -174,6 +203,7 @@ async function signIn(email, password) {
 // Sign out
 async function signOut() {
     try {
+        clearAuthCache();
         await auth.signOut();
         return { success: true };
     } catch (error) {
@@ -281,7 +311,7 @@ async function resendVerificationEmail() {
     
     try {
         await currentUser.sendEmailVerification({
-            url: 'https://sleipnirmc.com/pages/login.html',
+            url: 'https://sleipnirmc.com/login',
             handleCodeInApp: false
         });
         
@@ -425,7 +455,7 @@ function requireEmailVerification() {
             is: 'Vinsamlegast skráðu þig inn',
             en: 'Please sign in'
         }, true);
-        window.location.href = '/pages/login.html';
+        window.location.href = '/login';
         return false;
     }
 
@@ -443,70 +473,55 @@ function requireEmailVerification() {
 
 // Update UI for authenticated user
 function updateUIForAuthenticatedUser() {
-    // Check if email is verified before granting full access
     const isVerified = currentUser && currentUser.emailVerified;
-    
-    // Update navigation links
-    const loginLinks = document.querySelectorAll('.login-link');
-    const userMenus = document.querySelectorAll('.user-menu');
-    const adminLinks = document.querySelectorAll('.admin-link');
-    const authButtons = document.querySelectorAll('.auth-buttons');
-    
-    // Remove loading state and add loaded state
-    authButtons.forEach(btn => {
-        btn.classList.remove('auth-loading');
-        btn.classList.add('auth-loaded');
-    });
-    
+    const accountMenus = document.querySelectorAll('.account-menu');
+
     if (isVerified) {
-        // Full access for verified users
-        loginLinks.forEach(link => link.style.display = 'none');
-        userMenus.forEach(menu => {
-            menu.style.display = 'block';
-            // Update user name display
-            const nameDisplay = menu.querySelector('.user-name');
-            if (nameDisplay) {
-                nameDisplay.textContent = userDocument?.displayName || currentUser.email;
+        accountMenus.forEach(function(menu) {
+            menu.setAttribute('data-auth', 'logged-in');
+            var nameEl = menu.querySelector('.account-user-name');
+            if (nameEl) {
+                nameEl.textContent = userDocument?.displayName || currentUser.email;
+            }
+            // Admin link visibility
+            var adminLink = menu.querySelector('.admin-link');
+            if (adminLink) {
+                adminLink.style.display = isUserAdmin() ? 'block' : 'none';
             }
         });
-        
-        // Show/hide admin links based on role
-        if (isUserAdmin()) {
-            adminLinks.forEach(link => link.style.display = 'block');
-        } else {
-            adminLinks.forEach(link => link.style.display = 'none');
-        }
     } else {
-        // Limited access for unverified users - show login links
-        loginLinks.forEach(link => link.style.display = 'block');
-        userMenus.forEach(menu => menu.style.display = 'none');
-        adminLinks.forEach(link => link.style.display = 'none');
-        
-        // Show verification prompt
+        accountMenus.forEach(function(menu) {
+            menu.setAttribute('data-auth', 'logged-out');
+        });
         showEmailVerificationPrompt();
     }
-    
+
+    // Also update any legacy .user-menu elements (admin page inline navbar)
+    const userMenus = document.querySelectorAll('.user-menu');
+    userMenus.forEach(menu => {
+        menu.style.display = 'flex';
+        const nameDisplay = menu.querySelector('.user-name');
+        if (nameDisplay) {
+            nameDisplay.textContent = userDocument?.displayName || currentUser.email;
+        }
+    });
+
     // Update member badge
     updateMemberBadge();
 }
 
 // Update UI for unauthenticated user
 function updateUIForUnauthenticatedUser() {
-    const loginLinks = document.querySelectorAll('.login-link');
-    const userMenus = document.querySelectorAll('.user-menu');
-    const adminLinks = document.querySelectorAll('.admin-link');
-    const authButtons = document.querySelectorAll('.auth-buttons');
-    
-    // Remove loading state and add loaded state
-    authButtons.forEach(btn => {
-        btn.classList.remove('auth-loading');
-        btn.classList.add('auth-loaded');
+    const accountMenus = document.querySelectorAll('.account-menu');
+    accountMenus.forEach(function(menu) {
+        menu.setAttribute('data-auth', 'logged-out');
+        menu.classList.remove('active');
     });
-    
-    loginLinks.forEach(link => link.style.display = 'block');
+
+    // Also update any legacy .user-menu elements (admin page inline navbar)
+    const userMenus = document.querySelectorAll('.user-menu');
     userMenus.forEach(menu => menu.style.display = 'none');
-    adminLinks.forEach(link => link.style.display = 'none');
-    
+
     // Remove member badge
     updateMemberBadge();
 }
@@ -870,7 +885,7 @@ function startAdminSessionTimeout() {
     adminSessionTimeout = setTimeout(() => {
         clearAdminSession();
         // Redirect to login page
-        window.location.href = '/pages/login.html?session_expired=true';
+        window.location.href = '/login?session_expired=true';
     }, ADMIN_SESSION_DURATION);
 }
 
@@ -985,7 +1000,7 @@ async function protectAdminPage() {
     // Check if user is authenticated
     if (!currentUser) {
         console.log('protectAdminPage: No current user, redirecting to login');
-        window.location.href = '/pages/login.html?redirect=admin';
+        window.location.href = '/login?redirect=admin';
         return false;
     }
 
@@ -994,7 +1009,7 @@ async function protectAdminPage() {
     console.log('protectAdminPage: Verification result', verifyResult);
     if (!verifyResult.success) {
         console.log('protectAdminPage: Admin verification failed, redirecting to login');
-        window.location.href = '/pages/login.html?error=' + encodeURIComponent(verifyResult.error);
+        window.location.href = '/login?error=' + encodeURIComponent(verifyResult.error);
         return false;
     }
     
@@ -1101,7 +1116,7 @@ async function fixMemberStatus(makeMember = true) {
 }
 
 // Protect pages that require email verification
-async function protectVerifiedPage(redirectUrl = '/pages/login.html') {
+async function protectVerifiedPage(redirectUrl = '/login') {
     // Wait a bit for auth state to be established
     await new Promise(resolve => setTimeout(resolve, 500));
     
@@ -1160,7 +1175,8 @@ window.sleipnirAuth = {
     initializeAdminSession,
     clearAdminSession,
     checkMemberStatus,
-    fixMemberStatus
+    fixMemberStatus,
+    getCachedAuthState
 };
 
 // Re-apply auth UI state after navbar re-render on language change
@@ -1176,6 +1192,17 @@ window.addEventListener('langchange', function() {
 
 // Re-apply auth UI state after navbar is rendered/re-rendered
 window.addEventListener('navbarRendered', function() {
+    setTimeout(function() {
+        if (currentUser) {
+            updateUIForAuthenticatedUser();
+        } else {
+            updateUIForUnauthenticatedUser();
+        }
+    }, 50);
+});
+
+// Re-apply auth UI state after SPA page navigation
+window.addEventListener('pageLoaded', function() {
     setTimeout(function() {
         if (currentUser) {
             updateUIForAuthenticatedUser();

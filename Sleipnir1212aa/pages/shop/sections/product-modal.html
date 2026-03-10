@@ -1,0 +1,40 @@
+<!-- Product Modal -->
+<div id="productModal" class="product-modal">
+    <div class="product-modal-content">
+        <span class="modal-close" onclick="closeProductModal()">&times;</span>
+        <div class="modal-body">
+            <div class="modal-images">
+                <img id="modalMainImage" class="main-image" src="" alt="">
+                <div class="image-thumbnails" id="modalThumbnails">
+                    <!-- Thumbnails will be populated dynamically -->
+                </div>
+            </div>
+            <div class="modal-info">
+                <h2 id="modalProductName">
+                    <span class="is"></span>
+                    <span class="en"></span>
+                </h2>
+                <p class="modal-price" id="modalPrice"></p>
+                <p class="modal-description" id="modalDescription"></p>
+
+                <div class="modal-sizes">
+                    <h3 data-i18n="shop.modal.selectSize">Veldu st&aelig;r&eth;</h3>
+                    <div class="modal-size-options" id="modalSizes">
+                        <!-- Sizes will be populated dynamically -->
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-full" id="modalAddToCart" data-i18n="shop.modal.addToCart">B&aelig;ta &iacute; k&ouml;rfu</button>
+
+                <div class="product-features">
+                    <h3 data-i18n="shop.modal.features">Eiginleikar</h3>
+                    <ul class="feature-list">
+                        <li data-i18n="shop.modal.feature1">H&aacute;g&aelig;&eth;a efni</li>
+                        <li data-i18n="shop.modal.feature2">Handunni&eth; me&eth; &aacute;st</li>
+                        <li data-i18n="shop.modal.feature3">Opinber Sleipnir MC vara</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

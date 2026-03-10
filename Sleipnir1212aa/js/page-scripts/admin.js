@@ -18,7 +18,7 @@ window.addEventListener('authStateChanged', async (event) => {
     
     try {
         // First check email verification
-        const isVerified = await sleipnirAuth.protectVerifiedPage('/pages/login.html');
+        const isVerified = await sleipnirAuth.protectVerifiedPage('/login');
         if (!isVerified) {
             return; // Page will redirect if not verified
         }
@@ -33,7 +33,7 @@ window.addEventListener('authStateChanged', async (event) => {
         }
     } catch (error) {
         console.error('Admin authentication error:', error);
-        window.location.href = '/pages/login.html?redirect=admin';
+        window.location.href = '/login?redirect=admin';
     }
 });
 
@@ -41,7 +41,7 @@ window.addEventListener('authStateChanged', async (event) => {
 setTimeout(() => {
     if (!authInitialized) {
         console.log('Admin panel: Auth state timeout, redirecting to login');
-        window.location.href = '/pages/login.html?redirect=admin';
+        window.location.href = '/login?redirect=admin';
     }
 }, 5000); // 5 second timeout
 

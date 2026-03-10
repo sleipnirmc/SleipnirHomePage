@@ -1,0 +1,112 @@
+<!-- Main Contact Section -->
+<section class="contact-main">
+    <div class="contact-container">
+        <!-- Contact Form Card -->
+        <div class="contact-card">
+            <div class="card-header">
+                <span class="rune">&#5225;</span>
+                <h3 data-i18n="contact.form.title">Sendu Skilabo&eth;</h3>
+            </div>
+
+            <form class="contact-form" id="contactForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">
+                            <span data-i18n="contact.form.name">Nafn</span> *
+                        </label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            <span data-i18n="contact.form.email">Netfang</span> *
+                        </label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">
+                            <span data-i18n="contact.form.phone">S&iacute;mi</span>
+                        </label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">
+                            <span data-i18n="contact.form.subject">Efni</span> *
+                        </label>
+                        <select id="subject" name="subject" required>
+                            <option value="" data-i18n="contact.form.subject.default">-- Veldu efni --</option>
+                            <option value="general" data-i18n="contact.form.subject.general">Almennar fyrirspurnir</option>
+                            <option value="membership" data-i18n="contact.form.subject.membership">A&eth;ild a&eth; kl&uacute;bbnum</option>
+                            <option value="shop" data-i18n="contact.form.subject.shop">Verslun</option>
+                            <option value="events" data-i18n="contact.form.subject.events">Vi&eth;bur&eth;ir</option>
+                            <option value="other" data-i18n="contact.form.subject.other">Anna&eth;</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">
+                        <span data-i18n="contact.form.message">Skilabo&eth;</span> *
+                    </label>
+                    <textarea id="message" name="message" rows="6" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full contact-submit-btn" id="sendButton">
+                    <span class="btn-text" data-i18n="contact.form.submit">Senda Skilabo&eth;</span>
+                    <span class="btn-loading" style="display: none;">
+                        <span class="spinner"></span>
+                    </span>
+                </button>
+
+                <!-- Success/Error Messages -->
+                <div id="formSuccess" class="form-message success" data-i18n="contact.form.success">Skilabo&eth; send! Vi&eth; munum svara &thorn;&eacute;r flj&oacute;tlega.</div>
+                <div id="formError" class="form-message error" data-i18n="contact.form.error">Villa vi&eth; a&eth; senda skilabo&eth;. Vinsamlegast reyndu aftur.</div>
+            </form>
+        </div>
+
+        <!-- Map Card -->
+        <div class="contact-card map-container">
+            <div class="map-header">
+                <h3 data-i18n="contact.map.title">Finndu okkur</h3>
+                <p data-i18n="contact.map.subtitle">Komdu &iacute; heims&oacute;kn</p>
+            </div>
+
+            <div id="map"></div>
+
+            <div class="contact-info-grid">
+                <div class="info-item">
+                    <span class="info-icon">&#128205;</span>
+                    <div>
+                        <h4 data-i18n="contact.info.location.title">Sta&eth;setning</h4>
+                        <p data-i18n="contact.info.location.text">Reykjav&iacute;k, &Iacute;sland</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">&#128336;</span>
+                    <div>
+                        <h4 data-i18n="contact.info.hours.title">Opnunart&iacute;mi</h4>
+                        <p data-i18n="contact.info.hours.text">Eftir samkomulagi</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">&#128231;</span>
+                    <div>
+                        <h4 data-i18n="contact.info.email.title">Netfang</h4>
+                        <p>contact@sleipnirmc.is</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">&#9889;</span>
+                    <div>
+                        <h4 data-i18n="contact.info.emergency.title">Ney&eth;artilfelli</h4>
+                        <p data-i18n="contact.info.emergency.text">Br&aelig;&eth;ur alltaf</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

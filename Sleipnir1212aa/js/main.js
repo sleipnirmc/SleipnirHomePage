@@ -1,28 +1,39 @@
 /**
  * Sleipnir MC -- Main Script
- * Consolidated inline scripts: user menu toggle, logout, auth state listener.
+ * Consolidated inline scripts: account menu toggle, logout, auth state listener.
  * Uses EVENT DELEGATION on document so handlers survive navbar re-renders.
  */
 (function () {
     'use strict';
 
     /* -------------------------------------------------------------------
-       User menu toggle (event delegation)
+       Account menu toggle (event delegation)
        ------------------------------------------------------------------- */
     document.addEventListener('click', function (e) {
-        // Toggle user menu when clicking the toggle button
-        var toggle = e.target.closest('.user-menu-toggle');
-        if (toggle) {
+        // Toggle account menu when clicking the account icon button
+        var iconBtn = e.target.closest('.account-icon-btn');
+        if (iconBtn) {
             e.stopPropagation();
-            var menu = toggle.closest('.user-menu');
+            var menu = iconBtn.closest('.account-menu');
             if (menu) {
-                menu.classList.toggle('active');
+                var authState = menu.getAttribute('data-auth');
+                if (authState === 'logged-in') {
+                    // Toggle dropdown
+                    menu.classList.toggle('active');
+                } else {
+                    // Navigate to login
+                    if (window.sleipnirRouter) {
+                        window.sleipnirRouter.navigate('/login');
+                    } else {
+                        window.location.href = '/login';
+                    }
+                }
             }
             return;
         }
 
-        // Close user menu when clicking outside
-        var openMenu = document.querySelector('.user-menu.active');
+        // Close account menu when clicking outside
+        var openMenu = document.querySelector('.account-menu.active');
         if (openMenu && !openMenu.contains(e.target)) {
             openMenu.classList.remove('active');
         }
@@ -40,7 +51,11 @@
         if (typeof window.sleipnirAuth !== 'undefined' && window.sleipnirAuth.signOut) {
             window.sleipnirAuth.signOut().then(function (result) {
                 if (result.success) {
-                    window.location.href = '/index.html';
+                    if (window.sleipnirRouter) {
+                        window.sleipnirRouter.navigate('/');
+                    } else {
+                        window.location.href = '/';
+                    }
                 }
             });
         }
@@ -55,7 +70,7 @@
         var userDoc = detail.userDoc;
 
         if (user && userDoc) {
-            var userNameElements = document.querySelectorAll('.user-menu .user-name');
+            var userNameElements = document.querySelectorAll('.account-menu .account-user-name');
             var displayName = userDoc.displayName || user.email.split('@')[0];
             for (var i = 0; i < userNameElements.length; i++) {
                 userNameElements[i].textContent = displayName;

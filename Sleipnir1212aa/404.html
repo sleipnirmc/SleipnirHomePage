@@ -4,103 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Sleipnir MC Reykjavík</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        @font-face {
-            font-family: 'VIKING-N';
-            src: url('/assets/fonts/VIKING-N.woff');
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Cormorant Garamond', serif;
-            background-color: #000;
-            color: #acabab;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            height: 90%;
-            background: url('/assets/images/SleipnirLogo.png') no-repeat center center;
-            background-size: contain;
-            opacity: 0.15;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 500px;
-            padding: 2rem;
-        }
-
-        .error-code {
-            font-family: 'VIKING-N', 'Cinzel', serif;
-            font-size: 8rem;
-            color: #cf2342;
-            line-height: 1;
-            text-shadow: 0 0 40px rgba(207, 35, 66, 0.4);
-        }
-
-        h1 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.6rem;
-            font-weight: 400;
-            color: #acabab;
-            margin: 1rem 0 1.5rem;
-            letter-spacing: 0.05em;
-        }
-
-        p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #888;
-            margin-bottom: 2rem;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 0.8rem 2.5rem;
-            background: #cf2342;
-            color: #fff;
-            text-decoration: none;
-            font-family: 'Cinzel', serif;
-            font-size: 0.95rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(207, 35, 66, 0.3);
-        }
-
-        .btn:hover {
-            background: #e63856;
-            box-shadow: 0 6px 25px rgba(207, 35, 66, 0.5);
-            transform: translateY(-1px);
-        }
-
-        .divider {
-            width: 60px;
-            height: 2px;
-            background: #cf2342;
-            margin: 0 auto 2rem;
-            opacity: 0.6;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/404.css">
 </head>
 <body>
     <div class="container">
@@ -114,7 +19,7 @@
             <span class="is">Þessi síða er ekki til eða hefur verið fjarlægð.</span>
             <span class="en" style="display:none">This page doesn't exist or has been removed.</span>
         </p>
-        <a href="/" class="btn">
+        <a href="/" class="btn-404">
             <span class="is">Aftur heim</span>
             <span class="en" style="display:none">Back Home</span>
         </a>

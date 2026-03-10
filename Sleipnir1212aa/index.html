@@ -3,58 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sleipnir MC Reykjav&iacute;k - Official Homepage</title>
+    <title>Sleipnir MC Reykjav&iacute;k</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/navbar.css">
 </head>
-<body class="homepage">
+<body>
     <div id="navbar-root"></div>
-
-    <!-- Hero Section - Full Screen -->
-    <section class="hero hero-full" id="home">
-        <div class="hero-overlay"></div>
-        <div class="northern-lights"></div>
-        <div class="hero-logo-bg"></div>
-        <div class="hero-content">
-            <h1 class="hero-title">
-                NO DRUGS<br>
-                NO ATTITUDE
-            </h1>
-            <div class="cta-group">
-                <a href="/pages/shop.html" class="btn btn-primary" data-i18n="home.hero.cta.shop">Versla</a>
-                <a href="/pages/about.html" class="btn btn-secondary" data-i18n="home.hero.cta.members">Me&eth;limir</a>
-            </div>
-        </div>
-        <div class="frost-border"></div>
-    </section>
-
+    <main id="content-root"></main>
     <div id="footer-root"></div>
 
-    <!-- Core scripts -->
+    <!-- i18n + all translations (SPA needs all pages' translations upfront) -->
     <script src="/js/i18n.js"></script>
     <script src="/js/translations/core.js"></script>
     <script src="/js/translations/home.js"></script>
-    <script src="/js/nav-config.js"></script>
+    <script src="/js/translations/shop.js"></script>
+    <script src="/js/translations/admin.js"></script>
+    <script src="/js/translations/login.js"></script>
+    <script src="/js/translations/about.js"></script>
+    <script src="/js/translations/sagan.js"></script>
+    <script src="/js/translations/contact.js"></script>
+    <script src="/js/translations/chapters.js"></script>
+
+    <!-- Page registry + skeleton router -->
+    <script src="/js/page-registry.js"></script>
     <script src="/js/components.js"></script>
     <script src="/js/main.js"></script>
+    <script src="/js/skeleton.js"></script>
 
-    <!-- Firebase + Auth -->
+    <!-- Firebase SDK (always loaded) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="/js/firebase-config.js"></script>
     <script src="/js/authentication.js"></script>
-
-    <script>
-        // Northern lights parallax animation
-        var lastScrollY = window.scrollY;
-        window.addEventListener('scroll', function () {
-            var scrolled = window.pageYOffset;
-            var lights = document.querySelector('.northern-lights');
-            if (lights) {
-                lights.style.transform = 'translateY(' + (scrolled * 0.3) + 'px)';
-            }
-            lastScrollY = scrolled;
-        });
-    </script>
 </body>
 </html>

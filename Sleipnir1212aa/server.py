@@ -19,6 +19,13 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
+    def do_GET(self):
+        # SPA fallback: if path doesn't match a file, serve index.html
+        path = self.translate_path(self.path.split('?')[0])
+        if not os.path.exists(path) or (os.path.isdir(path) and not os.path.exists(os.path.join(path, 'index.html'))):
+            self.path = '/index.html'
+        return super().do_GET()
+
     def end_headers(self):
         # Add headers to prevent caching during development
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')

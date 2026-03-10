@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sleipnir MC Reykjav&iacute;k - H&oacute;purinn</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/navbar.css">
 </head>
 <body>
     <!-- Navbar injected by JS -->
@@ -99,8 +100,8 @@
                         ? 'Engar uppl\u00fdsingar um me\u00f0limi enn.'
                         : 'No member information available yet.';
                     membersGrid.innerHTML = `
-                        <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
-                            <p style="color: var(--gray); font-size: 1.1rem;">${emptyMsg}</p>
+                        <div class="members-empty-state">
+                            <p>${emptyMsg}</p>
                         </div>
                     `;
                     return;
@@ -119,8 +120,8 @@
                     ? 'Villa vi\u00f0 a\u00f0 hla\u00f0a me\u00f0limum.'
                     : 'Error loading members.';
                 membersGrid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
-                        <p style="color: var(--gray); font-size: 1.1rem;">${errorMsg}</p>
+                    <div class="members-empty-state">
+                        <p>${errorMsg}</p>
                     </div>
                 `;
             }

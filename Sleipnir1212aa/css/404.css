@@ -1,0 +1,89 @@
+/* ===================================================================
+   404 PAGE STYLES
+   Requires styles.css to be loaded first for variables, fonts, and reset.
+   =================================================================== */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    background: url('/assets/images/SleipnirLogo.png') no-repeat center center;
+    background-size: contain;
+    opacity: 0.15;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.container {
+    position: relative;
+    z-index: 1;
+    max-width: 500px;
+    padding: 2rem;
+}
+
+.error-code {
+    font-family: 'VIKING-N', 'Cinzel', serif;
+    font-size: 8rem;
+    color: var(--mc-red);
+    line-height: 1;
+    text-shadow: 0 0 40px rgba(207, 35, 66, 0.4);
+}
+
+h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--white);
+    margin: 1rem 0 1.5rem;
+    letter-spacing: 0.05em;
+}
+
+p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--gray);
+    margin-bottom: 2rem;
+}
+
+.divider {
+    width: 60px;
+    height: 2px;
+    background: var(--mc-red);
+    margin: 0 auto 2rem;
+    opacity: 0.6;
+}
+
+.btn-404 {
+    display: inline-block;
+    padding: 0.8rem 2.5rem;
+    background: var(--mc-red);
+    color: #fff;
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: var(--transition-base);
+    box-shadow: 0 4px 15px rgba(207, 35, 66, 0.3);
+}
+
+.btn-404:hover {
+    background: var(--mc-red-hover);
+    box-shadow: 0 6px 25px rgba(207, 35, 66, 0.5);
+    transform: translateY(-1px);
+}

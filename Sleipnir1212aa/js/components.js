@@ -14,7 +14,11 @@
        ------------------------------------------------------------------- */
     function isActive(href) {
         var path = window.location.pathname;
-        if (href === '/index.html') {
+        // Normalize path
+        if (path !== '/' && path.endsWith('/')) {
+            path = path.slice(0, -1);
+        }
+        if (href === '/' || href === '/index.html') {
             return path === '/' || path === '/index.html';
         }
         return path === href;
@@ -31,15 +35,6 @@
             var activeClass = isActive(item.href) ? ' class="active"' : '';
 
             if (item.children && item.children.length) {
-                // Check for nested children (3rd level)
-                var hasNested = false;
-                for (var c = 0; c < item.children.length; c++) {
-                    if (item.children[c].children && item.children[c].children.length) {
-                        hasNested = true;
-                        break;
-                    }
-                }
-
                 html += '<li class="nav-dropdown">';
                 html += '<a href="' + item.href + '">' + label + '</a>';
                 html += '<ul class="dropdown-menu">';
@@ -76,17 +71,39 @@
     }
 
     /* -------------------------------------------------------------------
+       Read cached auth state from localStorage for instant initial render
+       ------------------------------------------------------------------- */
+    function getCachedAuth() {
+        try {
+            var raw = localStorage.getItem('sleipnir_auth_cache');
+            if (!raw) return null;
+            var data = JSON.parse(raw);
+            // Expire cache after 24 hours
+            if (Date.now() - data.timestamp > 86400000) {
+                localStorage.removeItem('sleipnir_auth_cache');
+                return null;
+            }
+            return data;
+        } catch (e) { return null; }
+    }
+
+    /* -------------------------------------------------------------------
        Build the full navbar HTML
        ------------------------------------------------------------------- */
     function buildNavbar() {
         var lang = getLang();
         var langToggleLabel = lang === 'is' ? t('nav.lang.toggle.is', 'EN') : t('nav.lang.toggle.en', 'IS');
         var cartLabel = t('nav.cart', 'Karfa');
-        var loginLabel = t('nav.login', 'Innskr\u00e1');
         var logoutLabel = t('nav.logout', '\u00datskr\u00e1');
         var ordersLabel = t('nav.orders', 'Pantanir m\u00ednar');
         var outstandingLabel = t('nav.outstanding', '\u00d3afgreiddar pantanir');
         var adminLabel = t('nav.admin', 'Stj\u00f3rnbor\u00f0');
+        var accountLabel = t('nav.account', 'Minn a\u00f0gangur');
+
+        // Read cached auth state for instant initial render
+        var cached = getCachedAuth();
+        var initialAuth = cached && cached.isLoggedIn ? 'logged-in' : 'logged-out';
+        var cachedName = (cached && cached.displayName) ? cached.displayName : '';
 
         var html = '';
         html += '<header>';
@@ -94,7 +111,7 @@
 
         // Logo
         html += '<div class="logo">';
-        html += '<a href="/index.html" class="logo-link">';
+        html += '<a href="/" class="logo-link">';
         html += '<span class="logo-text">SLEIPNIR MC</span>';
         html += '<span class="location">REYKJAV\u00cdK</span>';
         html += '</a>';
@@ -128,40 +145,27 @@
         html += '</button>';
         html += '</div>';
 
-        // Auth buttons
-        html += '<div class="auth-buttons auth-loading">';
-
-        // Login link
-        html += '<a href="/pages/login.html" class="ghost-btn login-ghost login-link">';
+        // Account icon (persistent — no auth-loading dance)
+        html += '<div class="account-menu" data-auth="' + initialAuth + '">';
+        html += '<button class="ghost-btn account-icon-btn" aria-label="' + accountLabel + '" data-i18n-aria="nav.account">';
         html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
         html += '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>';
         html += '<circle cx="12" cy="7" r="4"/>';
         html += '</svg>';
-        html += loginLabel;
-        html += '</a>';
-
-        // User menu
-        html += '<div class="user-menu user-menu-ghost">';
-        html += '<div class="user-menu-toggle ghost-btn">';
-        html += '<span class="user-icon">\uD83D\uDC64</span>';
-        html += '<span class="user-name">User</span>';
-        html += '<span>\u25BE</span>';
-        html += '</div>';
-        html += '<div class="user-menu-dropdown">';
-        html += '<div style="padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">';
-        html += '<div class="user-name" style="font-size: 18px; margin-bottom: 5px;"></div>';
+        html += '</button>';
+        html += '<div class="account-dropdown">';
+        html += '<div class="account-dropdown-header">';
+        html += '<div class="account-user-name">' + cachedName + '</div>';
         html += '<div class="member-status-badge"></div>';
         html += '</div>';
         html += '<a href="#" class="orders-link">' + ordersLabel + '</a>';
         html += '<a href="#" class="outstanding-orders-link">' + outstandingLabel + '</a>';
-        html += '<a href="/pages/admin.html" class="admin-link" style="display: none;">' + adminLabel + '</a>';
+        html += '<a href="/admin" class="admin-link" style="display: none;">' + adminLabel + '</a>';
         html += '<a href="#" class="logout-btn">' + logoutLabel + '</a>';
         html += '</div>';
         html += '</div>';
 
-        html += '</div>'; // .auth-buttons
         html += '</div>'; // .nav-controls
-
         html += '</nav>';
         html += '</header>';
 

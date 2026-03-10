@@ -687,7 +687,7 @@ document.getElementById('checkoutBtn').addEventListener('click', async () => {
             ? 'Þú þarft að skrá þig inn til að panta. Viltu skrá þig inn núna?' 
             : 'You need to be logged in to place an order. Would you like to login now?';
         if (confirm(msg)) {
-            window.location.href = '/pages/login.html';
+            window.location.href = '/login';
         }
         return;
     }
@@ -778,7 +778,7 @@ function showOrderConfirmation(orderId) {
                 <span class="is">Við höfum móttekið pöntunina þína og munum hafa samband fljótlega.</span>
                 <span class="en">We have received your order and will contact you soon.</span>
             </p>
-            <button class="cta-button" onclick="window.location.href='/pages/shop.html'">
+            <button class="cta-button" onclick="window.location.href='/shop'">
                 <span class="is">Halda áfram að versla</span>
                 <span class="en">Continue Shopping</span>
             </button>

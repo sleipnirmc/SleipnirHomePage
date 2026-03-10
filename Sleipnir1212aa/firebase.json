@@ -17,14 +17,23 @@
       "**/node_modules/**"
     ],
     "rewrites": [
-      { "source": "/shop.html", "destination": "/pages/shop.html" },
-      { "source": "/admin.html", "destination": "/pages/admin.html" },
-      { "source": "/login.html", "destination": "/pages/login.html" },
-      { "source": "/about.html", "destination": "/pages/about.html" },
-      { "source": "/sagan.html", "destination": "/pages/sagan.html" },
-      { "source": "/contact.html", "destination": "/pages/contact.html" },
-      { "source": "/Reykjav%C3%ADk.html", "destination": "/pages/reykjavik.html" },
-      { "source": "/Akureyri.html", "destination": "/pages/akureyri.html" }
+      { "source": "/pages/shop.html", "destination": "/index.html" },
+      { "source": "/pages/about.html", "destination": "/index.html" },
+      { "source": "/pages/login.html", "destination": "/index.html" },
+      { "source": "/pages/admin.html", "destination": "/index.html" },
+      { "source": "/pages/sagan.html", "destination": "/index.html" },
+      { "source": "/pages/contact.html", "destination": "/index.html" },
+      { "source": "/pages/reykjavik.html", "destination": "/index.html" },
+      { "source": "/pages/akureyri.html", "destination": "/index.html" },
+      { "source": "/shop.html", "destination": "/index.html" },
+      { "source": "/admin.html", "destination": "/index.html" },
+      { "source": "/login.html", "destination": "/index.html" },
+      { "source": "/about.html", "destination": "/index.html" },
+      { "source": "/sagan.html", "destination": "/index.html" },
+      { "source": "/contact.html", "destination": "/index.html" },
+      { "source": "/Reykjav%C3%ADk.html", "destination": "/index.html" },
+      { "source": "/Akureyri.html", "destination": "/index.html" },
+      { "source": "**", "destination": "/index.html" }
     ]
   }
 }
