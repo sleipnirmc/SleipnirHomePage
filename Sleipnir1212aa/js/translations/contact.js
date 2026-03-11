@@ -27,7 +27,8 @@
         'contact.info.hours.text': 'Eftir samkomulagi',
         'contact.info.email.title': 'Netfang',
         'contact.info.emergency.title': 'Ney\u00f0artilfelli',
-        'contact.info.emergency.text': 'Br\u00e6\u00f0ur alltaf'
+        'contact.info.emergency.text': 'Br\u00e6\u00f0ur alltaf',
+        'contact.info.facebook.title': 'Facebook'
     });
 
     window.SleipnirI18n.registerTranslations('en', {
@@ -57,6 +58,7 @@
         'contact.info.hours.text': 'By Appointment',
         'contact.info.email.title': 'Email',
         'contact.info.emergency.title': 'Emergency',
-        'contact.info.emergency.text': 'Brothers Always'
+        'contact.info.emergency.text': 'Brothers Always',
+        'contact.info.facebook.title': 'Facebook'
     });
 })();

@@ -2384,7 +2384,68 @@ body.homepage {
     transition: filter 0.3s ease;
 }
 
-/* Contact Info Grid */
+/* Contact Info Bar */
+.contact-info-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 30px;
+    background: rgba(0,0,0,0.6);
+    border-top: 1px solid rgba(207, 35, 66, 0.2);
+}
+
+.info-bar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    justify-content: center;
+    text-decoration: none;
+    color: inherit;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background 0.25s ease;
+}
+
+.info-bar-item:hover {
+    background: rgba(207, 35, 66, 0.08);
+}
+
+.info-bar-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--mc-red);
+    flex-shrink: 0;
+}
+
+.info-bar-divider {
+    width: 1px;
+    height: 36px;
+    background: rgba(255,255,255,0.08);
+    flex-shrink: 0;
+}
+
+.info-bar-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.info-bar-label {
+    font-family: 'Iceland', cursive;
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.info-bar-value {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--white);
+    font-size: 14px;
+}
+
+/* Legacy contact-info-grid (unused, kept for compat) */
 .contact-info-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -2564,7 +2625,25 @@ body.homepage {
     .contact-info-grid {
         grid-template-columns: 1fr;
     }
-    
+
+    .contact-info-bar {
+        flex-direction: column;
+        gap: 0;
+        padding: 20px;
+    }
+
+    .info-bar-divider {
+        width: 80%;
+        height: 1px;
+        margin: 4px 0;
+    }
+
+    .info-bar-item {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 12px 16px;
+    }
+
     .map-container {
         min-height: 500px;
     }

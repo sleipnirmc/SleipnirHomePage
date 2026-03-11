@@ -21,7 +21,6 @@ header {
 
 nav {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     max-width: 1400px;
     margin: 0 auto;
@@ -83,6 +82,7 @@ nav {
     list-style: none;
     gap: 40px;
     flex-shrink: 0;
+    margin-left: 40px;
 }
 
 .nav-links a {
@@ -340,6 +340,7 @@ nav {
     display: flex;
     align-items: center;
     gap: 15px;
+    margin-left: auto;
 }
 
 /* Language Toggle */

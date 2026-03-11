@@ -25,34 +25,11 @@
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="phone">
-                            <span data-i18n="contact.form.phone">S&iacute;mi</span>
-                        </label>
-                        <input type="tel" id="phone" name="phone">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="subject">
-                            <span data-i18n="contact.form.subject">Efni</span> *
-                        </label>
-                        <select id="subject" name="subject" required>
-                            <option value="" data-i18n="contact.form.subject.default">-- Veldu efni --</option>
-                            <option value="general" data-i18n="contact.form.subject.general">Almennar fyrirspurnir</option>
-                            <option value="membership" data-i18n="contact.form.subject.membership">A&eth;ild a&eth; kl&uacute;bbnum</option>
-                            <option value="shop" data-i18n="contact.form.subject.shop">Verslun</option>
-                            <option value="events" data-i18n="contact.form.subject.events">Vi&eth;bur&eth;ir</option>
-                            <option value="other" data-i18n="contact.form.subject.other">Anna&eth;</option>
-                        </select>
-                    </div>
-                </div>
-
                 <div class="form-group">
                     <label for="message">
                         <span data-i18n="contact.form.message">Skilabo&eth;</span> *
                     </label>
-                    <textarea id="message" name="message" rows="6" required></textarea>
+                    <textarea id="message" name="message" rows="8" required></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-full contact-submit-btn" id="sendButton">
@@ -77,35 +54,38 @@
 
             <div id="map"></div>
 
-            <div class="contact-info-grid">
-                <div class="info-item">
-                    <span class="info-icon">&#128205;</span>
-                    <div>
-                        <h4 data-i18n="contact.info.location.title">Sta&eth;setning</h4>
-                        <p data-i18n="contact.info.location.text">Reykjav&iacute;k, &Iacute;sland</p>
+            <div class="contact-info-bar">
+                <a href="https://maps.google.com/?q=Reykjavik+Iceland" target="_blank" rel="noopener" class="info-bar-item">
+                    <svg class="info-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                        <circle cx="12" cy="9" r="2.5"/>
+                    </svg>
+                    <div class="info-bar-text">
+                        <span class="info-bar-label" data-i18n="contact.info.location.title">Sta&eth;setning</span>
+                        <span class="info-bar-value" data-i18n="contact.info.location.text">Reykjav&iacute;k, &Iacute;sland</span>
                     </div>
-                </div>
-                <div class="info-item">
-                    <span class="info-icon">&#128336;</span>
-                    <div>
-                        <h4 data-i18n="contact.info.hours.title">Opnunart&iacute;mi</h4>
-                        <p data-i18n="contact.info.hours.text">Eftir samkomulagi</p>
+                </a>
+                <div class="info-bar-divider"></div>
+                <a href="mailto:sleipnirmcreykjavik@gmail.com" class="info-bar-item">
+                    <svg class="info-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2"/>
+                        <path d="M22 4L12 13 2 4"/>
+                    </svg>
+                    <div class="info-bar-text">
+                        <span class="info-bar-label" data-i18n="contact.info.email.title">Netfang</span>
+                        <span class="info-bar-value">sleipnirmcreykjavik@gmail.com</span>
                     </div>
-                </div>
-                <div class="info-item">
-                    <span class="info-icon">&#128231;</span>
-                    <div>
-                        <h4 data-i18n="contact.info.email.title">Netfang</h4>
-                        <p>contact@sleipnirmc.is</p>
+                </a>
+                <div class="info-bar-divider"></div>
+                <a href="https://www.facebook.com/SleipnirMCReykjavik" target="_blank" rel="noopener" class="info-bar-item">
+                    <svg class="info-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+                    </svg>
+                    <div class="info-bar-text">
+                        <span class="info-bar-label" data-i18n="contact.info.facebook.title">Facebook</span>
+                        <span class="info-bar-value">SleipnirMCReykjavik</span>
                     </div>
-                </div>
-                <div class="info-item">
-                    <span class="info-icon">&#9889;</span>
-                    <div>
-                        <h4 data-i18n="contact.info.emergency.title">Ney&eth;artilfelli</h4>
-                        <p data-i18n="contact.info.emergency.text">Br&aelig;&eth;ur alltaf</p>
-                    </div>
-                </div>
+                </a>
             </div>
         </div>
     </div>

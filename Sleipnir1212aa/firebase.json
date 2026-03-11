@@ -1,4 +1,8 @@
 {
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs22"
+  },
   "firestore": {
     "database": "(default)",
     "location": "eur3",
@@ -11,6 +15,7 @@
       "firebase.json",
       "firebase/**",
       "docs/**",
+      "functions/**",
       "server.py",
       "public/**",
       "**/.*",
