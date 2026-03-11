@@ -1057,8 +1057,21 @@ window.navigateGallery = navigateGallery;
 window.goToSlide = goToSlide;
 window.changePage = changePage;
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize shop — runs immediately (SPA: DOM is ready when skeleton.js loads this script)
+(function initShop() {
+    // Guard against concurrent loadProducts calls
+    let isLoading = false;
+    const originalLoadProducts = loadProducts;
+    loadProducts = async function() {
+        if (isLoading) return;
+        isLoading = true;
+        try {
+            await originalLoadProducts();
+        } finally {
+            isLoading = false;
+        }
+    };
+
     // Set up category filter functionality
     document.querySelectorAll('.filter-buttons .btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -1069,56 +1082,20 @@ document.addEventListener('DOMContentLoaded', () => {
             displayProducts();
         });
     });
-    
-    // Wait for Firebase auth to initialize before loading products
-    // This ensures we have the correct member status before filtering
-    let authInitialized = false;
-    
-    // Check if auth is already initialized
-    if (window.firebase && window.firebase.auth && window.firebase.auth().currentUser !== undefined) {
-        authInitialized = true;
-    }
-    
-    // If auth is already initialized, load products after a short delay
-    // Otherwise, wait for the first auth state change
-    if (authInitialized) {
-        setTimeout(() => {
-            console.log('Shop: Loading products (auth already initialized)');
-            loadProducts();
-            updateCartUI();
-        }, 500);
-    } else {
-        // Set up a one-time listener for auth initialization
-        const authListener = (event) => {
-            console.log('Shop: Auth initialized, loading products');
-            window.removeEventListener('authStateChanged', authListener);
-            loadProducts();
-            updateCartUI();
-        };
-        window.addEventListener('authStateChanged', authListener);
-        
-        // Fallback: load products after 2 seconds if auth doesn't initialize
-        setTimeout(() => {
-            if (products.length === 0) {
-                console.log('Shop: Loading products (fallback timeout)');
-                window.removeEventListener('authStateChanged', authListener);
-                loadProducts();
-                updateCartUI();
-            }
-        }, 2000);
-    }
-    
-    // Also load when auth state changes
+
+    // Load products immediately
+    loadProducts();
+    updateCartUI();
+
+    // Reload on auth state changes (member-only product visibility)
     firebase.auth().onAuthStateChanged(() => {
-        // Reload products to update member-only visibility
         if (document.getElementById('productGrid')) {
             if (products.length > 0) {
-                // If products are already loaded, just re-display with new auth state
                 displayProducts();
             } else {
-                // Otherwise load products from Firebase
                 loadProducts();
             }
         }
+        updateCartUI();
     });
-});
+})();

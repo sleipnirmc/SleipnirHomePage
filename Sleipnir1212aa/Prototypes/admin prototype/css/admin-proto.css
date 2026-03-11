@@ -534,7 +534,7 @@ input, select, textarea {
 
 .stat-card-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
     margin-bottom: 24px;
 }
@@ -548,6 +548,15 @@ input, select, textarea {
     align-items: center;
     gap: 20px;
     transition: all 0.3s ease;
+}
+
+.stat-card--clickable {
+    cursor: pointer;
+}
+
+.stat-card--clickable:hover {
+    border-color: var(--mc-red);
+    background: var(--surface-2);
 }
 
 .stat-card:hover {
@@ -852,23 +861,23 @@ th.sort-desc .sort-icon::after {
 }
 
 .badge--pending {
-    background: rgba(245, 158, 11, 0.15);
-    color: #f59e0b;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--off-white);
 }
 
 .badge--processing {
-    background: rgba(59, 130, 246, 0.15);
-    color: #3b82f6;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--off-white);
 }
 
 .badge--completed {
-    background: rgba(34, 197, 94, 0.15);
-    color: #22c55e;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--gray);
 }
 
 .badge--cancelled {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--gray-dark);
 }
 
 .badge--admin {
@@ -1437,6 +1446,17 @@ th.sort-desc .sort-icon::after {
     font-size: 0.85rem;
 }
 
+.btn-outline {
+    background: transparent;
+    border: 1px solid rgba(207, 35, 66, 0.3);
+    color: var(--off-white);
+}
+
+.btn-outline:hover {
+    background: rgba(207, 35, 66, 0.1);
+    border-color: var(--mc-red);
+}
+
 .btn-icon {
     width: 32px;
     height: 32px;
@@ -1693,6 +1713,10 @@ th.sort-desc .sort-icon::after {
     margin-bottom: 24px;
 }
 
+.dashboard-row--single {
+    grid-template-columns: 1fr;
+}
+
 .chart-card {
     background: var(--surface-1);
     border: var(--border-red);
@@ -1727,11 +1751,18 @@ th.sort-desc .sort-icon::after {
     padding: 24px;
 }
 
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
 .activity-title {
     font-family: 'Cinzel', serif;
     font-size: 0.9rem;
     color: var(--off-white);
-    margin-bottom: 16px;
+    margin-bottom: 0;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1762,28 +1793,28 @@ th.sort-desc .sort-icon::after {
 }
 
 .activity-dot--pending {
-    background: var(--warning);
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+    background: var(--off-white);
+    box-shadow: 0 0 8px rgba(179, 178, 178, 0.2);
 }
 
 .activity-dot--completed {
-    background: var(--success);
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
+    background: var(--gray);
+    box-shadow: 0 0 8px rgba(136, 136, 136, 0.2);
 }
 
 .activity-dot--processing {
-    background: var(--info);
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+    background: var(--off-white);
+    box-shadow: 0 0 8px rgba(179, 178, 178, 0.2);
 }
 
 .activity-dot--cancelled {
-    background: var(--error);
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+    background: var(--gray-dark);
+    box-shadow: 0 0 8px rgba(85, 85, 85, 0.2);
 }
 
 .activity-dot--info {
     background: var(--gray);
-    box-shadow: 0 0 8px rgba(136, 136, 136, 0.3);
+    box-shadow: 0 0 8px rgba(136, 136, 136, 0.2);
 }
 
 .activity-text {
@@ -1797,6 +1828,15 @@ th.sort-desc .sort-icon::after {
 .activity-text strong {
     color: var(--white);
     font-weight: 600;
+}
+
+.activity-amount {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    color: var(--off-white);
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .activity-time {
@@ -2088,6 +2128,108 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .column-toggle:hover {
     border-color: rgba(255, 255, 255, 0.15);
+    color: var(--white);
+}
+
+/* Export date range */
+.export-date-range {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.export-date-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.85rem;
+    color: var(--off-white);
+    white-space: nowrap;
+}
+
+/* Export column toggle checkboxes */
+.export-column-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.export-column-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gray);
+    font-weight: 600;
+    margin-right: 6px;
+    white-space: nowrap;
+}
+
+.export-col-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px 5px 8px;
+    background: var(--surface-2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.export-col-checkbox:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--surface-3);
+}
+
+.export-col-checkbox.active {
+    border-color: rgba(207, 35, 66, 0.4);
+    background: rgba(207, 35, 66, 0.08);
+}
+
+.export-col-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.export-col-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    background: var(--surface-3);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: transparent;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.export-col-checkbox.active .export-col-check {
+    background: var(--mc-red);
+    border-color: var(--mc-red);
+    color: #fff;
+}
+
+.export-col-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.85rem;
+    color: var(--gray);
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+
+.export-col-checkbox.active .export-col-text {
+    color: var(--off-white);
+}
+
+.export-col-checkbox:hover .export-col-text {
     color: var(--white);
 }
 

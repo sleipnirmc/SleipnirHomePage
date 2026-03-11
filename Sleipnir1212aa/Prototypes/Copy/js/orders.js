@@ -67,7 +67,7 @@
             if (isExpanded) {
                 html += '<tr class="order-detail-row">' +
                     '<td colspan="8" style="padding:16px 24px;background:rgba(255,255,255,0.02);border-top:none;">' +
-                        '<div style="display:grid;grid-template-columns:280px auto;gap:32px;justify-content:start;">' +
+                        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">' +
                             '<div>' +
                                 '<h4 style="color:#cf2342;margin:0 0 10px;font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;">Pöntunarupplýsingar</h4>' +
                                 '<div style="color:#b3b2b2;font-size:0.9rem;line-height:1.8;">' +
@@ -79,7 +79,7 @@
                                     (order.completedAt ? '<div><strong>Kláruð:</strong> ' + AdminApp.formatDate(order.completedAt) + '</div>' : '') +
                                 '</div>' +
                             '</div>' +
-                            '<div style="min-width:320px;max-width:480px;">' +
+                            '<div>' +
                                 '<h4 style="color:#cf2342;margin:0 0 10px;font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;">Vörur</h4>' +
                                 '<table style="width:100%;font-size:0.9rem;color:#b3b2b2;">' +
                                     '<thead><tr style="color:#888;border-bottom:1px solid rgba(255,255,255,0.08);">' +

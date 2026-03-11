@@ -1,471 +1,413 @@
-<!-- Loading Overlay -->
-<div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-spinner"></div>
-</div>
+<div class="admin-layout">
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="adminLoadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
 
-<!-- Header -->
-<header>
-    <nav>
-        <div class="logo">
-            <a href="/" class="logo-link">
-                <span class="logo-text">SLEIPNIR MC</span>
-                <span class="location">ADMIN</span>
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+            <img src="/assets/images/SleipnirLogo.png" class="sidebar-logo" alt="Sleipnir MC">
+            <div class="sidebar-brand-text">
+                <span class="sidebar-title">SLEIPNIR MC</span>
+                <span class="sidebar-subtitle">ADMIN</span>
+            </div>
+        </div>
+        <div class="sidebar-divider"></div>
+        <nav class="sidebar-nav">
+            <a href="#" class="sidebar-link active" data-section="dashboard">
+                <span class="sidebar-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                </span>
+                <span class="sidebar-label" data-i18n="admin.nav.dashboard">Dashboard</span>
+            </a>
+            <a href="#" class="sidebar-link" data-section="members">
+                <span class="sidebar-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 010 7.75"/>
+                    </svg>
+                </span>
+                <span class="sidebar-label" data-i18n="admin.nav.members">Medlimir</span>
+            </a>
+            <a href="#" class="sidebar-link" data-section="users">
+                <span class="sidebar-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </span>
+                <span class="sidebar-label" data-i18n="admin.nav.users">Notendur</span>
+            </a>
+            <a href="#" class="sidebar-link" data-section="products">
+                <span class="sidebar-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 01-8 0"/>
+                    </svg>
+                </span>
+                <span class="sidebar-label" data-i18n="admin.nav.products">Vorur</span>
+            </a>
+            <a href="#" class="sidebar-link" data-section="events">
+                <span class="sidebar-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                </span>
+                <span class="sidebar-label" data-i18n="admin.nav.events">Vidburdir</span>
+            </a>
+            <a href="#" class="sidebar-link" data-section="orders">
+                <span class="sidebar-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                </span>
+                <span class="sidebar-label" data-i18n="admin.nav.orders">Pantanir</span>
+            </a>
+            <a href="#" class="sidebar-link" data-section="export">
+                <span class="sidebar-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </span>
+                <span class="sidebar-label" data-i18n="admin.nav.export">Utflutningur</span>
+            </a>
+        </nav>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-nav" style="flex: 0; padding-bottom: 0;">
+            <a href="/" class="sidebar-link" data-section="home">
+                <span class="sidebar-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </span>
+                <span class="sidebar-label" data-i18n="admin.nav.back_to_site">Til baka</span>
             </a>
         </div>
-        <ul class="nav-links">
-            <li><a href="/" data-i18n="admin.nav.home">Heim</a></li>
-            <li><a href="/shop" data-i18n="admin.nav.shop">Verslun</a></li>
-            <li><a href="/about" data-i18n="admin.nav.members">H&#243;purinn</a></li>
-            <li><a href="/contact" data-i18n="admin.nav.contact">Hafa Samband</a></li>
-            <li><a href="/admin" class="active" data-i18n="admin.nav.admin">ADMIN</a></li>
-        </ul>
-        <div class="user-menu" style="display: none;">
-            <span class="user-name"></span>
-            <button class="btn btn-dark btn-sm" onclick="sleipnirAuth.adminSignOut().then(() => window.location.href = '/')">
-                <span data-i18n="admin.nav.logout">&#218;tskr&#225;</span>
+        <div class="sidebar-footer">
+            <button class="sidebar-link" id="adminLogoutBtn">
+                <span class="sidebar-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
+                <span class="sidebar-label" data-i18n="admin.nav.logout">Utskra</span>
+            </button>
+            <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"/>
+                </svg>
             </button>
         </div>
-        <div class="language-toggle">
-            <button class="btn btn-dark btn-sm" onclick="toggleLanguage()">
-                <span class="is">EN</span>
-                <span class="en">IS</span>
-            </button>
-        </div>
-    </nav>
-</header>
+    </aside>
 
-<!-- Admin Container -->
-<div class="admin-container">
-    <!-- Admin Header -->
-    <div class="admin-header">
-        <h1 class="admin-title" data-i18n="admin.title">Admin Dashboard</h1>
-        <div class="admin-options" id="adminOptions">
-            <button class="options-btn" onclick="toggleOptions()">
-                <span data-i18n="admin.options">Options</span> &#9660;
+    <!-- TOP BAR -->
+    <header class="admin-topbar">
+        <div class="topbar-left">
+            <button class="topbar-hamburger" id="hamburgerBtn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
             </button>
-            <div class="options-dropdown">
-                <a href="#" onclick="showSection('members')" data-i18n="admin.options.members">View Members</a>
-                <a href="#" onclick="showSection('users')" data-i18n="admin.options.users">View Users</a>
-                <a href="#" onclick="showSection('products')" data-i18n="admin.options.products">Manage Products</a>
-                <a href="#" onclick="showSection('events')" data-i18n="admin.options.events">Manage Events</a>
-                <a href="#" onclick="showSection('orders')" data-i18n="admin.options.orders">View Orders</a>
-                <a href="#" onclick="showSection('export')" data-i18n="admin.options.export">Export Data</a>
+            <nav class="topbar-breadcrumb">
+                <span class="breadcrumb-root">Admin</span>
+                <span class="breadcrumb-sep">/</span>
+                <span class="breadcrumb-current" id="breadcrumbSection">Dashboard</span>
+            </nav>
+        </div>
+        <div class="topbar-right">
+            <button class="topbar-lang-btn" id="adminLangToggle" title="Switch language">
+                <span id="adminLangLabel">IS</span>
+            </button>
+            <div class="topbar-user">
+                <span class="topbar-user-name" id="adminUserName">...</span>
+                <div class="topbar-avatar" id="adminUserAvatar">?</div>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Dashboard Stats -->
-    <div class="dashboard-stats" id="dashboardStats">
-        <div class="stat-card">
-            <div class="stat-number" id="totalMembers">0</div>
-            <div class="stat-label" data-i18n="admin.stats.members">Total Members</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number" id="totalOrders">0</div>
-            <div class="stat-label" data-i18n="admin.stats.orders">Total Orders</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number" id="pendingOrders">0</div>
-            <div class="stat-label" data-i18n="admin.stats.pending">Pending Orders</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number" id="totalProducts">0</div>
-            <div class="stat-label" data-i18n="admin.stats.products">Products</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number" id="totalEvents">0</div>
-            <div class="stat-label" data-i18n="admin.stats.events">Events</div>
-        </div>
-    </div>
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+        <!-- DASHBOARD -->
+        <section class="admin-page active" id="page-dashboard">
+            <div class="page-header">
+                <h1 class="page-title" data-i18n="admin.dashboard.title">Dashboard</h1>
+                <p class="page-subtitle" data-i18n="admin.dashboard.subtitle">Yfirlit yfir klubbinn</p>
+            </div>
+            <div class="stat-card-grid" id="statCards"></div>
+            <div class="activity-card">
+                <div class="activity-header">
+                    <h3 class="activity-title" data-i18n="admin.dashboard.outstanding_orders">Oafgreiddar Pantanir</h3>
+                    <button class="btn btn-outline btn-sm" id="exportOutstandingBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span data-i18n="admin.dashboard.export_excel">Flytja ut Excel</span>
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="outstandingTable">
+                        <thead>
+                            <tr>
+                                <th data-i18n="admin.orders.col_order">Pontun</th>
+                                <th data-i18n="admin.orders.col_customer">Vidskiptavinur</th>
+                                <th data-i18n="admin.orders.col_items">Vorur</th>
+                                <th data-i18n="admin.orders.col_amount">Upphaed</th>
+                                <th data-i18n="admin.orders.col_date">Dagsetning</th>
+                            </tr>
+                        </thead>
+                        <tbody id="outstandingTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
-    <!-- Members Section -->
-    <div class="admin-section" id="membersSection">
-        <div class="section-header">
-            <h2 class="section-title" data-i18n="admin.members.title">Club Members</h2>
-        </div>
+        <!-- MEMBERS -->
+        <section class="admin-page" id="page-members">
+            <div class="page-header">
+                <h1 class="page-title" data-i18n="admin.members.title">Medlimir</h1>
+                <p class="page-subtitle" data-i18n="admin.members.subtitle">Klubbmedlimir</p>
+            </div>
+            <div class="page-toolbar">
+                <input type="text" class="toolbar-search" id="memberSearch" data-i18n-placeholder="admin.members.search_placeholder" placeholder="Leita ad medlimi...">
+                <select class="toolbar-select" id="memberChapterFilter">
+                    <option value="all" data-i18n="admin.members.filter_all">Oll svaedi</option>
+                    <option value="Reykjavik" data-i18n="admin.members.filter_reykjavik">Reykjavik</option>
+                    <option value="Akureyri" data-i18n="admin.members.filter_akureyri">Akureyri</option>
+                </select>
+                <div class="toolbar-view-toggle">
+                    <button class="view-btn active" data-view="grid" id="memberGridBtn" title="Grid view">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                    </button>
+                    <button class="view-btn" data-view="list" id="memberListBtn" title="List view">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="member-grid" id="memberGrid"></div>
+        </section>
 
-        <div style="margin-bottom: 20px;">
-            <input type="text" class="admin-input" data-i18n-placeholder="admin.members.search" placeholder="Search members..." id="memberSearch" style="max-width: 400px;">
-        </div>
-
-        <div id="membersContainer" style="display: grid; gap: 20px;">
-            <!-- Members will be loaded here -->
-        </div>
-    </div>
-
-    <!-- Users Section -->
-    <div class="admin-section" id="usersSection">
-        <div class="section-header">
-            <h2 class="section-title" data-i18n="admin.users.title">Registered Users</h2>
-            <div class="mode-toggle">
-                <label class="toggle-switch">
-                    <input type="checkbox" id="userManagementMode" onchange="toggleUserManagementMode()">
-                    <span class="toggle-slider"></span>
+        <!-- USERS -->
+        <section class="admin-page" id="page-users">
+            <div class="page-header">
+                <h1 class="page-title" data-i18n="admin.users.title">Notendur</h1>
+                <p class="page-subtitle" data-i18n="admin.users.subtitle">Skradir notendur</p>
+            </div>
+            <div class="page-toolbar">
+                <input type="text" class="toolbar-search" id="userSearch" data-i18n-placeholder="admin.users.search_placeholder" placeholder="Leita ad notanda...">
+                <select class="toolbar-select" id="userFilter">
+                    <option value="all" data-i18n="admin.users.filter_all">Allir</option>
+                    <option value="members" data-i18n="admin.users.filter_members">Medlimir</option>
+                    <option value="nonmembers" data-i18n="admin.users.filter_guests">Gestir</option>
+                </select>
+                <label class="form-toggle-label">
+                    <input type="checkbox" class="form-toggle" id="userRemovalMode">
+                    <span data-i18n="admin.users.removal_mode">Eyda ham</span>
                 </label>
-                <span id="modeLabel" class="mode-label" data-i18n="admin.users.mode.member">Member Management Mode</span>
+                <button class="btn btn-secondary btn-sm" id="bulkAddMembersBtn" data-i18n="admin.users.bulk_add">Baeta vid medlimum</button>
+                <button class="btn btn-secondary btn-sm" id="syncRealMembersBtn" data-i18n="admin.users.sync_members">Samstilla medlimi</button>
+                <button class="btn btn-danger btn-sm hidden" id="bulkDeleteBtn" data-i18n="admin.users.bulk_delete">Eyda voldum</button>
             </div>
-        </div>
-
-        <div style="margin-bottom: 20px;">
-            <input type="text" class="admin-input" data-i18n-placeholder="admin.users.search" placeholder="Search users..." id="userSearch" style="max-width: 400px;">
-            <select class="admin-select" id="userFilter" style="max-width: 200px; margin-left: 10px;">
-                <option value="all" data-i18n="admin.users.filter.all">All Users</option>
-                <option value="members" data-i18n="admin.users.filter.members">Members Only</option>
-                <option value="non-members" data-i18n="admin.users.filter.non_members">Non-Members</option>
-            </select>
-            <button class="admin-btn secondary" onclick="showBulkMemberModal()" style="margin-left: 10px;" data-i18n="admin.users.bulk_member">
-                Bulk Member Management
-            </button>
-            <button class="admin-btn secondary" onclick="syncRealMembers()" style="margin-left: 10px;" data-i18n="admin.users.sync_members">
-                Sync Real Members
-            </button>
-            <button class="admin-btn delete" onclick="bulkDeleteUsers()" style="margin-left: 10px; display: none;" id="bulkDeleteBtn" data-i18n="admin.users.delete_selected">
-                Delete Selected Users
-            </button>
-        </div>
-
-        <table class="orders-table">
-            <thead>
-                <tr>
-                    <th data-i18n="admin.users.th.id">User ID</th>
-                    <th data-i18n="admin.users.th.name">Name</th>
-                    <th data-i18n="admin.users.th.email">Email</th>
-                    <th data-i18n="admin.users.th.joined">Joined</th>
-                    <th data-i18n="admin.users.th.status">Status</th>
-                    <th data-i18n="admin.users.th.last_login">Last Login</th>
-                    <th data-i18n="admin.users.th.actions">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="usersTableBody">
-                <!-- Users will be loaded here -->
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Products Section -->
-    <div class="admin-section" id="productsSection">
-        <div class="section-header">
-            <h2 class="section-title" data-i18n="admin.products.title">Manage Products</h2>
-        </div>
-
-        <div class="admin-tabs">
-            <button class="tab-btn active" onclick="switchTab('addProduct')" data-i18n="admin.products.tab.add">Add Product</button>
-            <button class="tab-btn" onclick="switchTab('viewProducts')" data-i18n="admin.products.tab.view">View Products</button>
-        </div>
-
-        <!-- Add Product Tab -->
-        <div class="tab-content active" id="addProductTab">
-            <form class="admin-form" id="addProductForm">
-                <div class="form-group">
-                    <label data-i18n="admin.products.name_is">Product Name (Icelandic)</label>
-                    <input type="text" class="admin-input" id="productNameIs" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="admin.products.name_en">Product Name (English)</label>
-                    <input type="text" class="admin-input" id="productNameEn" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="admin.products.description">Description</label>
-                    <textarea class="admin-textarea" id="productDescription" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="admin.products.category">Category</label>
-                    <select class="admin-select" id="productCategory" required>
-                        <option value="" data-i18n="admin.products.category.select">Select Category</option>
-                        <option value="tshirt">T-Shirt</option>
-                        <option value="hoodie">Hoodie</option>
-                        <option value="jacket">Jacket</option>
-                        <option value="jeans">Jeans</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="admin.products.price">Price (ISK)</label>
-                    <input type="number" class="admin-input" id="productPrice" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="admin.products.sizes">Available Sizes</label>
-                    <div id="sizesContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="admin.products.members_only">Members Only</label>
-                    <select class="admin-select" id="productMembersOnly">
-                        <option value="false" data-i18n="admin.no">No</option>
-                        <option value="true" data-i18n="admin.yes">Yes</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="admin.products.images">Product Images</label>
-                    <div class="drop-zone" id="productDropZone">
-                        <p data-i18n="admin.products.drop_zone">Drag & drop images here or click to upload</p>
-                        <input type="file" id="productImages" multiple accept="image/*" style="display: none;">
-                    </div>
-                    <div id="imagePreview" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
-                </div>
-                <button type="submit" class="admin-btn" data-i18n="admin.products.btn.add">Add Product</button>
-            </form>
-        </div>
-
-        <!-- View Products Tab -->
-        <div class="tab-content" id="viewProductsTab">
-            <div class="admin-grid" id="productsGrid">
-                <!-- Products will be loaded here -->
+            <div class="table-container">
+                <table class="data-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="displayName" data-i18n="admin.users.col_name">Nafn <span class="sort-icon"></span></th>
+                            <th data-sort="email" data-i18n="admin.users.col_email">Netfang <span class="sort-icon"></span></th>
+                            <th data-sort="role" data-i18n="admin.users.col_role">Hlutverk <span class="sort-icon"></span></th>
+                            <th data-sort="createdAt" data-i18n="admin.users.col_joined">Skradur <span class="sort-icon"></span></th>
+                            <th data-sort="lastLogin" data-i18n="admin.users.col_last_login">Sidasta innskraning <span class="sort-icon"></span></th>
+                            <th data-sort="members" data-i18n="admin.users.col_status">Stada <span class="sort-icon"></span></th>
+                            <th data-i18n="admin.users.col_actions">Adgerdir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody"></tbody>
+                </table>
             </div>
-        </div>
-    </div>
+            <div class="table-pagination" id="usersPagination"></div>
+        </section>
 
-    <!-- Events Section -->
-    <div class="admin-section" id="eventsSection">
-        <div class="section-header">
-            <h2 class="section-title" data-i18n="admin.events.title">Manage Events</h2>
-        </div>
-
-        <div class="admin-tabs">
-            <button class="tab-btn active" onclick="switchEventTab('addEvent')" data-i18n="admin.events.tab.add">Add Event</button>
-            <button class="tab-btn" onclick="switchEventTab('viewEvents')" data-i18n="admin.events.tab.view">View Events</button>
-        </div>
-
-        <!-- Add Event Tab -->
-        <div class="tab-content active" id="addEventTab">
-            <form class="admin-form" id="addEventForm">
-                <div class="form-group">
-                    <label data-i18n="admin.events.name_is">Event Name (Icelandic)</label>
-                    <input type="text" class="admin-input" id="eventNameIs" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="admin.events.name_en">Event Name (English)</label>
-                    <input type="text" class="admin-input" id="eventNameEn" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="admin.events.description">Description</label>
-                    <textarea class="admin-textarea" id="eventDescription" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="admin.events.date">Date & Time</label>
-                    <input type="datetime-local" class="admin-input" id="eventDate" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="admin.events.location">Location</label>
-                    <input type="text" class="admin-input" id="eventLocation" required>
-                </div>
-                <div class="form-group">
-                    <label data-i18n="admin.events.image">Event Image</label>
-                    <div class="drop-zone" id="eventDropZone">
-                        <p data-i18n="admin.events.drop_zone">Drag & drop image here or click to upload</p>
-                        <input type="file" id="eventImage" accept="image/*" style="display: none;">
-                    </div>
-                    <div id="eventImagePreview" style="margin-top: 10px;"></div>
-                </div>
-                <button type="submit" class="admin-btn" data-i18n="admin.events.btn.add">Add Event</button>
-            </form>
-        </div>
-
-        <!-- View Events Tab -->
-        <div class="tab-content" id="viewEventsTab">
-            <div class="admin-grid" id="eventsGrid">
-                <!-- Events will be loaded here -->
+        <!-- PRODUCTS -->
+        <section class="admin-page" id="page-products">
+            <div class="page-header">
+                <h1 class="page-title" data-i18n="admin.products.title">Vorur</h1>
+                <p class="page-subtitle" data-i18n="admin.products.subtitle">Vorustjornun</p>
             </div>
-        </div>
-    </div>
-
-    <!-- Orders Section -->
-    <div class="admin-section" id="ordersSection">
-        <div class="section-header">
-            <h2 class="section-title" data-i18n="admin.orders.title">Manage Orders</h2>
-        </div>
-
-        <div class="admin-tabs">
-            <button class="tab-btn active" onclick="switchOrderTab('pending')" data-i18n="admin.orders.tab.pending">Pending Orders</button>
-            <button class="tab-btn" onclick="switchOrderTab('completed')" data-i18n="admin.orders.tab.completed">Completed Orders</button>
-        </div>
-
-        <!-- Orders Tables -->
-        <div class="tab-content active" id="pendingOrdersTab">
-            <table class="orders-table">
-                <thead>
-                    <tr>
-                        <th data-i18n="admin.orders.th.id">Order ID</th>
-                        <th data-i18n="admin.orders.th.customer">Customer</th>
-                        <th data-i18n="admin.orders.th.items">Items</th>
-                        <th data-i18n="admin.orders.th.total">Total</th>
-                        <th data-i18n="admin.orders.th.date">Date</th>
-                        <th data-i18n="admin.orders.th.status">Status</th>
-                        <th data-i18n="admin.orders.th.actions">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="pendingOrdersBody">
-                    <!-- Orders will be loaded here -->
-                </tbody>
-            </table>
-        </div>
-
-        <div class="tab-content" id="completedOrdersTab">
-            <table class="orders-table">
-                <thead>
-                    <tr>
-                        <th data-i18n="admin.orders.th.id">Order ID</th>
-                        <th data-i18n="admin.orders.th.customer">Customer</th>
-                        <th data-i18n="admin.orders.th.items">Items</th>
-                        <th data-i18n="admin.orders.th.total">Total</th>
-                        <th data-i18n="admin.orders.th.date">Date</th>
-                        <th data-i18n="admin.orders.th.completed">Completed</th>
-                    </tr>
-                </thead>
-                <tbody id="completedOrdersBody">
-                    <!-- Orders will be loaded here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Export Section -->
-    <div class="admin-section" id="exportSection">
-        <div class="section-header">
-            <h2 class="section-title" data-i18n="admin.export.title">Export Data</h2>
-        </div>
-
-        <div class="form-group">
-            <label data-i18n="admin.export.date_range">Date Range</label>
-            <div style="display: flex; gap: 10px;">
-                <input type="date" class="admin-input" id="exportStartDate">
-                <span style="align-self: center;" data-i18n="admin.export.to">to</span>
-                <input type="date" class="admin-input" id="exportEndDate">
+            <div class="page-toolbar">
+                <button class="btn btn-primary" id="addProductBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span data-i18n="admin.products.add_btn">Baeta vid voru</span>
+                </button>
+                <input type="text" class="toolbar-search" id="productSearch" data-i18n-placeholder="admin.products.search_placeholder" placeholder="Leita ad voru...">
+                <select class="toolbar-select" id="productCategoryFilter">
+                    <option value="all" data-i18n="admin.products.filter_all">Allir flokkar</option>
+                    <option value="tshirt" data-i18n="admin.products.filter_tshirt">Bolir</option>
+                    <option value="hoodie" data-i18n="admin.products.filter_hoodie">Hettupeysa</option>
+                    <option value="jacket" data-i18n="admin.products.filter_jacket">Jakkar</option>
+                    <option value="jeans" data-i18n="admin.products.filter_jeans">Buxur</option>
+                    <option value="other" data-i18n="admin.products.filter_other">Annad</option>
+                </select>
             </div>
-        </div>
+            <div class="product-grid" id="productGrid"></div>
+        </section>
 
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button class="admin-btn" onclick="exportOrders('all')" data-i18n="admin.export.all">Export All Orders</button>
-            <button class="admin-btn secondary" onclick="exportOrders('pending')" data-i18n="admin.export.pending">Export Pending Orders</button>
-            <button class="admin-btn secondary" onclick="exportOrders('completed')" data-i18n="admin.export.completed">Export Completed Orders</button>
+        <!-- EVENTS -->
+        <section class="admin-page" id="page-events">
+            <div class="page-header">
+                <h1 class="page-title" data-i18n="admin.events.title">Vidburdir</h1>
+                <p class="page-subtitle" data-i18n="admin.events.subtitle">Vidburdastjornun</p>
+            </div>
+            <div class="page-toolbar">
+                <button class="btn btn-primary" id="addEventBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span data-i18n="admin.events.add_btn">Baeta vid vidburdi</span>
+                </button>
+                <select class="toolbar-select" id="eventCategoryFilter">
+                    <option value="all" data-i18n="admin.events.filter_all">Allir flokkar</option>
+                    <option value="ride" data-i18n="admin.events.filter_ride">Akstursferð</option>
+                    <option value="meeting" data-i18n="admin.events.filter_meeting">Fundur</option>
+                    <option value="social" data-i18n="admin.events.filter_social">Felagsstarf</option>
+                    <option value="charity" data-i18n="admin.events.filter_charity">Godgerdamal</option>
+                    <option value="maintenance" data-i18n="admin.events.filter_maintenance">Vidhald</option>
+                </select>
+                <div class="toolbar-tabs">
+                    <button class="tab-btn active" data-tab="upcoming" data-i18n="admin.events.tab_upcoming">Framundan</button>
+                    <button class="tab-btn" data-tab="past" data-i18n="admin.events.tab_past">Lidnir</button>
+                </div>
+            </div>
+            <div class="event-list" id="eventList"></div>
+        </section>
+
+        <!-- ORDERS -->
+        <section class="admin-page" id="page-orders">
+            <div class="page-header">
+                <h1 class="page-title" data-i18n="admin.orders.title">Pantanir</h1>
+                <p class="page-subtitle" data-i18n="admin.orders.subtitle">Pontunarstjornun</p>
+            </div>
+            <div class="page-toolbar">
+                <div class="toolbar-tabs">
+                    <button class="tab-btn active" data-tab="all" data-i18n="admin.orders.tab_all">Allar</button>
+                    <button class="tab-btn" data-tab="pending" data-i18n="admin.orders.tab_pending">I bid</button>
+                    <button class="tab-btn" data-tab="processing" data-i18n="admin.orders.tab_processing">I vinnslu</button>
+                    <button class="tab-btn" data-tab="completed" data-i18n="admin.orders.tab_completed">Klaradar</button>
+                    <button class="tab-btn" data-tab="cancelled" data-i18n="admin.orders.tab_cancelled">Afturkalladar</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="admin.orders.col_order_num">Pontun #</th>
+                            <th data-i18n="admin.orders.col_customer">Vidskiptavinur</th>
+                            <th data-i18n="admin.orders.col_email">Netfang</th>
+                            <th data-i18n="admin.orders.col_items">Vorur</th>
+                            <th data-i18n="admin.orders.col_total">Samtals</th>
+                            <th data-i18n="admin.orders.col_date">Dagsetning</th>
+                            <th data-i18n="admin.orders.col_status">Stada</th>
+                            <th data-i18n="admin.orders.col_actions">Adgerdir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- DATA EXPORT -->
+        <section class="admin-page" id="page-export">
+            <div class="page-header">
+                <h1 class="page-title" data-i18n="admin.export.title">Gogn og Utflutningur</h1>
+                <p class="page-subtitle" data-i18n="admin.export.subtitle">Skoda og flytja ut gogn</p>
+            </div>
+            <div class="page-toolbar">
+                <div class="toolbar-tabs">
+                    <button class="tab-btn active" data-tab="orders" data-i18n="admin.export.tab_orders">Pantanir</button>
+                    <button class="tab-btn" data-tab="users" data-i18n="admin.export.tab_users">Notendur</button>
+                    <button class="tab-btn" data-tab="members" data-i18n="admin.export.tab_members">Medlimir</button>
+                    <button class="tab-btn" data-tab="products" data-i18n="admin.export.tab_products">Vorur</button>
+                </div>
+                <button class="btn btn-primary" id="exportCsvBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span data-i18n="admin.export.csv_btn">Flytja ut CSV</span>
+                </button>
+            </div>
+            <div class="export-filters" id="exportFilters"></div>
+            <div class="table-container">
+                <table class="data-table" id="exportTable">
+                    <thead id="exportTableHead"></thead>
+                    <tbody id="exportTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content" id="modalContent">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <button class="modal-close" id="modalCloseBtn">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer" id="modalFooter"></div>
+    </div>
+</div>
+
+<!-- TEMPLATE SELECTION MODAL -->
+<div class="modal-overlay" id="templateModalOverlay">
+    <div class="modal-content" style="max-width:1000px;">
+        <div class="modal-header">
+            <h2 class="modal-title" data-i18n="admin.members.template_title">Velja snidmat</h2>
+            <button class="modal-close" onclick="AdminApp.closeTemplateModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="templateGrid"></div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="AdminApp.closeTemplateModal()" data-i18n="admin.common.cancel">Haetta vid</button>
+            <button class="btn btn-primary" id="saveTemplateBtn" data-i18n="admin.members.save_template">Vista snidmat</button>
         </div>
     </div>
 </div>
 
-<!-- Template Preview Modal -->
-<div class="template-preview-modal" id="templateModal">
-    <div class="template-preview-content">
-        <span class="close-modal" onclick="closeTemplateModal()">&times;</span>
-        <div class="template-preview-header">
-            <h2 style="color: var(--white); margin: 0;">Select Member Card Template</h2>
+<!-- BULK MEMBER MANAGEMENT MODAL -->
+<div class="modal-overlay" id="bulkMemberModalOverlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" data-i18n="admin.users.bulk_title">Bua til medlimi i magni</h2>
+            <button class="modal-close" onclick="AdminApp.closeBulkMemberModal()">&times;</button>
         </div>
-        <div class="template-preview-grid" id="templateGrid">
-            <!-- Templates will be inserted here -->
-        </div>
-        <div style="text-align: center;">
-            <button class="admin-btn" onclick="saveTemplateSelection()" data-i18n="admin.save">Save Template Selection</button>
-            <button class="admin-btn secondary" onclick="closeTemplateModal()" data-i18n="admin.cancel">Cancel</button>
-        </div>
-    </div>
-</div>
-
-<!-- Bulk Member Management Modal -->
-<div id="bulkMemberModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--norse-black); border: 2px solid var(--mc-red); padding: 30px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="color: var(--white); margin: 0;">Bulk Member Management</h2>
-            <button onclick="closeBulkMemberModal()" style="background: none; border: none; color: var(--white); font-size: 24px; cursor: pointer;">&times;</button>
-        </div>
-
-        <div class="admin-form">
+        <div class="modal-body">
             <div class="form-group">
-                <label>Add Members by Email (one per line)</label>
-                <textarea id="bulkMemberEmails" class="admin-textarea" rows="10" placeholder="user1@example.com&#10;user2@example.com&#10;user3@example.com"></textarea>
-                <small style="color: #888;">Enter email addresses of users who should be members. Only existing users will be updated.</small>
+                <label class="form-label" data-i18n="admin.users.bulk_emails_label">Netfong (eitt per linu)</label>
+                <textarea class="form-textarea" id="bulkMemberEmails" rows="5" data-i18n-placeholder="admin.users.bulk_emails_placeholder" placeholder="email@example.com"></textarea>
             </div>
-
             <div class="form-group">
-                <label>Or Add Members by Email Domain</label>
-                <input type="text" id="memberDomain" class="admin-input" placeholder="@sleipnirmc.is">
-                <small style="color: #888;">All users with this email domain will be made members.</small>
+                <label class="form-label" data-i18n="admin.users.bulk_domain_label">Eda len</label>
+                <input type="text" class="form-input" id="memberDomain" data-i18n-placeholder="admin.users.bulk_domain_placeholder" placeholder="@example.com">
             </div>
-
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="admin-btn" onclick="processBulkMembers()">Add Members</button>
-                <button class="admin-btn secondary" onclick="closeBulkMemberModal()" data-i18n="admin.cancel">Cancel</button>
-            </div>
-
-            <div id="bulkMemberResults" style="margin-top: 20px; display: none;">
-                <h3 style="color: var(--white);">Results:</h3>
+            <div id="bulkMemberResults" style="display:none;">
                 <div id="bulkMemberResultsContent"></div>
             </div>
         </div>
-    </div>
-</div>
-
-<!-- Edit Product Modal -->
-<div id="editProductModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--norse-black); border: 2px solid var(--mc-red); padding: 30px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="color: var(--white); margin: 0;">Edit Product</h2>
-            <button onclick="closeEditModal()" style="background: none; border: none; color: var(--white); font-size: 24px; cursor: pointer;">&times;</button>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="AdminApp.closeBulkMemberModal()" data-i18n="admin.common.cancel">Haetta vid</button>
+            <button class="btn btn-primary" id="processBulkMembersBtn" data-i18n="admin.users.bulk_process">Vinna ur</button>
         </div>
-
-        <form id="editProductForm" class="admin-form">
-            <input type="hidden" id="editProductId">
-
-            <div class="form-group">
-                <label data-i18n="admin.products.name_is">Product Name (Icelandic)</label>
-                <input type="text" class="admin-input" id="editProductNameIs" required>
-            </div>
-
-            <div class="form-group">
-                <label data-i18n="admin.products.name_en">Product Name (English)</label>
-                <input type="text" class="admin-input" id="editProductNameEn" required>
-            </div>
-
-            <div class="form-group">
-                <label data-i18n="admin.products.description">Description</label>
-                <textarea class="admin-textarea" id="editProductDescription" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label data-i18n="admin.products.category">Category</label>
-                <select class="admin-select" id="editProductCategory" required>
-                    <option value="" data-i18n="admin.products.category.select">Select Category</option>
-                    <option value="tshirt">T-Shirt</option>
-                    <option value="hoodie">Hoodie</option>
-                    <option value="jacket">Jacket</option>
-                    <option value="jeans">Jeans</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label data-i18n="admin.products.price">Price (ISK)</label>
-                <input type="number" class="admin-input" id="editProductPrice" required>
-            </div>
-
-            <div class="form-group">
-                <label data-i18n="admin.products.sizes">Available Sizes</label>
-                <div id="editSizesContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
-            </div>
-
-            <div class="form-group">
-                <label data-i18n="admin.products.members_only">Members Only</label>
-                <select class="admin-select" id="editProductMembersOnly">
-                    <option value="false" data-i18n="admin.no">No</option>
-                    <option value="true" data-i18n="admin.yes">Yes</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Current Images</label>
-                <div id="editCurrentImages" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;"></div>
-            </div>
-
-            <div class="form-group">
-                <label>Add New Images</label>
-                <div class="drop-zone" id="editProductDropZone">
-                    <p data-i18n="admin.products.drop_zone">Drag & drop images here or click to upload</p>
-                    <input type="file" id="editProductImages" multiple accept="image/*" style="display: none;">
-                </div>
-                <div id="editImagePreview" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
-            </div>
-
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button type="submit" class="admin-btn" data-i18n="admin.products.btn.save">Save Changes</button>
-                <button type="button" class="admin-btn secondary" onclick="closeEditModal()" data-i18n="admin.products.btn.cancel">Cancel</button>
-            </div>
-        </form>
     </div>
 </div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>

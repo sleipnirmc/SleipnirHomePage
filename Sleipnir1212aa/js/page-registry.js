@@ -81,7 +81,17 @@ window.PAGE_REGISTRY = {
             { url: '/pages/admin/sections/admin-dashboard.html' }
         ],
         externalScripts: ['https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js'],
-        scripts: ['/js/page-scripts/admin.js', '/js/page-scripts/admin-init.js'],
+        scripts: [
+            '/js/page-scripts/admin/admin-app.js',
+            '/js/page-scripts/admin/dashboard.js',
+            '/js/page-scripts/admin/members.js',
+            '/js/page-scripts/admin/users.js',
+            '/js/page-scripts/admin/products.js',
+            '/js/page-scripts/admin/events.js',
+            '/js/page-scripts/admin/orders.js',
+            '/js/page-scripts/admin/data-export.js',
+            '/js/page-scripts/admin/admin-init.js'
+        ],
         styles: ['/css/admin.css'],
         protected: true
     }

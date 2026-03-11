@@ -190,26 +190,23 @@
 
         // Date range filter (for orders only)
         if (currentTab === 'orders') {
-            filtersHTML += '<div class="export-date-range">' +
-                '<label class="export-date-label">Frá:</label>' +
-                '<input type="date" id="exportDateStart" class="filter-input" onchange="ExportModule.refresh()">' +
-                '<label class="export-date-label">Til:</label>' +
-                '<input type="date" id="exportDateEnd" class="filter-input" onchange="ExportModule.refresh()">' +
+            filtersHTML += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">' +
+                '<label style="color:#b3b2b2;font-size:0.85rem;white-space:nowrap;">Frá:</label>' +
+                '<input type="date" id="exportDateStart" class="form-input" style="max-width:160px;" onchange="ExportModule.refresh()">' +
+                '<label style="color:#b3b2b2;font-size:0.85rem;white-space:nowrap;">Til:</label>' +
+                '<input type="date" id="exportDateEnd" class="form-input" style="max-width:160px;" onchange="ExportModule.refresh()">' +
             '</div>';
         }
 
         // Column visibility checkboxes
         var cols = getColumns();
-        filtersHTML += '<div class="export-column-toggles">' +
-            '<span class="export-column-label">Dálkar:</span>';
+        filtersHTML += '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px;">' +
+            '<span style="color:#888;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;margin-right:4px;align-self:center;">Dálkar:</span>';
         cols.forEach(function(col, idx) {
-            filtersHTML += '<label class="export-col-checkbox' + (col.visible ? ' active' : '') + '">' +
-                '<input type="checkbox" class="export-col-input" ' + (col.visible ? 'checked' : '') +
+            filtersHTML += '<label style="display:inline-flex;align-items:center;gap:4px;color:#b3b2b2;font-size:0.85rem;cursor:pointer;">' +
+                '<input type="checkbox" ' + (col.visible ? 'checked' : '') +
                 ' onchange="ExportModule.toggleColumn(\'' + currentTab + '\',' + idx + ',this.checked)">' +
-                '<span class="export-col-check">' +
-                    '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2 6 5 9 10 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-                '</span>' +
-                '<span class="export-col-text">' + col.label + '</span>' +
+                ' ' + col.label +
             '</label>';
         });
         filtersHTML += '</div>';
@@ -348,7 +345,6 @@
         toggleColumn: function(tab, colIdx, visible) {
             if (tabColumns[tab] && tabColumns[tab][colIdx] !== undefined) {
                 tabColumns[tab][colIdx].visible = visible;
-                renderFilters();
                 renderTable();
             }
         },

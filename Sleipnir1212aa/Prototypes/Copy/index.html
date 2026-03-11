@@ -137,28 +137,19 @@
                     <p class="page-subtitle">Yfirlit yfir klúbbinn</p>
                 </div>
                 <div class="stat-card-grid" id="statCards"></div>
+                <div class="dashboard-row">
+                    <div class="chart-card">
+                        <h3 class="chart-title">Óafgreiddar Pantanir</h3>
+                        <div id="outstandingOrders"></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3 class="chart-title">Tekjur eftir Flokki</h3>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
                 <div class="activity-card">
-                    <div class="activity-header">
-                        <h3 class="activity-title">Óafgreiddar Pantanir</h3>
-                        <button class="btn btn-outline btn-sm" id="exportOutstandingBtn">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            Flytja út Excel
-                        </button>
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table" id="outstandingTable">
-                            <thead>
-                                <tr>
-                                    <th>Pöntun</th>
-                                    <th>Viðskiptavinur</th>
-                                    <th>Vörur</th>
-                                    <th>Upphæð</th>
-                                    <th>Dagsetning</th>
-                                </tr>
-                            </thead>
-                            <tbody id="outstandingTableBody"></tbody>
-                        </table>
-                    </div>
+                    <h3 class="activity-title">Nýleg Virkni</h3>
+                    <div class="activity-feed" id="activityFeed"></div>
                 </div>
             </section>
 

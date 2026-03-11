@@ -196,7 +196,16 @@
        Main page loader
        ------------------------------------------------------------------- */
     function loadPage(path, pushState) {
-        var registryPath = normalizePath(path);
+        // Extract query string before normalization
+        var queryString = '';
+        var pathOnly = path;
+        var qIndex = path.indexOf('?');
+        if (qIndex !== -1) {
+            queryString = path.substring(qIndex);
+            pathOnly = path.substring(0, qIndex);
+        }
+
+        var registryPath = normalizePath(pathOnly);
         var entry = window.PAGE_REGISTRY[registryPath];
 
         if (!entry) {
@@ -215,9 +224,12 @@
 
         currentPath = registryPath;
 
-        // Update URL if needed
-        if (pushState && window.location.pathname !== path) {
-            history.pushState({ path: registryPath }, '', registryPath === '/' ? '/' : registryPath);
+        // Update URL if needed (preserve query string)
+        if (pushState) {
+            var fullUrl = (registryPath === '/' ? '/' : registryPath) + queryString;
+            if (window.location.pathname + window.location.search !== fullUrl) {
+                history.pushState({ path: registryPath }, '', fullUrl);
+            }
         }
 
         // Update document title
@@ -307,8 +319,9 @@
         // Skip modifier key clicks (open in new tab)
         if (e.ctrlKey || e.metaKey || e.shiftKey) return;
 
-        // Normalize the path
-        var normalizedPath = normalizePath(href);
+        // Normalize the path (strip query string for registry lookup)
+        var hrefPath = href.split('?')[0];
+        var normalizedPath = normalizePath(hrefPath);
 
         // Only handle paths that exist in the registry
         if (!window.PAGE_REGISTRY[normalizedPath]) return;
@@ -330,12 +343,13 @@
        ------------------------------------------------------------------- */
     function init() {
         var path = window.location.pathname;
-        // Replace current history entry with normalized path
+        var search = window.location.search;
+        // Replace current history entry with normalized path (preserve query string)
         var normalizedPath = normalizePath(path);
         if (normalizedPath !== path && normalizedPath !== '/') {
-            history.replaceState({ path: normalizedPath }, '', normalizedPath);
+            history.replaceState({ path: normalizedPath }, '', normalizedPath + search);
         }
-        loadPage(path, false);
+        loadPage(path + search, false);
     }
 
     // Expose for external use

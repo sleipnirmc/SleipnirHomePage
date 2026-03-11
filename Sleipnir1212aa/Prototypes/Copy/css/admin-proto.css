@@ -1,13 +1,5 @@
 /* =============================================
-   SLEIPNIR MC — ADMIN DASHBOARD STYLES
-   Adapted from prototype, scoped for SPA shell.
-   styles.css handles base resets, fonts, and
-   global element styles. This file only adds
-   admin-specific rules.
-   ============================================= */
-
-/* =============================================
-   SECTION 1: ADMIN CSS VARIABLES
+   SECTION 1: VARIABLES & RESET
    ============================================= */
 
 :root {
@@ -52,44 +44,94 @@
     --border-red: 1px solid rgba(207, 35, 66, 0.2);
 }
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 /* =============================================
-   SECTION 2: SCROLLBAR STYLING
+   SECTION 2: FONTS
    ============================================= */
 
+@font-face {
+    font-family: 'VIKING-N';
+    src: url('../../assets/fonts/VIKING-N.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* =============================================
+   SECTION 3: BASE STYLES
+   ============================================= */
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    background: var(--pure-black);
+    color: var(--white);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--white);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+button {
+    font-family: inherit;
+}
+
+input, select, textarea {
+    font-family: inherit;
+}
+
 /* Scrollbar styling */
-.admin-layout ::-webkit-scrollbar {
+::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
-.admin-layout ::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
     background: var(--pure-black);
 }
 
-.admin-layout ::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     background: var(--surface-3);
     border-radius: 4px;
 }
 
-.admin-layout ::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
     background: var(--mc-red);
 }
 
 /* Firefox scrollbar */
-.admin-layout * {
+* {
     scrollbar-width: thin;
     scrollbar-color: var(--surface-3) var(--pure-black);
-}
-
-/* =============================================
-   SECTION 3: SPA SHELL INTEGRATION
-   ============================================= */
-
-/* Ensure admin layout fills viewport when inside SPA shell */
-#content-root:has(.admin-layout) {
-    padding: 0;
-    margin: 0;
-    max-width: none;
 }
 
 /* =============================================
@@ -182,6 +224,7 @@
 .sidebar-nav {
     display: flex;
     flex-direction: column;
+    flex: 1;
     padding: 8px;
     gap: 2px;
     overflow-y: auto;
@@ -203,8 +246,6 @@
     text-decoration: none;
     position: relative;
     white-space: nowrap;
-    font-family: inherit;
-    font-size: inherit;
 }
 
 .sidebar-link:hover {
@@ -252,13 +293,10 @@
 
 /* Sidebar footer */
 .sidebar-footer {
-    margin-top: auto;
     padding: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    justify-content: center;
 }
 
 .sidebar-collapse-btn {
@@ -398,25 +436,6 @@
     gap: 16px;
 }
 
-.topbar-lang-btn {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 6px;
-    color: var(--gray);
-    cursor: pointer;
-    padding: 6px 12px;
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    transition: all 0.2s ease;
-}
-
-.topbar-lang-btn:hover {
-    color: var(--mc-red);
-    border-color: var(--mc-red);
-}
-
 .topbar-user {
     display: flex;
     align-items: center;
@@ -467,7 +486,7 @@
     transform: translate(-50%, -50%);
     width: 400px;
     height: 400px;
-    background: url('/assets/images/SleipnirLogo.png') no-repeat center center;
+    background: url('../../assets/images/SleipnirLogo.png') no-repeat center center;
     background-size: contain;
     opacity: 0.03;
     z-index: 0;
@@ -515,7 +534,7 @@
 
 .stat-card-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 24px;
     margin-bottom: 24px;
 }
@@ -529,15 +548,6 @@
     align-items: center;
     gap: 20px;
     transition: all 0.3s ease;
-}
-
-.stat-card--clickable {
-    cursor: pointer;
-}
-
-.stat-card--clickable:hover {
-    border-color: var(--mc-red);
-    background: var(--surface-2);
 }
 
 .stat-card:hover {
@@ -682,7 +692,7 @@
     border: var(--border-subtle);
 }
 
-.admin-layout .tab-btn {
+.tab-btn {
     padding: 8px 18px;
     background: transparent;
     border: none;
@@ -695,12 +705,12 @@
     white-space: nowrap;
 }
 
-.admin-layout .tab-btn:hover {
+.tab-btn:hover {
     color: var(--white);
     background: rgba(255, 255, 255, 0.04);
 }
 
-.admin-layout .tab-btn.active {
+.tab-btn.active {
     background: var(--mc-red);
     color: #ffffff;
 }
@@ -829,8 +839,8 @@ th.sort-desc .sort-icon::after {
     background: rgba(207, 35, 66, 0.04);
 }
 
-/* Status badges — scoped under .admin-layout */
-.admin-layout .badge {
+/* Status badges */
+.badge {
     display: inline-block;
     padding: 4px 12px;
     border-radius: 20px;
@@ -842,23 +852,23 @@ th.sort-desc .sort-icon::after {
 }
 
 .badge--pending {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--off-white);
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
 }
 
 .badge--processing {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--off-white);
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
 }
 
 .badge--completed {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--gray);
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
 }
 
 .badge--cancelled {
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--gray-dark);
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
 }
 
 .badge--admin {
@@ -1352,10 +1362,10 @@ th.sort-desc .sort-icon::after {
 }
 
 /* =============================================
-   SECTION 12: BUTTONS — scoped under .admin-layout
+   SECTION 12: BUTTONS
    ============================================= */
 
-.admin-layout .btn {
+.btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -1372,70 +1382,59 @@ th.sort-desc .sort-icon::after {
     white-space: nowrap;
 }
 
-.admin-layout .btn svg {
+.btn svg {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
 }
 
-.admin-layout .btn-primary {
+.btn-primary {
     background: var(--mc-red);
     color: #ffffff;
 }
 
-.admin-layout .btn-primary:hover {
+.btn-primary:hover {
     background: var(--mc-red-hover);
     transform: translateY(-1px);
     box-shadow: var(--shadow-red);
 }
 
-.admin-layout .btn-secondary {
+.btn-secondary {
     background: var(--surface-2);
     color: var(--off-white);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.admin-layout .btn-secondary:hover {
+.btn-secondary:hover {
     border-color: var(--mc-red);
     color: var(--white);
 }
 
-.admin-layout .btn-danger {
+.btn-danger {
     background: rgba(239, 68, 68, 0.15);
     color: #ef4444;
     border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-.admin-layout .btn-danger:hover {
+.btn-danger:hover {
     background: #ef4444;
     color: #ffffff;
     border-color: #ef4444;
 }
 
-.admin-layout .btn-ghost {
+.btn-ghost {
     background: transparent;
     color: var(--gray);
     padding: 8px;
 }
 
-.admin-layout .btn-ghost:hover {
+.btn-ghost:hover {
     color: var(--mc-red);
 }
 
-.admin-layout .btn-sm {
+.btn-sm {
     padding: 6px 14px;
     font-size: 0.85rem;
-}
-
-.admin-layout .btn-outline {
-    background: transparent;
-    border: 1px solid rgba(207, 35, 66, 0.3);
-    color: var(--off-white);
-}
-
-.admin-layout .btn-outline:hover {
-    background: rgba(207, 35, 66, 0.1);
-    border-color: var(--mc-red);
 }
 
 .btn-icon {
@@ -1471,14 +1470,14 @@ th.sort-desc .sort-icon::after {
 }
 
 /* =============================================
-   SECTION 13: FORMS — scoped under .admin-layout
+   SECTION 13: FORMS
    ============================================= */
 
-.admin-layout .form-group {
+.form-group {
     margin-bottom: 20px;
 }
 
-.admin-layout .form-label {
+.form-label {
     display: block;
     font-family: 'Cinzel', serif;
     font-size: 0.8rem;
@@ -1489,9 +1488,9 @@ th.sort-desc .sort-icon::after {
     font-weight: 600;
 }
 
-.admin-layout .form-input,
-.admin-layout .form-select,
-.admin-layout .form-textarea {
+.form-input,
+.form-select,
+.form-textarea {
     width: 100%;
     background: var(--surface-3);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1504,19 +1503,19 @@ th.sort-desc .sort-icon::after {
     outline: none;
 }
 
-.admin-layout .form-input::placeholder,
-.admin-layout .form-textarea::placeholder {
+.form-input::placeholder,
+.form-textarea::placeholder {
     color: var(--gray-dark);
 }
 
-.admin-layout .form-input:focus,
-.admin-layout .form-select:focus,
-.admin-layout .form-textarea:focus {
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
     border-color: var(--mc-red);
     box-shadow: 0 0 0 3px rgba(207, 35, 66, 0.1);
 }
 
-.admin-layout .form-select {
+.form-select {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -1527,12 +1526,12 @@ th.sort-desc .sort-icon::after {
     cursor: pointer;
 }
 
-.admin-layout .form-select option {
+.form-select option {
     background: var(--surface-1);
     color: var(--white);
 }
 
-.admin-layout .form-textarea {
+.form-textarea {
     min-height: 100px;
     resize: vertical;
     line-height: 1.5;
@@ -1694,10 +1693,6 @@ th.sort-desc .sort-icon::after {
     margin-bottom: 24px;
 }
 
-.dashboard-row--single {
-    grid-template-columns: 1fr;
-}
-
 .chart-card {
     background: var(--surface-1);
     border: var(--border-red);
@@ -1721,6 +1716,112 @@ th.sort-desc .sort-icon::after {
     max-height: 260px;
 }
 
+/* Outstanding Orders Widget */
+.outstanding-summary {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.outstanding-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.outstanding-stat-value {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--white);
+}
+
+.outstanding-stat-pending {
+    color: var(--warning);
+}
+
+.outstanding-stat-processing {
+    color: var(--info);
+}
+
+.outstanding-stat-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.8rem;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.outstanding-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.outstanding-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.outstanding-row:last-child {
+    border-bottom: none;
+}
+
+.outstanding-row-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+}
+
+.outstanding-order-id {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    color: var(--mc-red);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.outstanding-customer {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.95rem;
+    color: var(--white);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.outstanding-items {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.85rem;
+    color: var(--gray);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.outstanding-row-end {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.outstanding-amount {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    color: var(--off-white);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
 /* =============================================
    SECTION 15: ACTIVITY FEED
    ============================================= */
@@ -1732,18 +1833,11 @@ th.sort-desc .sort-icon::after {
     padding: 24px;
 }
 
-.activity-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
 .activity-title {
     font-family: 'Cinzel', serif;
     font-size: 0.9rem;
     color: var(--off-white);
-    margin-bottom: 0;
+    margin-bottom: 16px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1774,28 +1868,28 @@ th.sort-desc .sort-icon::after {
 }
 
 .activity-dot--pending {
-    background: var(--off-white);
-    box-shadow: 0 0 8px rgba(179, 178, 178, 0.2);
+    background: var(--warning);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
 }
 
 .activity-dot--completed {
-    background: var(--gray);
-    box-shadow: 0 0 8px rgba(136, 136, 136, 0.2);
+    background: var(--success);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
 }
 
 .activity-dot--processing {
-    background: var(--off-white);
-    box-shadow: 0 0 8px rgba(179, 178, 178, 0.2);
+    background: var(--info);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
 }
 
 .activity-dot--cancelled {
-    background: var(--gray-dark);
-    box-shadow: 0 0 8px rgba(85, 85, 85, 0.2);
+    background: var(--error);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
 }
 
 .activity-dot--info {
     background: var(--gray);
-    box-shadow: 0 0 8px rgba(136, 136, 136, 0.2);
+    box-shadow: 0 0 8px rgba(136, 136, 136, 0.3);
 }
 
 .activity-text {
@@ -2112,108 +2206,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: var(--white);
 }
 
-/* Export date range */
-.export-date-range {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-}
-
-.export-date-label {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 0.85rem;
-    color: var(--off-white);
-    white-space: nowrap;
-}
-
-/* Export column toggle checkboxes */
-.export-column-toggles {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 16px;
-}
-
-.export-column-label {
-    font-family: 'Cinzel', serif;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--gray);
-    font-weight: 600;
-    margin-right: 6px;
-    white-space: nowrap;
-}
-
-.export-col-checkbox {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 12px 5px 8px;
-    background: var(--surface-2);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    user-select: none;
-}
-
-.export-col-checkbox:hover {
-    border-color: rgba(255, 255, 255, 0.15);
-    background: var(--surface-3);
-}
-
-.export-col-checkbox.active {
-    border-color: rgba(207, 35, 66, 0.4);
-    background: rgba(207, 35, 66, 0.08);
-}
-
-.export-col-input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-    pointer-events: none;
-}
-
-.export-col-check {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    border-radius: 3px;
-    background: var(--surface-3);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: transparent;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-}
-
-.export-col-checkbox.active .export-col-check {
-    background: var(--mc-red);
-    border-color: var(--mc-red);
-    color: #fff;
-}
-
-.export-col-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 0.85rem;
-    color: var(--gray);
-    transition: color 0.2s ease;
-    white-space: nowrap;
-}
-
-.export-col-checkbox.active .export-col-text {
-    color: var(--off-white);
-}
-
-.export-col-checkbox:hover .export-col-text {
-    color: var(--white);
-}
-
 /* Export info bar */
 .export-info {
     display: flex;
@@ -2235,41 +2227,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* =============================================
-   SECTION 19: LOADING OVERLAY
-   ============================================= */
-
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-.loading-overlay.hidden {
-    display: none;
-}
-
-.loading-spinner {
-    width: 36px;
-    height: 36px;
-    border: 3px solid var(--surface-3);
-    border-top-color: var(--mc-red);
-    border-radius: 50%;
-    animation: admin-spin 0.8s linear infinite;
-}
-
-@keyframes admin-spin {
-    to { transform: rotate(360deg); }
-}
-
-/* =============================================
-   SECTION 20: RESPONSIVE
+   SECTION 19: RESPONSIVE
    ============================================= */
 
 /* Large tablets / small desktops */
@@ -2478,7 +2436,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         width: 100%;
     }
 
-    .admin-layout .tab-btn {
+    .tab-btn {
         flex: 1;
         text-align: center;
         padding: 8px 12px;
@@ -2581,7 +2539,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* =============================================
-   SECTION 21: UTILITY CLASSES
+   SECTION 20: UTILITY CLASSES
    ============================================= */
 
 .text-center { text-align: center; }
@@ -2654,14 +2612,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     max-width: 400px;
 }
 
-/* Loading spinner (inline) */
+/* Loading spinner */
 .spinner {
     width: 36px;
     height: 36px;
     border: 3px solid var(--surface-3);
     border-top-color: var(--mc-red);
     border-radius: 50%;
-    animation: admin-spin 0.8s linear infinite;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 /* Skeleton loading */
