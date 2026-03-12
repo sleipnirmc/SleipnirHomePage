@@ -34,3 +34,5 @@ tasks.txt
 .env.local
 .env.production
 .env.template
+
+CLAUDE.md
