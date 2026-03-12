@@ -33,6 +33,4 @@ tasks.txt
 .env
 .env.local
 .env.production
-
-# CSS development (if modular approach not ready)
-# css/
+.env.template
