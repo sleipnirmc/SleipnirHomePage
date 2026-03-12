@@ -836,8 +836,8 @@ body.homepage {
     top: 55%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 1200px;
-    height: 1200px;
+    width: 2400px;
+    height: 2400px;
     background: url('../assets/images/SleipnirLogo.png') no-repeat center center;
     background-size: contain;
     opacity: 0.4;
