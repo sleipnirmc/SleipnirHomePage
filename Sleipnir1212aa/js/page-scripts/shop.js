@@ -1,4 +1,7 @@
 // Shop functionality
+(function() {
+'use strict';
+
 let cart = [];
 let products = [];
 let currentFilter = 'all';
@@ -253,7 +256,7 @@ async function displayProducts() {
         memberFieldType: typeof currentUserData?.userDoc?.members
     });
     
-    if (!currentUserData || !currentUserData.isMember) {
+    if (!currentUserData || (!currentUserData.isMember && !currentUserData.isAdmin)) {
         // User is not logged in or is not a member - hide members-only products
         const beforeFilter = filteredProducts.length;
         filteredProducts = filteredProducts.filter(p => !p.membersOnly);
@@ -1073,44 +1076,45 @@ window.goToSlide = goToSlide;
 window.changePage = changePage;
 
 // Initialize shop — runs immediately (SPA: DOM is ready when skeleton.js loads this script)
-(function initShop() {
-    // Guard against concurrent loadProducts calls
-    let isLoading = false;
-    const originalLoadProducts = loadProducts;
-    loadProducts = async function() {
-        if (isLoading) return;
-        isLoading = true;
-        try {
-            await originalLoadProducts();
-        } finally {
-            isLoading = false;
-        }
-    };
 
-    // Set up category filter functionality
-    document.querySelectorAll('.filter-buttons .btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.filter-buttons .btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            currentFilter = this.dataset.category;
-            currentPage = 1; // Reset to first page when filtering
+// Guard against concurrent loadProducts calls
+let isLoading = false;
+const originalLoadProducts = loadProducts;
+loadProducts = async function() {
+    if (isLoading) return;
+    isLoading = true;
+    try {
+        await originalLoadProducts();
+    } finally {
+        isLoading = false;
+    }
+};
+
+// Set up category filter functionality
+document.querySelectorAll('.filter-buttons .btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-buttons .btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentFilter = this.dataset.category;
+        currentPage = 1; // Reset to first page when filtering
+        displayProducts();
+    });
+});
+
+// Load products immediately
+loadProducts();
+updateCartUI();
+
+// Reload on auth state changes (member-only product visibility)
+firebase.auth().onAuthStateChanged(() => {
+    if (document.getElementById('productGrid')) {
+        if (products.length > 0) {
             displayProducts();
-        });
-    });
-
-    // Load products immediately
-    loadProducts();
-    updateCartUI();
-
-    // Reload on auth state changes (member-only product visibility)
-    firebase.auth().onAuthStateChanged(() => {
-        if (document.getElementById('productGrid')) {
-            if (products.length > 0) {
-                displayProducts();
-            } else {
-                loadProducts();
-            }
+        } else {
+            loadProducts();
         }
-        updateCartUI();
-    });
+    }
+    updateCartUI();
+});
+
 })();

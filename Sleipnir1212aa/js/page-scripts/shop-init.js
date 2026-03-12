@@ -4,11 +4,6 @@
 (function() {
     'use strict';
 
-    // Protect this page - require email verification
-    if (window.sleipnirAuth && window.sleipnirAuth.protectVerifiedPage) {
-        sleipnirAuth.protectVerifiedPage('/login');
-    }
-
     // Member Status Indicator - Always hidden for clean UI
     function updateMemberStatusIndicator() {
         var indicator = document.getElementById('memberStatusIndicator');
