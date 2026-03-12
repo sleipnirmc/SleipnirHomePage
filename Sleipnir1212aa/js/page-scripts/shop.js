@@ -826,6 +826,21 @@ function showOrderConfirmation(orderId) {
             margin-bottom: 30px;
             color: var(--gray);
         }
+        .order-confirmation-content .cta-button {
+            background: var(--mc-red);
+            color: #fff;
+            border: none;
+            padding: 14px 36px;
+            font-size: 16px;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .order-confirmation-content .cta-button:hover {
+            background: var(--mc-red-hover);
+        }
     `;
     document.head.appendChild(style);
 }

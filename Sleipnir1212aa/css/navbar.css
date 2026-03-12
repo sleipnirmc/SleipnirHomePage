@@ -82,7 +82,7 @@ nav {
     list-style: none;
     gap: 40px;
     flex-shrink: 0;
-    margin-left: 40px;
+    margin-left: auto;
 }
 
 .nav-links a {
@@ -340,7 +340,7 @@ nav {
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-left: auto;
+    margin-left: 0;
 }
 
 /* Language Toggle */
