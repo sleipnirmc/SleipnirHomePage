@@ -80,7 +80,10 @@ window.PAGE_REGISTRY = {
         sections: [
             { url: '/pages/admin/sections/admin-dashboard.html' }
         ],
-        externalScripts: ['https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js'],
+        externalScripts: [
+            'https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js',
+            'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js'
+        ],
         scripts: [
             '/js/page-scripts/admin/admin-app.js',
             '/js/page-scripts/admin/dashboard.js',

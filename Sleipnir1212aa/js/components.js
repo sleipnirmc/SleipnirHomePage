@@ -146,6 +146,8 @@
         html += '</div>';
 
         // Account icon (persistent — no auth-loading dance)
+        var loginLabel = t('nav.login', 'Innskrá');
+
         html += '<div class="account-menu" data-auth="' + initialAuth + '">';
         html += '<button class="ghost-btn account-icon-btn" aria-label="' + accountLabel + '" data-i18n-aria="nav.account">';
         html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
@@ -153,7 +155,8 @@
         html += '<circle cx="12" cy="7" r="4"/>';
         html += '</svg>';
         html += '</button>';
-        html += '<div class="account-dropdown">';
+        // Logged-in dropdown
+        html += '<div class="account-dropdown account-dropdown-logged-in">';
         html += '<div class="account-dropdown-header">';
         html += '<div class="account-user-name">' + cachedName + '</div>';
         html += '<div class="member-status-badge"></div>';
@@ -162,6 +165,10 @@
         html += '<a href="#" class="outstanding-orders-link">' + outstandingLabel + '</a>';
         html += '<a href="/admin" class="admin-link" style="display: none;">' + adminLabel + '</a>';
         html += '<a href="#" class="logout-btn">' + logoutLabel + '</a>';
+        html += '</div>';
+        // Logged-out dropdown
+        html += '<div class="account-dropdown account-dropdown-logged-out">';
+        html += '<a href="/login" class="login-link">' + loginLabel + '</a>';
         html += '</div>';
         html += '</div>';
 

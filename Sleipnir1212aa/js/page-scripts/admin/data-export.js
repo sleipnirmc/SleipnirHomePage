@@ -2,8 +2,8 @@
     'use strict';
 
     // =============================================
-    // DATA EXPORT MODULE — Firestore-backed export with sorting & CSV
-    // Depends on: window.AdminApp, firebase, sleipnirAuth
+    // DATA EXPORT MODULE — Firestore-backed export with sorting & Excel
+    // Depends on: window.AdminApp, firebase, sleipnirAuth, ExcelJS
     // =============================================
 
     var currentTab = 'orders';
@@ -52,7 +52,7 @@
     };
 
     var statusLabels = {
-        pending: '\u00CD bi\u00F0', processing: '\u00CD vinnslu', completed: 'Kl\u00E1ru\u00F0', cancelled: 'Afturk\u00F6llu\u00F0'
+        pending: '\u00CD bi\u00F0', processing: '\u00CD vinnslu', paid: 'Greitt', completed: 'Kl\u00E1ru\u00F0', cancelled: 'Afturk\u00F6llu\u00F0'
     };
 
     // =============================================
@@ -220,7 +220,7 @@
         }
     }
 
-    function getCellCsvValue(row, key) {
+    function getCellExportValue(row, key) {
         var raw = getCellRawValue(row, key);
 
         switch (currentTab) {
@@ -377,9 +377,13 @@
     }
 
     function loadAndRenderTab() {
-        var tableContainer = document.getElementById('exportTableBody');
-        if (tableContainer && tableContainer.parentElement) {
-            AdminApp.showLoading(tableContainer.parentElement.parentElement);
+        var tbodyEl = document.getElementById('exportTableBody');
+        var theadEl = document.getElementById('exportTableHead');
+        if (tbodyEl) {
+            tbodyEl.innerHTML = '<tr><td colspan="' + getVisibleColumns().length + '" style="text-align:center;padding:40px;"><div class="loading-spinner" style="margin:0 auto;"></div></td></tr>';
+        }
+        if (theadEl) {
+            theadEl.innerHTML = '';
         }
 
         fetchTabData(currentTab)
@@ -423,66 +427,143 @@
     }
 
     // =============================================
-    // CSV EXPORT
+    // EXCEL EXPORT (ExcelJS)
     // =============================================
 
-    function csvEscape(val) {
-        var str = String(val);
-        if (str.indexOf('"') !== -1 || str.indexOf(',') !== -1 || str.indexOf('\n') !== -1) {
-            return '"' + str.replace(/"/g, '""') + '"';
+    var BRAND = {
+        mcRed: 'FFCF2342',
+        black: 'FF000000',
+        norseBlack: 'FF1A1A1A',
+        white: 'FFFFFFFF',
+        offWhite: 'FFB3B2B2',
+        border: 'FF333333'
+    };
+
+    function applyExcelStyles(worksheet, visibleCols, rowCount) {
+        var priceKeys = { totalAmount: true, price: true };
+
+        // Column widths — estimate from header labels + some padding
+        visibleCols.forEach(function(col, idx) {
+            var colNum = idx + 1;
+            var width = Math.max(col.label.length + 4, 14);
+            if (col.key === 'items' || col.key === 'userEmail' || col.key === 'email') width = 36;
+            if (col.key === 'id') width = 16;
+            worksheet.getColumn(colNum).width = Math.min(width, 42);
+
+            if (priceKeys[col.key]) {
+                worksheet.getColumn(colNum).numFmt = '#,##0 "kr."';
+                worksheet.getColumn(colNum).alignment = { horizontal: 'right', vertical: 'middle' };
+            }
+        });
+
+        // Header row styling
+        var headerRow = worksheet.getRow(1);
+        headerRow.height = 28;
+        headerRow.eachCell(function(cell) {
+            cell.font = { bold: true, size: 11, color: { argb: BRAND.white } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND.mcRed } };
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell.border = {
+                bottom: { style: 'medium', color: { argb: BRAND.mcRed } }
+            };
+        });
+
+        // Data row styling — alternating dark fills
+        for (var r = 2; r <= rowCount + 1; r++) {
+            var row = worksheet.getRow(r);
+            var isEven = (r % 2 === 0);
+            row.eachCell({ includeEmpty: true }, function(cell) {
+                cell.font = { size: 10, color: { argb: BRAND.offWhite } };
+                cell.fill = {
+                    type: 'pattern', pattern: 'solid',
+                    fgColor: { argb: isEven ? BRAND.black : BRAND.norseBlack }
+                };
+                cell.border = {
+                    top: { style: 'thin', color: { argb: BRAND.border } },
+                    bottom: { style: 'thin', color: { argb: BRAND.border } },
+                    left: { style: 'thin', color: { argb: BRAND.border } },
+                    right: { style: 'thin', color: { argb: BRAND.border } }
+                };
+                if (!cell.alignment || !cell.alignment.horizontal) {
+                    cell.alignment = { vertical: 'middle' };
+                }
+            });
         }
-        return str;
+
+        // Freeze header row
+        worksheet.views = [{ state: 'frozen', ySplit: 1 }];
     }
 
-    function downloadCSV() {
+    function downloadExcel() {
         fetchTabData(currentTab)
             .then(function(data) {
                 var visibleCols = getVisibleColumns();
                 var filtered = applyDateFilter(data);
                 var sorted = sortData(filtered);
 
+                var workbook = new ExcelJS.Workbook();
+                workbook.creator = 'Sleipnir MC';
+
+                var sheetNames = {
+                    orders: 'Pantanir',
+                    users: 'Notendur',
+                    members: 'Me\u00F0limir',
+                    products: 'V\u00F6rur'
+                };
+                var worksheet = workbook.addWorksheet(sheetNames[currentTab] || currentTab, {
+                    properties: { tabColor: { argb: BRAND.mcRed } }
+                });
+
                 // Header row
-                var lines = [];
-                lines.push(visibleCols.map(function(c) { return csvEscape(c.label); }).join(','));
+                var headers = visibleCols.map(function(c) { return c.label; });
+                worksheet.addRow(headers);
 
                 // Data rows
                 sorted.forEach(function(row) {
-                    var rowValues = visibleCols.map(function(col) {
-                        return csvEscape(getCellCsvValue(row, col.key));
+                    var values = visibleCols.map(function(col) {
+                        var val = getCellExportValue(row, col.key);
+                        // Keep numbers as numbers for price columns
+                        if (col.key === 'totalAmount' || col.key === 'price') {
+                            return Number(getCellRawValue(row, col.key)) || 0;
+                        }
+                        return val;
                     });
-                    lines.push(rowValues.join(','));
+                    worksheet.addRow(values);
                 });
 
-                var csv = lines.join('\n');
-                var BOM = '\uFEFF'; // UTF-8 BOM for Icelandic character support
-                var blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
-                var url = URL.createObjectURL(blob);
+                // Apply brand styling
+                applyExcelStyles(worksheet, visibleCols, sorted.length);
 
-                var tabNames = {
+                var tabFileNames = {
                     orders: 'pantanir',
                     users: 'notendur',
                     members: 'medlimir',
                     products: 'vorur'
                 };
-                var filename = 'sleipnir_' + (tabNames[currentTab] || currentTab) + '_' +
-                    new Date().toISOString().split('T')[0] + '.csv';
+                var filename = 'sleipnir_' + (tabFileNames[currentTab] || currentTab) + '_' +
+                    new Date().toISOString().split('T')[0] + '.xlsx';
 
-                var link = document.createElement('a');
-                link.href = url;
-                link.download = filename;
-                link.style.display = 'none';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                return workbook.xlsx.writeBuffer().then(function(buffer) {
+                    var blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    var url = URL.createObjectURL(blob);
 
-                setTimeout(function() { URL.revokeObjectURL(url); }, 100);
+                    var link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
 
-                AdminApp.showToast(SleipnirI18n.t('admin.export.csvSuccess', 'CSV skr\u00E1 s\u00F3tt') + ': ' + filename, 'success');
-                AdminApp.logActivity('data_exported', 'CSV export: ' + currentTab + ' (' + sorted.length + ' rows)');
+                    setTimeout(function() { URL.revokeObjectURL(url); }, 100);
+
+                    AdminApp.showToast(SleipnirI18n.t('admin.export.excelSuccess', 'Excel skr\u00E1 s\u00F3tt') + ': ' + filename, 'success');
+                    AdminApp.logActivity('data_exported', 'Excel export: ' + currentTab + ' (' + sorted.length + ' rows)');
+                });
             })
             .catch(function(error) {
-                console.error('Error exporting CSV:', error);
-                AdminApp.showToast(SleipnirI18n.t('admin.export.csvError', 'Villa vi\u00F0 a\u00F0 flytja \u00FAt CSV'), 'error');
+                console.error('Error exporting Excel:', error);
+                AdminApp.showToast(SleipnirI18n.t('admin.export.excelError', 'Villa vi\u00F0 a\u00F0 flytja \u00FAt Excel'), 'error');
             });
     }
 
@@ -514,8 +595,8 @@
             }
         },
 
-        exportCSV: function() {
-            downloadCSV();
+        exportExcel: function() {
+            downloadExcel();
         }
     };
 
@@ -533,8 +614,11 @@
         renderFilters();
         loadAndRenderTab();
 
-        var csvBtn = document.getElementById('exportCsvBtn');
-        if (csvBtn) csvBtn.addEventListener('click', ExportModule.exportCSV);
+        var excelBtn = document.getElementById('exportExcelBtn');
+        if (excelBtn) {
+            excelBtn.removeEventListener('click', ExportModule.exportExcel);
+            excelBtn.addEventListener('click', ExportModule.exportExcel);
+        }
     });
 
     document.addEventListener('sectionShow', function(e) {

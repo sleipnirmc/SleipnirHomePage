@@ -851,6 +851,11 @@ th.sort-desc .sort-icon::after {
     color: var(--off-white);
 }
 
+.badge--paid {
+    background: rgba(76, 175, 80, 0.15);
+    color: #81c784;
+}
+
 .badge--completed {
     background: rgba(255, 255, 255, 0.08);
     color: var(--gray);

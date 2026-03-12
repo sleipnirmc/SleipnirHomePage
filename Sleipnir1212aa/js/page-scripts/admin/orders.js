@@ -13,6 +13,7 @@
     var statusLabels = {
         pending: '\u00CD bi\u00F0',
         processing: '\u00CD vinnslu',
+        paid: 'Greitt',
         completed: 'Kl\u00E1ru\u00F0',
         cancelled: 'Afturk\u00F6llu\u00F0'
     };
@@ -20,6 +21,7 @@
     var statusClasses = {
         pending: 'badge--pending',
         processing: 'badge--processing',
+        paid: 'badge--paid',
         completed: 'badge--completed',
         cancelled: 'badge--cancelled'
     };
@@ -90,9 +92,23 @@
                 return (item.productName || '') + ' (' + (item.size || '') + ') \u00D7' + (item.quantity || 1);
             }).join(', ');
             var isExpanded = expandedOrder === order.id;
-            var canComplete = order.status === 'pending' || order.status === 'processing';
+            var canMarkPaid = order.status === 'pending' || order.status === 'processing';
+            var canComplete = order.status === 'paid';
 
             var statusLabel = SleipnirI18n.t('admin.orders.status.' + order.status, statusLabels[order.status] || order.status);
+
+            var actionBtn = '';
+            if (canMarkPaid) {
+                actionBtn = '<button class="btn btn-sm btn-primary" onclick="event.stopPropagation();OrdersModule.markPaid(\'' + AdminApp.escapeAttr(order.id) + '\')" style="font-size:0.75rem;">' +
+                    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> ' +
+                    AdminApp.escapeHTML(SleipnirI18n.t('admin.orders.paid_btn', 'Greitt')) +
+                  '</button>';
+            } else if (canComplete) {
+                actionBtn = '<button class="btn btn-sm btn-primary" onclick="event.stopPropagation();OrdersModule.markComplete(\'' + AdminApp.escapeAttr(order.id) + '\')" style="font-size:0.75rem;">' +
+                    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> ' +
+                    AdminApp.escapeHTML(SleipnirI18n.t('admin.orders.complete', 'Kl\u00E1ra')) +
+                  '</button>';
+            }
 
             html += '<tr class="order-row' + (isExpanded ? ' expanded' : '') + '" onclick="OrdersModule.toggleRow(\'' + AdminApp.escapeAttr(order.id) + '\')" style="cursor:pointer;">' +
                 '<td style="font-family:\'Cinzel\',serif;font-weight:600;color:#cf2342;">#' + AdminApp.escapeHTML(orderId) + '</td>' +
@@ -102,14 +118,7 @@
                 '<td style="font-weight:600;white-space:nowrap;">' + AdminApp.formatPrice(order.totalAmount) + '</td>' +
                 '<td style="white-space:nowrap;">' + AdminApp.formatFirestoreDate(order.createdAt) + '</td>' +
                 '<td><span class="badge ' + (statusClasses[order.status] || '') + '">' + AdminApp.escapeHTML(statusLabel) + '</span></td>' +
-                '<td style="white-space:nowrap;">' +
-                    (canComplete
-                        ? '<button class="btn btn-sm btn-primary" onclick="event.stopPropagation();OrdersModule.markComplete(\'' + AdminApp.escapeAttr(order.id) + '\')" style="font-size:0.75rem;">' +
-                            '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> ' +
-                            AdminApp.escapeHTML(SleipnirI18n.t('admin.orders.complete', 'Kl\u00E1ra')) +
-                          '</button>'
-                        : '') +
-                '</td>' +
+                '<td style="white-space:nowrap;">' + actionBtn + '</td>' +
             '</tr>';
 
             // Expanded detail row
@@ -155,6 +164,9 @@
                             addressHTML +
                             '<div><strong>' + AdminApp.escapeHTML(SleipnirI18n.t('admin.orders.status', 'Sta\u00F0a')) + ':</strong> ' + AdminApp.escapeHTML(statusLabel) + '</div>' +
                             '<div><strong>' + AdminApp.escapeHTML(SleipnirI18n.t('admin.orders.orderDate', 'P\u00F6ntunardagur')) + ':</strong> ' + AdminApp.formatFirestoreDate(order.createdAt) + '</div>' +
+                            (order.paidAt
+                                ? '<div><strong>' + AdminApp.escapeHTML(SleipnirI18n.t('admin.orders.paidDate', 'Greitt')) + ':</strong> ' + AdminApp.formatFirestoreDate(order.paidAt) + '</div>'
+                                : '') +
                             (order.completedAt
                                 ? '<div><strong>' + AdminApp.escapeHTML(SleipnirI18n.t('admin.orders.completedDate', 'Kl\u00E1ru\u00F0')) + ':</strong> ' + AdminApp.formatFirestoreDate(order.completedAt) + '</div>'
                                 : '') +
@@ -212,6 +224,50 @@
         toggleRow: function(id) {
             expandedOrder = (expandedOrder === id) ? null : id;
             renderOrders();
+        },
+
+        markPaid: function(id) {
+            var order = null;
+            for (var i = 0; i < orders.length; i++) {
+                if (orders[i].id === id) { order = orders[i]; break; }
+            }
+            if (!order) return;
+
+            AdminApp.openModal(
+                SleipnirI18n.t('admin.orders.paid_title', 'Merkja sem greitt'),
+                '<p style="color:#b3b2b2;font-size:1.1rem;">' +
+                    AdminApp.escapeHTML(SleipnirI18n.t('admin.orders.paid_confirm', 'Merkja p\u00F6ntun sem greidda')) +
+                    ' <strong>#' + AdminApp.escapeHTML(id.slice(-6).toUpperCase()) + '</strong> ' +
+                    AdminApp.escapeHTML(SleipnirI18n.t('admin.orders.from', 'fr\u00E1')) +
+                    ' <strong>' + AdminApp.escapeHTML(order.userName || '') + '</strong>?' +
+                '</p>' +
+                '<p style="color:#888;margin-top:8px;">' +
+                    AdminApp.escapeHTML(SleipnirI18n.t('admin.orders.total', 'Samtals')) + ': ' + AdminApp.formatPrice(order.totalAmount) +
+                '</p>',
+                '<button class="btn btn-secondary" onclick="AdminApp.closeModal()">' +
+                    AdminApp.escapeHTML(SleipnirI18n.t('admin.common.cancel', 'H\u00E6tta vi\u00F0')) +
+                '</button>' +
+                '<button class="btn btn-primary" onclick="OrdersModule.confirmPaid(\'' + AdminApp.escapeAttr(id) + '\')">' +
+                    AdminApp.escapeHTML(SleipnirI18n.t('admin.orders.paid_btn', 'Greitt')) +
+                '</button>'
+            );
+        },
+
+        confirmPaid: function(id) {
+            AdminApp.db.collection('orders').doc(id).update({
+                status: 'paid',
+                paidAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+                .then(function() {
+                    AdminApp.closeModal();
+                    AdminApp.showToast(SleipnirI18n.t('admin.orders.paid_success', 'P\u00F6ntun merkt sem greidd'), 'success');
+                    AdminApp.logActivity('order_paid', 'Order #' + id.slice(-6).toUpperCase());
+                    loadOrders();
+                })
+                .catch(function(error) {
+                    console.error('Error marking order as paid:', error);
+                    AdminApp.showToast(SleipnirI18n.t('admin.orders.paid_error', 'Villa vi\u00F0 a\u00F0 merkja p\u00F6ntun sem greidda'), 'error');
+                });
         },
 
         markComplete: function(id) {

@@ -66,9 +66,19 @@ auth.onAuthStateChanged(async (user) => {
         // Cache auth state for instant UI on next page load
         cacheAuthState(true, userDocument?.displayName || user.email, isUserAdmin(), isUserMember());
 
-        // Show email verification prompt if not verified
+        // Sign out unverified users (treat as guest) unless login page is handling
         if (!user.emailVerified) {
-            showEmailVerificationPrompt();
+            const isLoginPage = window.location.pathname === '/login' ||
+                                window.location.pathname.includes('/login');
+            if (isLoginPage) {
+                // Brief wait for login.js to load and set its flag
+                await new Promise(r => setTimeout(r, 100));
+                if (window._sleipnirLoginPageHandling) return;
+            }
+            console.log('Unverified email on non-login page, signing out');
+            clearAuthCache();
+            await auth.signOut();
+            return;
         }
     } else {
         // User is signed out
@@ -337,88 +347,6 @@ async function resendVerificationEmail() {
     }
 }
 
-// Show email verification prompt
-function showEmailVerificationPrompt() {
-    // Check if prompt already exists
-    if (document.getElementById('email-verification-prompt')) {
-        return;
-    }
-    
-    const currentLang = localStorage.getItem('language') || 'is';
-    
-    const promptHTML = `
-        <div id="email-verification-prompt" style="
-            position: fixed;
-            top: 70px;
-            right: 20px;
-            background: #f8d7da;
-            color: #721c24;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            max-width: 400px;
-            z-index: 9999;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        ">
-            <div style="display: flex; justify-content: space-between; align-items: start;">
-                <div style="flex: 1;">
-                    <h4 style="margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">
-                        ${currentLang === 'is' ? 'Staðfestu netfangið þitt' : 'Verify your email'}
-                    </h4>
-                    <p style="margin: 0 0 15px 0; font-size: 14px; line-height: 1.5;">
-                        ${currentLang === 'is' 
-                            ? 'Vinsamlegast staðfestu netfangið þitt til að fá fullan aðgang að öllum eiginleikum.' 
-                            : 'Please verify your email address to access all features.'}
-                    </p>
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="sleipnirAuth.resendVerificationEmail().then(result => {
-                            if (result.success) {
-                                sleipnirAuth.showAuthMessage(result.message, false);
-                            } else {
-                                sleipnirAuth.showAuthMessage(result.error, true);
-                            }
-                        })" style="
-                            background: #721c24;
-                            color: white;
-                            border: none;
-                            padding: 8px 16px;
-                            border-radius: 4px;
-                            cursor: pointer;
-                            font-size: 14px;
-                            font-weight: 500;
-                        ">
-                            ${currentLang === 'is' ? 'Senda aftur' : 'Resend email'}
-                        </button>
-                        <button onclick="document.getElementById('email-verification-prompt').remove()" style="
-                            background: transparent;
-                            color: #721c24;
-                            border: 1px solid #721c24;
-                            padding: 8px 16px;
-                            border-radius: 4px;
-                            cursor: pointer;
-                            font-size: 14px;
-                            font-weight: 500;
-                        ">
-                            ${currentLang === 'is' ? 'Loka' : 'Close'}
-                        </button>
-                    </div>
-                </div>
-                <button onclick="document.getElementById('email-verification-prompt').remove()" style="
-                    background: transparent;
-                    border: none;
-                    color: #721c24;
-                    font-size: 24px;
-                    cursor: pointer;
-                    padding: 0;
-                    margin-left: 10px;
-                    line-height: 1;
-                ">&times;</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', promptHTML);
-}
 
 // Check if user is admin
 function isUserAdmin() {
@@ -464,7 +392,7 @@ function requireEmailVerification() {
             is: 'Vinsamlegast staðfestu netfangið þitt til að halda áfram',
             en: 'Please verify your email to continue'
         }, true);
-        showEmailVerificationPrompt();
+        window.location.href = '/login';
         return false;
     }
     
@@ -493,7 +421,6 @@ function updateUIForAuthenticatedUser() {
         accountMenus.forEach(function(menu) {
             menu.setAttribute('data-auth', 'logged-out');
         });
-        showEmailVerificationPrompt();
     }
 
     // Also update any legacy .user-menu elements (admin page inline navbar)
@@ -1127,19 +1054,10 @@ async function protectVerifiedPage(redirectUrl = '/login') {
     }
     
     if (!currentUser.emailVerified) {
-        // Authenticated but not verified
-        showAuthMessage({
-            is: 'Vinsamlegast staðfestu netfangið þitt til að fá aðgang að þessari síðu',
-            en: 'Please verify your email to access this page'
-        }, true);
-        
-        showEmailVerificationPrompt();
-        
-        // Redirect to login after a delay
-        setTimeout(() => {
-            window.location.href = redirectUrl + '?error=' + encodeURIComponent('Email verification required');
-        }, 3000);
-        
+        // Authenticated but not verified — sign out and redirect
+        clearAuthCache();
+        await auth.signOut();
+        window.location.href = redirectUrl + '?error=' + encodeURIComponent('Email verification required');
         return false;
     }
     
@@ -1162,7 +1080,6 @@ window.sleipnirAuth = {
     requireEmailVerification,
     resendVerificationEmail,
     showAuthMessage,
-    showEmailVerificationPrompt,
     getAllUsers,
     toggleUserMembership,
     deleteUser,

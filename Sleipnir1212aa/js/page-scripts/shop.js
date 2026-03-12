@@ -335,14 +335,14 @@ async function displayProducts() {
                 `}
             </div>
             
-            <div class="product-info" onclick="event.stopPropagation()">
+            <div class="product-info">
                 <h3 class="product-name">
                     <span class="is">${product.nameIs}</span>
                     <span class="en">${product.nameEn}</span>
                 </h3>
                 <p class="product-saga">${product.description}</p>
                 <p class="product-price">${formatPrice(product.price)} ISK</p>
-                <div class="size-selector">
+                <div class="size-selector" onclick="event.stopPropagation()">
                     <label class="size-label">
                         <span class="is">Stærð:</span>
                         <span class="en">Size:</span>
@@ -351,7 +351,8 @@ async function displayProducts() {
                         ${getSizeOptions(product.category, product.availableSizes)}
                     </div>
                 </div>
-                <button class="add-to-cart" 
+                <button class="add-to-cart"
+                        onclick="event.stopPropagation()"
                         data-product-id="${product.id}"
                         data-product-name="${product.nameIs}"
                         data-product-price="${product.price}">

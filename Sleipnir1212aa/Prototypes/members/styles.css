@@ -1,0 +1,369 @@
+/* ============================================
+   CSS Variables — Sleipnir Design System
+   ============================================ */
+:root {
+    --pure-black: #000000;
+    --midnight-black: #0a0a0a;
+    --norse-black: #1a1a1a;
+    --charcoal: #2a2a2a;
+    --mc-red: #cf2342;
+    --mc-red-hover: #e63856;
+    --mc-red-03: rgba(207, 35, 66, 0.3);
+    --mc-red-01: rgba(207, 35, 66, 0.1);
+    --white: #acabab;
+    --off-white: #b3b2b2;
+    --gray: #888888;
+    --shadow-red: 0 10px 30px rgba(207, 35, 66, 0.3);
+    --transition-base: all 0.3s ease;
+}
+
+/* ============================================
+   Reset & Base
+   ============================================ */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--mc-red) var(--midnight-black);
+}
+
+body {
+    margin: 0;
+    background-color: var(--pure-black);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    color: var(--white);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   Scrollbar
+   ============================================ */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--midnight-black);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--mc-red);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--mc-red-hover);
+}
+
+/* ============================================
+   Hero Section
+   ============================================ */
+.hero {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0.15) 30%,
+        rgba(0, 0, 0, 0.5) 60%,
+        rgba(0, 0, 0, 0.85) 80%,
+        rgba(0, 0, 0, 1) 100%
+    );
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding-bottom: 60px;
+}
+
+.hero-content h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 6px;
+    color: var(--white);
+    margin-bottom: 16px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.hero-content p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--gray);
+    letter-spacing: 1px;
+}
+
+/* ============================================
+   Hero / Members Separator
+   ============================================ */
+.section-separator {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        to right,
+        transparent 0%,
+        var(--mc-red-03) 20%,
+        var(--mc-red) 50%,
+        var(--mc-red-03) 80%,
+        transparent 100%
+    );
+}
+
+/* ============================================
+   Members Section
+   ============================================ */
+.members-section {
+    background-color: var(--pure-black);
+    padding: 60px 40px;
+}
+
+.members-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Section Header */
+.section-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: var(--white);
+    display: inline-block;
+    position: relative;
+    padding-bottom: 16px;
+}
+
+.section-header h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background-color: var(--mc-red);
+}
+
+/* ============================================
+   Members Grid
+   ============================================ */
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+/* ============================================
+   Member Card
+   ============================================ */
+.member-card {
+    background-color: var(--norse-black);
+    border: 1px solid var(--mc-red-03);
+    border-top: 3px solid var(--mc-red);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: var(--transition-base);
+    cursor: default;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.member-card:nth-child(1) { animation-delay: 0.1s; }
+.member-card:nth-child(2) { animation-delay: 0.2s; }
+.member-card:nth-child(3) { animation-delay: 0.3s; }
+.member-card:nth-child(4) { animation-delay: 0.4s; }
+.member-card:nth-child(5) { animation-delay: 0.5s; }
+.member-card:nth-child(6) { animation-delay: 0.6s; }
+.member-card:nth-child(7) { animation-delay: 0.7s; }
+.member-card:nth-child(8) { animation-delay: 0.8s; }
+.member-card:nth-child(9) { animation-delay: 0.9s; }
+.member-card:nth-child(10) { animation-delay: 1.0s; }
+
+.member-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--mc-red);
+    box-shadow: var(--shadow-red);
+}
+
+/* Photo Area */
+.member-photo {
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+    background-color: var(--midnight-black);
+}
+
+.member-photo svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.member-card:hover .member-photo svg {
+    transform: scale(1.05);
+}
+
+/* Info Area */
+.member-info {
+    padding: 20px;
+    text-align: center;
+}
+
+.member-name {
+    font-family: 'Iceland', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 4px;
+}
+
+.member-role {
+    color: var(--mc-red);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.member-motorcycle {
+    color: var(--gray);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 4px;
+}
+
+.member-motorcycle svg {
+    flex-shrink: 0;
+}
+
+.member-date {
+    color: var(--gray);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.85rem;
+    margin-top: 8px;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   Responsive — 1024px
+   ============================================ */
+@media (max-width: 1024px) {
+    .member-photo {
+        height: 240px;
+    }
+}
+
+/* ============================================
+   Responsive — 768px
+   ============================================ */
+@media (max-width: 768px) {
+    .hero {
+        height: 50vh;
+    }
+
+    .hero-content h1 {
+        font-size: 2.5rem;
+        letter-spacing: 4px;
+    }
+
+    .hero-content p {
+        font-size: 1.05rem;
+    }
+
+    .hero-content {
+        padding-bottom: 40px;
+    }
+
+    .member-photo {
+        height: 250px;
+    }
+
+    .section-header h2 {
+        font-size: 1.8rem;
+    }
+}
+
+/* ============================================
+   Responsive — 480px
+   ============================================ */
+@media (max-width: 480px) {
+    .hero-content h1 {
+        font-size: 2rem;
+        letter-spacing: 3px;
+    }
+
+    .hero-content p {
+        font-size: 0.95rem;
+        padding: 0 20px;
+    }
+
+    .members-section {
+        padding: 30px 20px;
+    }
+
+    .section-header h2 {
+        font-size: 1.6rem;
+    }
+}

@@ -16,18 +16,7 @@
             e.stopPropagation();
             var menu = iconBtn.closest('.account-menu');
             if (menu) {
-                var authState = menu.getAttribute('data-auth');
-                if (authState === 'logged-in') {
-                    // Toggle dropdown
-                    menu.classList.toggle('active');
-                } else {
-                    // Navigate to login
-                    if (window.sleipnirRouter) {
-                        window.sleipnirRouter.navigate('/login');
-                    } else {
-                        window.location.href = '/login';
-                    }
-                }
+                menu.classList.toggle('active');
             }
             return;
         }

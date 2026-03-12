@@ -86,8 +86,8 @@ body::before {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 75%;
-    height: 75%;
+    width: 120%;
+    height: 120%;
     background: url('../assets/images/SleipnirLogo.png') no-repeat center center;
     background-size: contain;
     opacity: 0.3;

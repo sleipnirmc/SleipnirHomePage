@@ -2,6 +2,78 @@
  * Login page script — Auth forms, tab switching, social login
  */
 (function() {
+    // Flag to prevent authentication.js from auto-signing out unverified users
+    // while login.js is handling the verification flow
+    window._sleipnirLoginPageHandling = true;
+
+    // Show verification screen replacing the form area
+    function showVerificationScreen(email) {
+        var t = window.SleipnirI18n.t;
+        var container = document.querySelector('.split-form-container');
+        if (!container) return;
+
+        container.innerHTML =
+            '<div class="verification-screen">' +
+                '<div class="verification-icon">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="80" height="80">' +
+                        '<rect x="2" y="4" width="20" height="16" rx="2"/>' +
+                        '<path d="M22 4L12 13L2 4"/>' +
+                    '</svg>' +
+                '</div>' +
+                '<h2 class="verification-title" data-i18n="login.verify.title">' +
+                    t('login.verify.title', 'Staðfestu netfangið þitt') +
+                '</h2>' +
+                '<p class="verification-message" data-i18n="login.verify.message">' +
+                    t('login.verify.message', 'Við höfum sent staðfestingarpóst á') +
+                '</p>' +
+                '<p class="verification-email">' + email + '</p>' +
+                '<p class="verification-instructions" data-i18n="login.verify.instructions">' +
+                    t('login.verify.instructions', 'Smelltu á hlekkinn í tölvupóstinum og skráðu þig svo inn aftur.') +
+                '</p>' +
+                '<div class="verification-actions">' +
+                    '<button class="verification-btn verification-btn-primary" id="verifyLoginBtn" data-i18n="login.verify.btn.login">' +
+                        t('login.verify.btn.login', 'Skrá inn aftur') +
+                    '</button>' +
+                    '<button class="verification-btn verification-btn-secondary" id="verifyGuestBtn" data-i18n="login.verify.btn.guest">' +
+                        t('login.verify.btn.guest', 'Halda áfram sem gestur') +
+                    '</button>' +
+                '</div>' +
+                '<p class="verification-note" data-i18n="login.verify.note">' +
+                    t('login.verify.note', 'Athugaðu einnig ruslpóstmöppuna ef þú finnur ekki póstinn.') +
+                '</p>' +
+            '</div>';
+
+        var loginBtn = document.getElementById('verifyLoginBtn');
+        var guestBtn = document.getElementById('verifyGuestBtn');
+
+        if (loginBtn) {
+            loginBtn.addEventListener('click', function() {
+                if (window.sleipnirRouter) {
+                    window.sleipnirRouter.navigate('/login');
+                } else {
+                    window.location.href = '/login';
+                }
+            });
+        }
+
+        if (guestBtn) {
+            guestBtn.addEventListener('click', function() {
+                if (window.sleipnirRouter) {
+                    window.sleipnirRouter.navigate('/');
+                } else {
+                    window.location.href = '/';
+                }
+            });
+        }
+    }
+
+    // Clear flag when navigating away from login page (SPA)
+    window.addEventListener('pageLoaded', function(e) {
+        if (e.detail && e.detail.path !== '/login') {
+            window._sleipnirLoginPageHandling = false;
+        }
+    });
+
     // Tab switching functionality
     var tabs = document.querySelectorAll('.tab-btn');
     var confirmGroup = document.getElementById('confirmGroup');
@@ -135,27 +207,11 @@
                     });
 
                     if (result.success) {
-                        if (result.emailVerificationSent && result.message) {
-                            sleipnirAuth.showAuthMessage(result.message, false);
-                        }
-
-                        sleipnirAuth.showAuthMessage({
-                            is: 'Aðgangur búinn til! Vinsamlegast staðfestu netfangið þitt með því að smella á hlekkinn í tölvupóstinum.',
-                            en: 'Account created! Please verify your email by clicking the link in the email we sent you.'
-                        }, false);
-
-                        authForm.reset();
-                        tabs.forEach(function(t) { t.classList.remove('active'); });
-                        tabs[0].classList.add('active');
-                        confirmGroup.style.display = 'none';
-                        nameGroup.style.display = 'none';
-                        phoneGroup.style.display = 'none';
-                        addressGroup.style.display = 'none';
-                        cityGroup.style.display = 'none';
-                        postalGroup.style.display = 'none';
-
-                        submitBtn.setAttribute('data-i18n', 'login.btn.login');
-                        submitBtn.textContent = window.SleipnirI18n.t('login.btn.login', 'Login');
+                        // Verification email already sent by signUp()
+                        // Sign out — user must verify email before getting account access
+                        await sleipnirAuth.signOut();
+                        showVerificationScreen(email);
+                        return;
                     } else {
                         sleipnirAuth.showAuthMessage(result.error, true);
                         submitBtn.disabled = false;
@@ -189,12 +245,19 @@
                                     window.location.href = '/';
                                 }, 1000);
                             } else {
-                                sleipnirAuth.showAuthMessage({
-                                    is: 'Vinsamlegast staðfestu netfangið þitt áður en þú heldur áfram. Athugaðu póstólfið þitt.',
-                                    en: 'Please verify your email before continuing. Check your inbox.'
-                                }, true);
-                                sleipnirAuth.showEmailVerificationPrompt();
-                                submitBtn.disabled = false;
+                                // Send verification email while still authenticated
+                                try {
+                                    await firebase.auth().currentUser.sendEmailVerification({
+                                        url: 'https://sleipnirmc.com/login',
+                                        handleCodeInApp: false
+                                    });
+                                } catch (verifyErr) {
+                                    console.error('Error sending verification email:', verifyErr);
+                                }
+                                // Sign out — user stays as guest until verified
+                                await sleipnirAuth.signOut();
+                                showVerificationScreen(email);
+                                return;
                             }
                         } else {
                             sleipnirAuth.showAuthMessage(result.error, true);
@@ -227,6 +290,22 @@
                 }
 
                 if (result.success) {
+                    // Check if social login returned unverified email (rare but possible)
+                    var currentAuthUser = firebase.auth().currentUser;
+                    if (currentAuthUser && !currentAuthUser.emailVerified) {
+                        try {
+                            await currentAuthUser.sendEmailVerification({
+                                url: 'https://sleipnirmc.com/login',
+                                handleCodeInApp: false
+                            });
+                        } catch (verifyErr) {
+                            console.error('Error sending verification email:', verifyErr);
+                        }
+                        await sleipnirAuth.signOut();
+                        showVerificationScreen(currentAuthUser.email);
+                        return;
+                    }
+
                     sleipnirAuth.showAuthMessage({
                         is: 'Innskráning tókst! Beið...',
                         en: 'Login successful! Redirecting...'

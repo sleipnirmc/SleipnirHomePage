@@ -27,7 +27,7 @@
                 var activeOrders = 0;
                 ordersSnap.docs.forEach(function(doc) {
                     var status = doc.data().status;
-                    if (status === 'pending' || status === 'processing') {
+                    if (status === 'pending' || status === 'processing' || status === 'paid') {
                         activeOrders++;
                     }
                 });
@@ -169,7 +169,7 @@
     }
 
     // =============================================
-    // CSV EXPORT
+    // EXCEL EXPORT (Outstanding Orders)
     // =============================================
 
     function bindExportButton() {
@@ -182,14 +182,29 @@
                 return;
             }
 
-            // UTF-8 BOM for Icelandic character support
-            var bom = '\uFEFF';
-            var csv = bom + 'P\u00F6ntun,Vi\u00F0skiptavinur,V\u00F6rur,Upph\u00E6\u00F0,Dagsetning\n';
+            var BRAND = {
+                mcRed: 'FFCF2342',
+                black: 'FF000000',
+                norseBlack: 'FF1A1A1A',
+                white: 'FFFFFFFF',
+                offWhite: 'FFB3B2B2',
+                border: 'FF333333'
+            };
 
+            var workbook = new ExcelJS.Workbook();
+            workbook.creator = 'Sleipnir MC';
+            var worksheet = workbook.addWorksheet('\u00D3afgreiddar pantanir', {
+                properties: { tabColor: { argb: BRAND.mcRed } }
+            });
+
+            // Header row
+            var headers = ['P\u00F6ntun', 'Vi\u00F0skiptavinur', 'V\u00F6rur', 'Upph\u00E6\u00F0', 'Dagsetning'];
+            worksheet.addRow(headers);
+
+            // Data rows
             outstandingOrders.forEach(function(order) {
                 var orderId = order._id ? order._id.slice(-6).toUpperCase() : '';
                 var customerName = order.userName || order.customerName || order.displayName || '';
-
                 var items = '';
                 if (order.items && order.items.length > 0) {
                     items = order.items.map(function(item) {
@@ -197,26 +212,69 @@
                         return name + (item.quantity > 1 ? ' x' + item.quantity : '');
                     }).join('; ');
                 }
-
                 var amount = order.totalAmount || order.total || 0;
                 var date = AdminApp.formatFirestoreDate(order.createdAt);
-
-                // Escape CSV fields with quotes
-                csv += orderId + ',' +
-                    '"' + customerName.replace(/"/g, '""') + '",' +
-                    '"' + items.replace(/"/g, '""') + '",' +
-                    amount + ',' +
-                    '"' + date + '"\n';
+                worksheet.addRow([orderId, customerName, items, amount, date]);
             });
 
-            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            var link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'oafgreiddar_pantanir_' + new Date().toISOString().slice(0, 10) + '.csv';
-            link.click();
-            URL.revokeObjectURL(link.href);
+            // Column widths
+            worksheet.getColumn(1).width = 14;
+            worksheet.getColumn(2).width = 24;
+            worksheet.getColumn(3).width = 36;
+            worksheet.getColumn(4).width = 16;
+            worksheet.getColumn(4).numFmt = '#,##0 "kr."';
+            worksheet.getColumn(4).alignment = { horizontal: 'right', vertical: 'middle' };
+            worksheet.getColumn(5).width = 18;
 
-            AdminApp.showToast(SleipnirI18n.t('admin.dashboard.csvExported', 'CSV skr\u00E1 s\u00F3tt'), 'success');
+            // Header styling
+            var headerRow = worksheet.getRow(1);
+            headerRow.height = 28;
+            headerRow.eachCell(function(cell) {
+                cell.font = { bold: true, size: 11, color: { argb: BRAND.white } };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND.mcRed } };
+                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                cell.border = { bottom: { style: 'medium', color: { argb: BRAND.mcRed } } };
+            });
+
+            // Data row styling
+            for (var r = 2; r <= outstandingOrders.length + 1; r++) {
+                var row = worksheet.getRow(r);
+                var isEven = (r % 2 === 0);
+                row.eachCell({ includeEmpty: true }, function(cell) {
+                    cell.font = { size: 10, color: { argb: BRAND.offWhite } };
+                    cell.fill = {
+                        type: 'pattern', pattern: 'solid',
+                        fgColor: { argb: isEven ? BRAND.black : BRAND.norseBlack }
+                    };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: BRAND.border } },
+                        bottom: { style: 'thin', color: { argb: BRAND.border } },
+                        left: { style: 'thin', color: { argb: BRAND.border } },
+                        right: { style: 'thin', color: { argb: BRAND.border } }
+                    };
+                    if (!cell.alignment || !cell.alignment.horizontal) {
+                        cell.alignment = { vertical: 'middle' };
+                    }
+                });
+            }
+
+            worksheet.views = [{ state: 'frozen', ySplit: 1 }];
+
+            var filename = 'oafgreiddar_pantanir_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+
+            workbook.xlsx.writeBuffer().then(function(buffer) {
+                var blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                var link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                link.click();
+                URL.revokeObjectURL(link.href);
+
+                AdminApp.showToast(SleipnirI18n.t('admin.dashboard.excelExported', 'Excel skr\u00E1 s\u00F3tt'), 'success');
+            }).catch(function(err) {
+                console.error('Error exporting Excel:', err);
+                AdminApp.showToast('Villa vi\u00F0 a\u00F0 flytja \u00FAt Excel', 'error');
+            });
         });
     }
 
