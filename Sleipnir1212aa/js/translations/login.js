@@ -47,13 +47,22 @@
         'login.msg.reset_error': 'Lykilor\u00f0 e\u00f0a netfang er rangt',
         'login.msg.signup_verification': 'A\u00f0gangur stofna\u00f0ur! Sta\u00f0festingarp\u00f3stur hefur veri\u00f0 sendur \u00e1 ',
 
+        // Continue as Guest
+        'login.btn.guest': 'Halda \u00e1fram sem gestur',
+
         // Verification Screen
         'login.verify.title': 'Sta\u00f0festu netfangi\u00f0 \u00feitt',
         'login.verify.message': 'Vi\u00f0 h\u00f6fum sent sta\u00f0festingarp\u00f3st \u00e1',
         'login.verify.instructions': 'Smelltu \u00e1 hlekkinn \u00ed t\u00f6lvup\u00f3stinum og skr\u00e1\u00f0u \u00feig svo inn aftur.',
         'login.verify.btn.login': 'Skr\u00e1 inn aftur',
         'login.verify.btn.guest': 'Halda \u00e1fram sem gestur',
-        'login.verify.note': 'Athuga\u00f0u einnig ruslp\u00f3stm\u00f6ppuna ef \u00fe\u00fa finnur ekki p\u00f3stinn.'
+        'login.verify.note': 'Athuga\u00f0u einnig ruslp\u00f3stm\u00f6ppuna ef \u00fe\u00fa finnur ekki p\u00f3stinn.',
+        'login.verify.warning': 'Ekki loka \u00feessum glugga fyrr en \u00fe\u00fa hefur sta\u00f0fest netfangi\u00f0.',
+        'login.verify.checking': 'B\u00ed\u00f0 eftir sta\u00f0festingu...',
+        'login.verify.success': 'Netfang sta\u00f0fest! Stofna a\u00f0gang...',
+        'login.verify.timeout': 'T\u00edmam\u00f6rk n\u00e1\u00f0. Vinsamlegast skr\u00e1\u00f0u \u00feig inn eftir sta\u00f0festingu.',
+        'login.verify.btn.resend': 'Senda aftur',
+        'login.verify.btn.cancel': 'H\u00e6tta vi\u00f0'
     });
 
     window.SleipnirI18n.registerTranslations('en', {
@@ -104,12 +113,21 @@
         'login.msg.reset_error': 'Password or email is incorrect',
         'login.msg.signup_verification': 'Account created! A verification email has been sent to ',
 
+        // Continue as Guest
+        'login.btn.guest': 'Continue as guest',
+
         // Verification Screen
         'login.verify.title': 'Verify your email',
         'login.verify.message': 'We have sent a verification email to',
         'login.verify.instructions': 'Click the link in the email, then log in again.',
         'login.verify.btn.login': 'Log in again',
         'login.verify.btn.guest': 'Continue as guest',
-        'login.verify.note': 'Also check your spam folder if you don\'t see the email.'
+        'login.verify.note': 'Also check your spam folder if you don\'t see the email.',
+        'login.verify.warning': 'Do not close this window until you have verified your email.',
+        'login.verify.checking': 'Waiting for verification...',
+        'login.verify.success': 'Email verified! Creating your account...',
+        'login.verify.timeout': 'Timed out. Please log in again after verifying your email.',
+        'login.verify.btn.resend': 'Resend email',
+        'login.verify.btn.cancel': 'Cancel'
     });
 })();

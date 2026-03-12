@@ -6,7 +6,7 @@
     var mapEl = document.getElementById('map');
     if (!mapEl) return;
 
-    var map = L.map('map').setView([64.037402, -21.987437], 13);
+    var map = L.map('map').setView([64.037078, -21.987303], 15);
 
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -23,8 +23,8 @@
     });
 
     // Add marker
-    var marker = L.marker([64.037402, -21.987437], {icon: sleipnirIcon}).addTo(map);
-    marker.bindPopup('<b>Sleipnir MC Reykjavík</b><br>Home of the Three-Legged Brotherhood').openPopup();
+    var marker = L.marker([64.037078, -21.987303], {icon: sleipnirIcon}).addTo(map);
+    marker.bindPopup('<b>Sleipnir MC</b><br>Straumhella 4, Hafnarfjörður').openPopup();
 
     // Contact form handler
     var contactForm = document.getElementById('contactForm');

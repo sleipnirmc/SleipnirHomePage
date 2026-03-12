@@ -56,17 +56,6 @@
                 </span>
                 <span class="sidebar-label" data-i18n="admin.nav.products">Vorur</span>
             </a>
-            <a href="#" class="sidebar-link" data-section="events">
-                <span class="sidebar-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="16" y1="2" x2="16" y2="6"/>
-                        <line x1="8" y1="2" x2="8" y2="6"/>
-                        <line x1="3" y1="10" x2="21" y2="10"/>
-                    </svg>
-                </span>
-                <span class="sidebar-label" data-i18n="admin.nav.events">Vidburdir</span>
-            </a>
             <a href="#" class="sidebar-link" data-section="orders">
                 <span class="sidebar-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -189,6 +178,10 @@
                     <option value="Reykjavik" data-i18n="admin.members.filter_reykjavik">Reykjavik</option>
                     <option value="Akureyri" data-i18n="admin.members.filter_akureyri">Akureyri</option>
                 </select>
+                <button class="btn btn-outline btn-sm" onclick="ExportModule.exportTab('members')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span data-i18n="admin.export.excel_btn">Flytja ut Excel</span>
+                </button>
                 <div class="toolbar-view-toggle">
                     <button class="view-btn active" data-view="grid" id="memberGridBtn" title="Grid view">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
@@ -214,13 +207,10 @@
                     <option value="members" data-i18n="admin.users.filter_members">Medlimir</option>
                     <option value="nonmembers" data-i18n="admin.users.filter_guests">Gestir</option>
                 </select>
-                <label class="form-toggle-label">
-                    <input type="checkbox" class="form-toggle" id="userRemovalMode">
-                    <span data-i18n="admin.users.removal_mode">Eyda ham</span>
-                </label>
-                <button class="btn btn-secondary btn-sm" id="bulkAddMembersBtn" data-i18n="admin.users.bulk_add">Baeta vid medlimum</button>
-                <button class="btn btn-secondary btn-sm" id="syncRealMembersBtn" data-i18n="admin.users.sync_members">Samstilla medlimi</button>
-                <button class="btn btn-danger btn-sm hidden" id="bulkDeleteBtn" data-i18n="admin.users.bulk_delete">Eyda voldum</button>
+                <button class="btn btn-outline btn-sm" onclick="ExportModule.exportTab('users')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span data-i18n="admin.export.excel_btn">Flytja ut Excel</span>
+                </button>
             </div>
             <div class="table-container">
                 <table class="data-table" id="usersTable">
@@ -261,35 +251,12 @@
                     <option value="jeans" data-i18n="admin.products.filter_jeans">Buxur</option>
                     <option value="other" data-i18n="admin.products.filter_other">Annad</option>
                 </select>
+                <button class="btn btn-outline btn-sm" onclick="ExportModule.exportTab('products')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span data-i18n="admin.export.excel_btn">Flytja ut Excel</span>
+                </button>
             </div>
             <div class="product-grid" id="productGrid"></div>
-        </section>
-
-        <!-- EVENTS -->
-        <section class="admin-page" id="page-events">
-            <div class="page-header">
-                <h1 class="page-title" data-i18n="admin.events.title">Vidburdir</h1>
-                <p class="page-subtitle" data-i18n="admin.events.subtitle">Vidburdastjornun</p>
-            </div>
-            <div class="page-toolbar">
-                <button class="btn btn-primary" id="addEventBtn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    <span data-i18n="admin.events.add_btn">Baeta vid vidburdi</span>
-                </button>
-                <select class="toolbar-select" id="eventCategoryFilter">
-                    <option value="all" data-i18n="admin.events.filter_all">Allir flokkar</option>
-                    <option value="ride" data-i18n="admin.events.filter_ride">Akstursferð</option>
-                    <option value="meeting" data-i18n="admin.events.filter_meeting">Fundur</option>
-                    <option value="social" data-i18n="admin.events.filter_social">Felagsstarf</option>
-                    <option value="charity" data-i18n="admin.events.filter_charity">Godgerdamal</option>
-                    <option value="maintenance" data-i18n="admin.events.filter_maintenance">Vidhald</option>
-                </select>
-                <div class="toolbar-tabs">
-                    <button class="tab-btn active" data-tab="upcoming" data-i18n="admin.events.tab_upcoming">Framundan</button>
-                    <button class="tab-btn" data-tab="past" data-i18n="admin.events.tab_past">Lidnir</button>
-                </div>
-            </div>
-            <div class="event-list" id="eventList"></div>
         </section>
 
         <!-- ORDERS -->
@@ -307,6 +274,10 @@
                     <button class="tab-btn" data-tab="completed" data-i18n="admin.orders.tab_completed">Klaradar</button>
                     <button class="tab-btn" data-tab="cancelled" data-i18n="admin.orders.tab_cancelled">Afturkalladar</button>
                 </div>
+                <button class="btn btn-outline btn-sm" onclick="ExportModule.exportTab('orders')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span data-i18n="admin.export.excel_btn">Flytja ut Excel</span>
+                </button>
             </div>
             <div class="table-container">
                 <table class="data-table" id="ordersTable">
@@ -379,33 +350,6 @@
         <div class="modal-footer">
             <button class="btn btn-secondary" onclick="AdminApp.closeTemplateModal()" data-i18n="admin.common.cancel">Haetta vid</button>
             <button class="btn btn-primary" id="saveTemplateBtn" data-i18n="admin.members.save_template">Vista snidmat</button>
-        </div>
-    </div>
-</div>
-
-<!-- BULK MEMBER MANAGEMENT MODAL -->
-<div class="modal-overlay" id="bulkMemberModalOverlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title" data-i18n="admin.users.bulk_title">Bua til medlimi i magni</h2>
-            <button class="modal-close" onclick="AdminApp.closeBulkMemberModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label class="form-label" data-i18n="admin.users.bulk_emails_label">Netfong (eitt per linu)</label>
-                <textarea class="form-textarea" id="bulkMemberEmails" rows="5" data-i18n-placeholder="admin.users.bulk_emails_placeholder" placeholder="email@example.com"></textarea>
-            </div>
-            <div class="form-group">
-                <label class="form-label" data-i18n="admin.users.bulk_domain_label">Eda len</label>
-                <input type="text" class="form-input" id="memberDomain" data-i18n-placeholder="admin.users.bulk_domain_placeholder" placeholder="@example.com">
-            </div>
-            <div id="bulkMemberResults" style="display:none;">
-                <div id="bulkMemberResultsContent"></div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="AdminApp.closeBulkMemberModal()" data-i18n="admin.common.cancel">Haetta vid</button>
-            <button class="btn btn-primary" id="processBulkMembersBtn" data-i18n="admin.users.bulk_process">Vinna ur</button>
         </div>
     </div>
 </div>

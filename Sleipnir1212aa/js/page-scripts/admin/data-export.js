@@ -597,6 +597,17 @@
 
         exportExcel: function() {
             downloadExcel();
+        },
+
+        exportTab: function(tab) {
+            var prevTab = currentTab;
+            currentTab = tab;
+            delete dataCache[tab];
+            downloadExcel().then(function() {
+                currentTab = prevTab;
+            }).catch(function() {
+                currentTab = prevTab;
+            });
         }
     };
 

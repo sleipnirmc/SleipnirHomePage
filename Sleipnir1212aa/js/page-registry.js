@@ -90,7 +90,6 @@ window.PAGE_REGISTRY = {
             '/js/page-scripts/admin/members.js',
             '/js/page-scripts/admin/users.js',
             '/js/page-scripts/admin/products.js',
-            '/js/page-scripts/admin/events.js',
             '/js/page-scripts/admin/orders.js',
             '/js/page-scripts/admin/data-export.js',
             '/js/page-scripts/admin/admin-init.js'

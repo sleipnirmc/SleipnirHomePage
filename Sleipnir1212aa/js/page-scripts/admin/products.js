@@ -45,7 +45,18 @@
 
         AdminApp.showLoading(grid);
 
-        AdminApp.db.collection('products').orderBy('createdAt', 'desc').get()
+        // Ensure db is available (may not be set if Firebase loaded after admin-app.js)
+        var db = AdminApp.db;
+        if (!db && typeof firebase !== 'undefined' && firebase.firestore) {
+            db = firebase.firestore();
+            AdminApp.db = db;
+        }
+        if (!db) {
+            grid.innerHTML = '<div class="empty-state">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.loadError', 'Firebase ekki tilgengilegt')) + '</div>';
+            return;
+        }
+
+        db.collection('products').orderBy('createdAt', 'desc').get()
             .then(function(snapshot) {
                 products = [];
                 snapshot.forEach(function(doc) {
@@ -56,9 +67,28 @@
                 renderProducts();
             })
             .catch(function(error) {
-                console.error('Error loading products:', error);
-                AdminApp.showToast(SleipnirI18n.t('admin.products.loadError', 'Villa vi\u00F0 a\u00F0 hla\u00F0a v\u00F6rum'), 'error');
-                if (grid) grid.innerHTML = '<div class="empty-state">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.loadError', 'Villa vi\u00F0 a\u00F0 hla\u00F0a v\u00F6rum')) + '</div>';
+                console.warn('Ordered products query failed, trying without order:', error);
+                // Fallback: fetch without orderBy and sort client-side
+                db.collection('products').get()
+                    .then(function(snapshot) {
+                        products = [];
+                        snapshot.forEach(function(doc) {
+                            var data = doc.data();
+                            data.id = doc.id;
+                            products.push(data);
+                        });
+                        products.sort(function(a, b) {
+                            var aDate = a.createdAt ? (a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)) : new Date(0);
+                            var bDate = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : new Date(0);
+                            return bDate - aDate;
+                        });
+                        renderProducts();
+                    })
+                    .catch(function(err2) {
+                        console.error('Error loading products (fallback):', err2);
+                        AdminApp.showToast(SleipnirI18n.t('admin.products.loadError', 'Villa vi\u00F0 a\u00F0 hla\u00F0a v\u00F6rum'), 'error');
+                        grid.innerHTML = '<div class="empty-state">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.loadError', 'Villa vi\u00F0 a\u00F0 hla\u00F0a v\u00F6rum')) + '</div>';
+                    });
             });
     }
 

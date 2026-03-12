@@ -108,9 +108,15 @@ async function loadUserDocument(userId) {
                 members: userDocument.members
             });
         } else {
-            console.log('loadUserDocument: No document exists, creating new one');
-            // Create user document if it doesn't exist (for legacy users)
-            userDocument = await createUserDocument(userId, currentUser);
+            // Don't auto-create doc for unverified users (they must complete verification first)
+            if (currentUser && !currentUser.emailVerified) {
+                console.log('loadUserDocument: Unverified user, deferring document creation');
+                userDocument = null;
+            } else {
+                console.log('loadUserDocument: No document exists, creating new one');
+                // Create user document if it doesn't exist (for legacy/verified users)
+                userDocument = await createUserDocument(userId, currentUser);
+            }
         }
     } catch (error) {
         console.error('Error loading user document:', error);
@@ -163,26 +169,59 @@ async function signUp(email, password, additionalData = {}) {
             console.error('Error sending verification email:', verificationError);
         }
         
-        // Create user document with verification status
-        await createUserDocument(credential.user.uid, credential.user, {
-            ...additionalData,
-            verificationEmailSent: true,
-            verificationEmailSentAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        return { 
-            success: true, 
+        // Don't create Firestore doc yet — wait for email verification
+        // The doc will be created by completeRegistration() after the user verifies
+
+        return {
+            success: true,
             user: credential.user,
             emailVerificationSent: true,
             message: {
-                is: 'Aðgangur stofnaður! Staðfestingarpóstur hefur verið sendur á ' + email,
-                en: 'Account created! A verification email has been sent to ' + email
+                is: 'Staðfestingarpóstur hefur verið sendur á ' + email,
+                en: 'A verification email has been sent to ' + email
             }
         };
     } catch (error) {
         console.error('Sign up error:', error);
         return { success: false, error: getAuthErrorMessage(error.code) };
     }
+}
+
+// Complete registration after email verification (called from login.js polling)
+async function completeRegistration(additionalData = {}) {
+    if (!currentUser) {
+        return { success: false, error: 'No user signed in' };
+    }
+
+    await currentUser.reload();
+
+    if (!currentUser.emailVerified) {
+        return { success: false, error: 'Email not yet verified' };
+    }
+
+    // Prevent double-creation
+    const existingDoc = await db.collection('users').doc(currentUser.uid).get();
+    if (existingDoc.exists) {
+        return { success: true, alreadyExists: true };
+    }
+
+    // Create the Firestore user document now that email is verified
+    userDocument = await createUserDocument(currentUser.uid, currentUser, {
+        ...additionalData,
+        emailVerified: true,
+        emailVerifiedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        verificationEmailSent: true,
+        verificationEmailSentAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    updateUIForAuthenticatedUser();
+    cacheAuthState(true, userDocument?.displayName || currentUser.email, isUserAdmin(), isUserMember());
+
+    window.dispatchEvent(new CustomEvent('authStateChanged', {
+        detail: { user: currentUser, userDoc: userDocument }
+    }));
+
+    return { success: true, user: currentUser, userDoc: userDocument };
 }
 
 // Sign in existing user
@@ -325,11 +364,19 @@ async function resendVerificationEmail() {
             handleCodeInApp: false
         });
         
-        // Update user document
-        await db.collection('users').doc(currentUser.uid).update({
-            verificationEmailSent: true,
-            verificationEmailResentAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        // Update user document if it exists (may not exist yet for fresh signups)
+        try {
+            const userDocRef = db.collection('users').doc(currentUser.uid);
+            const docSnapshot = await userDocRef.get();
+            if (docSnapshot.exists) {
+                await userDocRef.update({
+                    verificationEmailSent: true,
+                    verificationEmailResentAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+        } catch (updateErr) {
+            console.warn('Could not update user doc for resend:', updateErr);
+        }
         
         return { 
             success: true,
@@ -1069,6 +1116,7 @@ window.sleipnirAuth = {
     signUp,
     signIn,
     signOut,
+    completeRegistration,
     signInWithGoogle,
     signInWithFacebook,
     sendPasswordResetEmail,

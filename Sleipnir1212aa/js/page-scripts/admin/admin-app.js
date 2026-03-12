@@ -11,7 +11,6 @@
         members:   function() { return SleipnirI18n.t('admin.nav.members', 'Me\u00F0limir'); },
         users:     function() { return SleipnirI18n.t('admin.nav.users', 'Notendur'); },
         products:  function() { return SleipnirI18n.t('admin.nav.products', 'V\u00F6rur'); },
-        events:    function() { return SleipnirI18n.t('admin.nav.events', 'Vi\u00F0bur\u00F0ir'); },
         orders:    function() { return SleipnirI18n.t('admin.nav.orders', 'Pantanir'); },
         export:    function() { return SleipnirI18n.t('admin.nav.export', '\u00DAtflutningur'); }
     };
@@ -225,20 +224,6 @@
         },
 
         // =============================================
-        // BULK MEMBER MODAL HELPERS
-        // =============================================
-
-        openBulkMemberModal: function() {
-            var overlay = document.getElementById('bulkMemberModalOverlay');
-            if (overlay) overlay.classList.add('active');
-        },
-
-        closeBulkMemberModal: function() {
-            var overlay = document.getElementById('bulkMemberModalOverlay');
-            if (overlay) overlay.classList.remove('active');
-        },
-
-        // =============================================
         // SECTION SWITCHING
         // =============================================
 
@@ -354,7 +339,6 @@
         if (e.key === 'Escape') {
             AdminApp.closeModal();
             AdminApp.closeTemplateModal();
-            AdminApp.closeBulkMemberModal();
         }
     });
 

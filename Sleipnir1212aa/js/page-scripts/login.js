@@ -6,13 +6,98 @@
     // while login.js is handling the verification flow
     window._sleipnirLoginPageHandling = true;
 
+    // Verification polling state
+    var verificationPollTimer = null;
+    var verificationPollCount = 0;
+    var VERIFICATION_POLL_INTERVAL = 3000;
+    var VERIFICATION_MAX_POLLS = 100; // ~5 minutes
+
+    function stopVerificationPolling() {
+        if (verificationPollTimer) {
+            clearInterval(verificationPollTimer);
+            verificationPollTimer = null;
+        }
+        verificationPollCount = 0;
+    }
+
+    function startVerificationPolling(email, additionalData) {
+        stopVerificationPolling();
+        verificationPollCount = 0;
+
+        verificationPollTimer = setInterval(async function() {
+            verificationPollCount++;
+
+            var user = firebase.auth().currentUser;
+            if (!user) {
+                stopVerificationPolling();
+                return;
+            }
+
+            try {
+                await user.reload();
+            } catch (err) {
+                console.error('Reload error during poll:', err);
+                return;
+            }
+
+            if (user.emailVerified) {
+                stopVerificationPolling();
+
+                var statusEl = document.getElementById('verificationStatus');
+                if (statusEl) {
+                    var t = window.SleipnirI18n.t;
+                    statusEl.innerHTML =
+                        '<div class="verification-success-icon">&#10003;</div>' +
+                        '<p class="verification-success-text" data-i18n="login.verify.success">' +
+                            t('login.verify.success', 'Netfang staðfest! Stofna aðgang...') +
+                        '</p>';
+                }
+
+                try {
+                    var result = await sleipnirAuth.completeRegistration(additionalData || {});
+                    if (result.success) {
+                        sleipnirAuth.showAuthMessage({
+                            is: 'Aðgangur stofnaður! Beið...',
+                            en: 'Account created! Redirecting...'
+                        }, false);
+                        setTimeout(function() {
+                            if (window.sleipnirRouter) {
+                                window.sleipnirRouter.navigate('/');
+                            } else {
+                                window.location.href = '/';
+                            }
+                        }, 1500);
+                    }
+                } catch (err) {
+                    console.error('completeRegistration error:', err);
+                }
+                return;
+            }
+
+            if (verificationPollCount >= VERIFICATION_MAX_POLLS) {
+                stopVerificationPolling();
+                var statusEl = document.getElementById('verificationStatus');
+                if (statusEl) {
+                    var t = window.SleipnirI18n.t;
+                    statusEl.innerHTML =
+                        '<p class="verification-timeout" data-i18n="login.verify.timeout">' +
+                            t('login.verify.timeout', 'Tímamörk náð. Vinsamlegast skráðu þig inn eftir staðfestingu.') +
+                        '</p>';
+                }
+            }
+        }, VERIFICATION_POLL_INTERVAL);
+    }
+
     // Show verification screen replacing the form area
-    function showVerificationScreen(email) {
+    // mode: 'polling' (fresh signup, user stays signed in) or 'static' (unverified login, user signed out)
+    function showVerificationScreen(email, mode, additionalData) {
         var t = window.SleipnirI18n.t;
         var container = document.querySelector('.split-form-container');
         if (!container) return;
 
-        container.innerHTML =
+        var isPolling = (mode === 'polling');
+
+        var html =
             '<div class="verification-screen">' +
                 '<div class="verification-icon">' +
                     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="80" height="80">' +
@@ -27,6 +112,31 @@
                     t('login.verify.message', 'Við höfum sent staðfestingarpóst á') +
                 '</p>' +
                 '<p class="verification-email">' + email + '</p>' +
+                '<div class="verification-warning">' +
+                    '<span class="verification-warning-icon">&#9888;</span>' +
+                    '<p data-i18n="login.verify.warning">' +
+                        t('login.verify.warning', 'Ekki loka þessum glugga fyrr en þú hefur staðfest netfangið.') +
+                    '</p>' +
+                '</div>';
+
+        if (isPolling) {
+            html +=
+                '<div class="verification-status" id="verificationStatus">' +
+                    '<div class="verification-spinner"></div>' +
+                    '<p class="verification-checking" data-i18n="login.verify.checking">' +
+                        t('login.verify.checking', 'Bíð eftir staðfestingu...') +
+                    '</p>' +
+                '</div>' +
+                '<div class="verification-actions">' +
+                    '<button class="verification-btn verification-btn-secondary" id="verifyResendBtn" data-i18n="login.verify.btn.resend">' +
+                        t('login.verify.btn.resend', 'Senda aftur') +
+                    '</button>' +
+                    '<button class="verification-btn verification-btn-secondary" id="verifyCancelBtn" data-i18n="login.verify.btn.cancel">' +
+                        t('login.verify.btn.cancel', 'Hætta við') +
+                    '</button>' +
+                '</div>';
+        } else {
+            html +=
                 '<p class="verification-instructions" data-i18n="login.verify.instructions">' +
                     t('login.verify.instructions', 'Smelltu á hlekkinn í tölvupóstinum og skráðu þig svo inn aftur.') +
                 '</p>' +
@@ -37,40 +147,89 @@
                     '<button class="verification-btn verification-btn-secondary" id="verifyGuestBtn" data-i18n="login.verify.btn.guest">' +
                         t('login.verify.btn.guest', 'Halda áfram sem gestur') +
                     '</button>' +
-                '</div>' +
+                '</div>';
+        }
+
+        html +=
                 '<p class="verification-note" data-i18n="login.verify.note">' +
                     t('login.verify.note', 'Athugaðu einnig ruslpóstmöppuna ef þú finnur ekki póstinn.') +
                 '</p>' +
             '</div>';
 
-        var loginBtn = document.getElementById('verifyLoginBtn');
-        var guestBtn = document.getElementById('verifyGuestBtn');
+        container.innerHTML = html;
 
-        if (loginBtn) {
-            loginBtn.addEventListener('click', function() {
-                if (window.sleipnirRouter) {
-                    window.sleipnirRouter.navigate('/login');
-                } else {
-                    window.location.href = '/login';
-                }
-            });
-        }
+        if (isPolling) {
+            startVerificationPolling(email, additionalData);
 
-        if (guestBtn) {
-            guestBtn.addEventListener('click', function() {
-                if (window.sleipnirRouter) {
-                    window.sleipnirRouter.navigate('/');
-                } else {
-                    window.location.href = '/';
-                }
-            });
+            var resendBtn = document.getElementById('verifyResendBtn');
+            if (resendBtn) {
+                resendBtn.addEventListener('click', async function() {
+                    resendBtn.disabled = true;
+                    try {
+                        var user = firebase.auth().currentUser;
+                        if (user) {
+                            await user.sendEmailVerification({
+                                url: 'https://sleipnirmc.com/login',
+                                handleCodeInApp: false
+                            });
+                            sleipnirAuth.showAuthMessage({
+                                is: 'Staðfestingarpóstur hefur verið sendur aftur',
+                                en: 'Verification email has been resent'
+                            }, false);
+                        }
+                    } catch (err) {
+                        console.error('Error resending:', err);
+                        sleipnirAuth.showAuthMessage({
+                            is: 'Villa kom upp. Reyndu aftur síðar.',
+                            en: 'Error occurred. Please try again later.'
+                        }, true);
+                    }
+                    setTimeout(function() { resendBtn.disabled = false; }, 30000);
+                });
+            }
+
+            var cancelBtn = document.getElementById('verifyCancelBtn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', async function() {
+                    stopVerificationPolling();
+                    await sleipnirAuth.signOut();
+                    if (window.sleipnirRouter) {
+                        window.sleipnirRouter.navigate('/');
+                    } else {
+                        window.location.href = '/';
+                    }
+                });
+            }
+        } else {
+            var loginBtn = document.getElementById('verifyLoginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function() {
+                    if (window.sleipnirRouter) {
+                        window.sleipnirRouter.navigate('/login');
+                    } else {
+                        window.location.href = '/login';
+                    }
+                });
+            }
+
+            var guestBtn = document.getElementById('verifyGuestBtn');
+            if (guestBtn) {
+                guestBtn.addEventListener('click', function() {
+                    if (window.sleipnirRouter) {
+                        window.sleipnirRouter.navigate('/');
+                    } else {
+                        window.location.href = '/';
+                    }
+                });
+            }
         }
     }
 
-    // Clear flag when navigating away from login page (SPA)
+    // Clear flag and stop polling when navigating away from login page (SPA)
     window.addEventListener('pageLoaded', function(e) {
         if (e.detail && e.detail.path !== '/login') {
             window._sleipnirLoginPageHandling = false;
+            stopVerificationPolling();
         }
     });
 
@@ -86,7 +245,10 @@
     var formTitle = document.querySelector('.split-form-title');
     var formSubtitle = document.querySelector('.split-form-subtitle');
 
-    if (!submitBtn) return; // Not on login page
+    if (!submitBtn) {
+        console.warn('[login.js] Submit button not found in DOM — aborting init');
+        return;
+    }
 
     tabs.forEach(function(tab) {
         tab.addEventListener('click', function() {
@@ -103,7 +265,13 @@
             postalGroup.style.display = isSignup ? 'block' : 'none';
 
             if (isSignup) {
-                setTimeout(function() { observeElements(); }, 100);
+                setTimeout(function() {
+                    observeElements();
+                    // Force visibility for newly shown signup fields
+                    document.querySelectorAll('.split-input-group:not(.visible)').forEach(function(el) {
+                        el.classList.add('visible');
+                    });
+                }, 100);
             }
 
             if (isSignup) {
@@ -207,10 +375,14 @@
                     });
 
                     if (result.success) {
-                        // Verification email already sent by signUp()
-                        // Sign out — user must verify email before getting account access
-                        await sleipnirAuth.signOut();
-                        showVerificationScreen(email);
+                        // Keep user signed in for polling (_sleipnirLoginPageHandling prevents auto-signout)
+                        showVerificationScreen(email, 'polling', {
+                            fullName: fullName,
+                            phone: phone,
+                            address: address,
+                            city: city,
+                            postalCode: postalCode
+                        });
                         return;
                     } else {
                         sleipnirAuth.showAuthMessage(result.error, true);
@@ -256,7 +428,7 @@
                                 }
                                 // Sign out — user stays as guest until verified
                                 await sleipnirAuth.signOut();
-                                showVerificationScreen(email);
+                                showVerificationScreen(email, 'static', null);
                                 return;
                             }
                         } else {
@@ -276,18 +448,12 @@
         });
     }
 
-    // Social login handlers
-    document.querySelectorAll('.social-btn').forEach(function(btn) {
-        btn.addEventListener('click', async function() {
-            var provider = btn.textContent.includes('Google') ? 'google' : 'facebook';
-
+    // Google login handler
+    var googleBtn = document.querySelector('.social-btn');
+    if (googleBtn) {
+        googleBtn.addEventListener('click', async function() {
             try {
-                var result;
-                if (provider === 'google') {
-                    result = await sleipnirAuth.signInWithGoogle();
-                } else {
-                    result = await sleipnirAuth.signInWithFacebook();
-                }
+                var result = await sleipnirAuth.signInWithGoogle();
 
                 if (result.success) {
                     // Check if social login returned unverified email (rare but possible)
@@ -302,7 +468,7 @@
                             console.error('Error sending verification email:', verifyErr);
                         }
                         await sleipnirAuth.signOut();
-                        showVerificationScreen(currentAuthUser.email);
+                        showVerificationScreen(currentAuthUser.email, 'static', null);
                         return;
                     }
 
@@ -333,7 +499,7 @@
                 }, true);
             }
         });
-    });
+    }
 
     // Forgot password handler
     var forgotLink = document.querySelector('.split-link');
@@ -460,10 +626,7 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.split-input-group').forEach(function(el) {
-            observer.observe(el);
-        });
-
+        // Only observe fade-in elements (input groups use CSS animation now)
         document.querySelectorAll('.split-form-header, .form-tabs, .split-submit-btn, .split-social-section').forEach(function(el) {
             el.classList.add('fade-in');
             observer.observe(el);
@@ -471,6 +634,13 @@
     }
 
     observeElements();
+
+    // Fallback: force visibility for fade-in elements if IntersectionObserver doesn't fire (SPA navigation)
+    requestAnimationFrame(function() {
+        document.querySelectorAll('.fade-in:not(.visible)').forEach(function(el) {
+            el.classList.add('visible');
+        });
+    });
 
     // Smooth scroll to form when clicking visual section
     var visualSection = document.querySelector('.login-visual-section');
