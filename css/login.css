@@ -752,6 +752,25 @@ body {
     line-height: 1.5;
 }
 
+/* Verification Info (replaces warning for polling mode) */
+.verification-info {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin: 20px auto 25px;
+    max-width: 380px;
+    text-align: center;
+}
+
+.verification-info p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    color: #e0e0e0;
+    margin: 0;
+    line-height: 1.5;
+}
+
 /* Verification Polling Status */
 .verification-status {
     display: flex;
@@ -817,7 +836,8 @@ body {
         width: 60px;
         height: 60px;
     }
-    .verification-warning {
+    .verification-warning,
+    .verification-info {
         margin: 15px auto 20px;
         padding: 12px 14px;
     }

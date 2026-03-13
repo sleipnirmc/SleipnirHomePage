@@ -38,10 +38,43 @@
     };
 
     // =============================================
+    // IMAGE COMPRESSION
+    // =============================================
+
+    function compressImage(dataUrl, callback) {
+        var img = new Image();
+        img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var maxDim = 800;
+            var width = img.width;
+            var height = img.height;
+
+            if (width > maxDim || height > maxDim) {
+                if (width > height) {
+                    height = Math.round(height * (maxDim / width));
+                    width = maxDim;
+                } else {
+                    width = Math.round(width * (maxDim / height));
+                    height = maxDim;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            var compressed = canvas.toDataURL('image/jpeg', 0.7);
+            callback(compressed);
+        };
+        img.src = dataUrl;
+    }
+
+    // =============================================
     // DATA LOADING
     // =============================================
 
     function loadProducts() {
+        console.log('[Products] loadProducts called');
         var grid = document.getElementById('productGrid');
         if (!grid) return;
 
@@ -53,44 +86,34 @@
             db = firebase.firestore();
             AdminApp.db = db;
         }
+        console.log('[Products] db available:', !!db);
         if (!db) {
             grid.innerHTML = '<div class="empty-state">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.loadError', 'Firebase ekki tilgengilegt')) + '</div>';
             return;
         }
 
-        db.collection('products').orderBy('createdAt', 'desc').get()
+        db.collection('products').get()
             .then(function(snapshot) {
+                console.log('[Products] Query returned', snapshot.size, 'products');
                 products = [];
                 snapshot.forEach(function(doc) {
                     var data = doc.data();
                     data.id = doc.id;
                     products.push(data);
                 });
+                // Sort client-side (newest first, gracefully handle missing createdAt)
+                products.sort(function(a, b) {
+                    var aDate = a.createdAt ? (a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)) : new Date(0);
+                    var bDate = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : new Date(0);
+                    return bDate - aDate;
+                });
                 renderProducts();
             })
             .catch(function(error) {
-                console.warn('Ordered products query failed, trying without order:', error);
-                // Fallback: fetch without orderBy and sort client-side
-                db.collection('products').get()
-                    .then(function(snapshot) {
-                        products = [];
-                        snapshot.forEach(function(doc) {
-                            var data = doc.data();
-                            data.id = doc.id;
-                            products.push(data);
-                        });
-                        products.sort(function(a, b) {
-                            var aDate = a.createdAt ? (a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)) : new Date(0);
-                            var bDate = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : new Date(0);
-                            return bDate - aDate;
-                        });
-                        renderProducts();
-                    })
-                    .catch(function(err2) {
-                        console.error('Error loading products (fallback):', err2);
-                        AdminApp.showToast(SleipnirI18n.t('admin.products.loadError', 'Villa vi\u00F0 a\u00F0 hla\u00F0a v\u00F6rum'), 'error');
-                        grid.innerHTML = '<div class="empty-state">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.loadError', 'Villa vi\u00F0 a\u00F0 hla\u00F0a v\u00F6rum')) + '</div>';
-                    });
+                console.log('[Products] Query error:', error);
+                console.error('Error loading products:', error);
+                AdminApp.showToast(SleipnirI18n.t('admin.products.loadError', 'Villa vi\u00F0 a\u00F0 hla\u00F0a v\u00F6rum'), 'error');
+                grid.innerHTML = '<div class="empty-state">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.loadError', 'Villa vi\u00F0 a\u00F0 hla\u00F0a v\u00F6rum')) + '</div>';
             });
     }
 
@@ -99,6 +122,7 @@
     // =============================================
 
     function renderProducts() {
+        console.log('[Products] renderProducts called, count:', products.length);
         var grid = document.getElementById('productGrid');
         if (!grid) return;
 
@@ -326,15 +350,17 @@
             }
             var reader = new FileReader();
             reader.onloadend = function() {
-                var imageData = { dataUrl: reader.result, name: file.name };
-                // Determine which list to add to (edit mode or add mode)
-                if (currentEditImages.length > 0 || editNewImages.length > 0) {
-                    editNewImages.push(imageData);
-                    renderEditNewPreviews();
-                } else {
-                    uploadedImages.push(imageData);
-                    renderNewImagePreviews();
-                }
+                compressImage(reader.result, function(compressedUrl) {
+                    var imageData = { dataUrl: compressedUrl, name: file.name };
+                    // Determine which list to add to (edit mode or add mode)
+                    if (currentEditImages.length > 0 || editNewImages.length > 0) {
+                        editNewImages.push(imageData);
+                        renderEditNewPreviews();
+                    } else {
+                        uploadedImages.push(imageData);
+                        renderNewImagePreviews();
+                    }
+                });
             };
             reader.readAsDataURL(file);
         });

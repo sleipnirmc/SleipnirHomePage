@@ -1485,10 +1485,8 @@ th.sort-desc .sort-icon::after {
 
 .admin-layout .form-label {
     display: block;
-    font-family: 'Cinzel', serif;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.95rem;
     color: var(--off-white);
     margin-bottom: 8px;
     font-weight: 600;

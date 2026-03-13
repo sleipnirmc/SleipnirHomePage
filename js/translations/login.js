@@ -57,12 +57,14 @@
         'login.verify.btn.login': 'Skr\u00e1 inn aftur',
         'login.verify.btn.guest': 'Halda \u00e1fram sem gestur',
         'login.verify.note': 'Athuga\u00f0u einnig ruslp\u00f3stm\u00f6ppuna ef \u00fe\u00fa finnur ekki p\u00f3stinn.',
-        'login.verify.warning': 'Ekki loka \u00feessum glugga fyrr en \u00fe\u00fa hefur sta\u00f0fest netfangi\u00f0.',
+        'login.verify.warning': 'Opna\u00f0u hlekkinn \u00ed t\u00f6lvup\u00f3stinum til a\u00f0 sta\u00f0festa. \u00de\u00fa getur sta\u00f0fest fr\u00e1 hva\u00f0a t\u00e6ki sem er.',
         'login.verify.checking': 'B\u00ed\u00f0 eftir sta\u00f0festingu...',
         'login.verify.success': 'Netfang sta\u00f0fest! Stofna a\u00f0gang...',
         'login.verify.timeout': 'T\u00edmam\u00f6rk n\u00e1\u00f0. Vinsamlegast skr\u00e1\u00f0u \u00feig inn eftir sta\u00f0festingu.',
         'login.verify.btn.resend': 'Senda aftur',
-        'login.verify.btn.cancel': 'H\u00e6tta vi\u00f0'
+        'login.verify.btn.cancel': 'H\u00e6tta vi\u00f0',
+        'login.verify.btn.check': '\u00c9g hef sta\u00f0fest',
+        'login.verify.btn.signin': 'Skr\u00e1 inn'
     });
 
     window.SleipnirI18n.registerTranslations('en', {
@@ -123,11 +125,13 @@
         'login.verify.btn.login': 'Log in again',
         'login.verify.btn.guest': 'Continue as guest',
         'login.verify.note': 'Also check your spam folder if you don\'t see the email.',
-        'login.verify.warning': 'Do not close this window until you have verified your email.',
+        'login.verify.warning': 'Open the link in your email to verify. You can verify from any device.',
         'login.verify.checking': 'Waiting for verification...',
         'login.verify.success': 'Email verified! Creating your account...',
         'login.verify.timeout': 'Timed out. Please log in again after verifying your email.',
         'login.verify.btn.resend': 'Resend email',
-        'login.verify.btn.cancel': 'Cancel'
+        'login.verify.btn.cancel': 'Cancel',
+        'login.verify.btn.check': 'I\'ve verified',
+        'login.verify.btn.signin': 'Sign in'
     });
 })();

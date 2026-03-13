@@ -1,6 +1,8 @@
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
+const { getAuth } = require('firebase-admin/auth');
 const nodemailer = require('nodemailer');
 
 initializeApp();
@@ -55,5 +57,36 @@ exports.sendContactEmail = onDocumentCreated(
             console.error('Failed to send email:', error);
             await event.data.ref.update({ emailSent: false, emailError: error.message });
         }
+    }
+);
+
+// ── Cleanup unverified Auth accounts older than 7 days ──────────────
+exports.cleanupUnverifiedAccounts = onSchedule(
+    { schedule: 'every 24 hours', region: 'europe-west1' },
+    async () => {
+        const auth = getAuth();
+        const db = getFirestore();
+        const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        let deleted = 0;
+        let nextPageToken;
+
+        do {
+            const result = await auth.listUsers(1000, nextPageToken);
+            for (const user of result.users) {
+                if (user.emailVerified) continue;
+                if (!user.metadata.creationTime) continue;
+                if (new Date(user.metadata.creationTime).getTime() > cutoff) continue;
+
+                // Safety: skip if Firestore user doc exists
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists) continue;
+
+                await auth.deleteUser(user.uid);
+                deleted++;
+            }
+            nextPageToken = result.pageToken;
+        } while (nextPageToken);
+
+        console.log(`Cleaned up ${deleted} unverified accounts`);
     }
 );

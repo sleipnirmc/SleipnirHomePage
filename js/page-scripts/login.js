@@ -82,7 +82,21 @@
                     statusEl.innerHTML =
                         '<p class="verification-timeout" data-i18n="login.verify.timeout">' +
                             t('login.verify.timeout', 'Tímamörk náð. Vinsamlegast skráðu þig inn eftir staðfestingu.') +
-                        '</p>';
+                        '</p>' +
+                        '<button class="verification-btn verification-btn-primary" id="verifyTimeoutSigninBtn" data-i18n="login.verify.btn.signin">' +
+                            t('login.verify.btn.signin', 'Skrá inn') +
+                        '</button>';
+                    var signinBtn = document.getElementById('verifyTimeoutSigninBtn');
+                    if (signinBtn) {
+                        signinBtn.addEventListener('click', async function() {
+                            await sleipnirAuth.signOut();
+                            if (window.sleipnirRouter) {
+                                window.sleipnirRouter.navigate('/login');
+                            } else {
+                                window.location.href = '/login';
+                            }
+                        });
+                    }
                 }
             }
         }, VERIFICATION_POLL_INTERVAL);
@@ -112,10 +126,9 @@
                     t('login.verify.message', 'Við höfum sent staðfestingarpóst á') +
                 '</p>' +
                 '<p class="verification-email">' + email + '</p>' +
-                '<div class="verification-warning">' +
-                    '<span class="verification-warning-icon">&#9888;</span>' +
+                '<div class="verification-info">' +
                     '<p data-i18n="login.verify.warning">' +
-                        t('login.verify.warning', 'Ekki loka þessum glugga fyrr en þú hefur staðfest netfangið.') +
+                        t('login.verify.warning', 'Opnaðu hlekkinn í tölvupóstinum til að staðfesta. Þú getur staðfest frá hvaða tæki sem er.') +
                     '</p>' +
                 '</div>';
 
@@ -128,6 +141,9 @@
                     '</p>' +
                 '</div>' +
                 '<div class="verification-actions">' +
+                    '<button class="verification-btn verification-btn-primary" id="verifyCheckBtn" data-i18n="login.verify.btn.check">' +
+                        t('login.verify.btn.check', 'Ég hef staðfest') +
+                    '</button>' +
                     '<button class="verification-btn verification-btn-secondary" id="verifyResendBtn" data-i18n="login.verify.btn.resend">' +
                         t('login.verify.btn.resend', 'Senda aftur') +
                     '</button>' +
@@ -160,6 +176,54 @@
 
         if (isPolling) {
             startVerificationPolling(email, additionalData);
+
+            var checkBtn = document.getElementById('verifyCheckBtn');
+            if (checkBtn) {
+                checkBtn.addEventListener('click', async function() {
+                    checkBtn.disabled = true;
+                    try {
+                        var user = firebase.auth().currentUser;
+                        if (user) {
+                            await user.reload();
+                            if (user.emailVerified) {
+                                stopVerificationPolling();
+                                var statusEl = document.getElementById('verificationStatus');
+                                if (statusEl) {
+                                    var t = window.SleipnirI18n.t;
+                                    statusEl.innerHTML =
+                                        '<div class="verification-success-icon">&#10003;</div>' +
+                                        '<p class="verification-success-text" data-i18n="login.verify.success">' +
+                                            t('login.verify.success', 'Netfang staðfest! Stofna aðgang...') +
+                                        '</p>';
+                                }
+                                var result = await sleipnirAuth.completeRegistration(additionalData || {});
+                                if (result.success) {
+                                    sleipnirAuth.showAuthMessage({
+                                        is: 'Aðgangur stofnaður! Beið...',
+                                        en: 'Account created! Redirecting...'
+                                    }, false);
+                                    setTimeout(function() {
+                                        if (window.sleipnirRouter) {
+                                            window.sleipnirRouter.navigate('/');
+                                        } else {
+                                            window.location.href = '/';
+                                        }
+                                    }, 1500);
+                                }
+                                return;
+                            } else {
+                                sleipnirAuth.showAuthMessage({
+                                    is: 'Netfang hefur ekki verið staðfest ennþá. Smelltu á hlekkinn í tölvupóstinum.',
+                                    en: 'Email not verified yet. Please click the link in your email.'
+                                }, true);
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Manual verification check error:', err);
+                    }
+                    checkBtn.disabled = false;
+                });
+            }
 
             var resendBtn = document.getElementById('verifyResendBtn');
             if (resendBtn) {
