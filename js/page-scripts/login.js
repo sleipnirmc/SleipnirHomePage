@@ -585,32 +585,6 @@
         });
     });
 
-    // Parallax scrolling effect
-    var ticking = false;
-    function updateParallax() {
-        var scrolled = window.pageYOffset;
-        var parallaxSpeed = 0.5;
-        var bgPattern = document.querySelector('.visual-bg-pattern');
-        var logoContainer = document.querySelector('.visual-logo-container');
-
-        if (bgPattern) {
-            bgPattern.style.transform = 'translate(' + (scrolled * 0.1) + 'px, ' + (scrolled * parallaxSpeed) + 'px)';
-        }
-        if (logoContainer) {
-            logoContainer.style.transform = 'translateY(' + (scrolled * 0.3) + 'px)';
-        }
-        ticking = false;
-    }
-
-    function requestTick() {
-        if (!ticking) {
-            window.requestAnimationFrame(updateParallax);
-            ticking = true;
-        }
-    }
-
-    window.addEventListener('scroll', requestTick);
-
     // Intersection Observer for scroll animations
     var observerOptions = {
         threshold: 0.1,

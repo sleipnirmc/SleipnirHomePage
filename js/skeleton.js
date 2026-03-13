@@ -10,6 +10,7 @@
        Route aliases: map old/alternate URLs to registry keys
        ------------------------------------------------------------------- */
     var ROUTE_ALIASES = {
+        '/__/auth/action': '/login',
         '/index.html': '/',
         '/pages/shop.html': '/shop',
         '/pages/about.html': '/about',

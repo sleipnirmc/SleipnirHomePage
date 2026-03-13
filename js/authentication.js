@@ -183,7 +183,89 @@ async function signUp(email, password, additionalData = {}) {
         };
     } catch (error) {
         console.error('Sign up error:', error);
+
+        // If email already exists, attempt recovery for unverified accounts
+        if (error.code === 'auth/email-already-in-use') {
+            return await handleExistingUnverifiedAccount(email, password, additionalData);
+        }
+
         return { success: false, error: getAuthErrorMessage(error.code) };
+    }
+}
+
+// Handle signup attempt when Auth record already exists (incomplete previous signup)
+async function handleExistingUnverifiedAccount(email, password, additionalData) {
+    try {
+        const credential = await auth.signInWithEmailAndPassword(email, password);
+        const user = credential.user;
+
+        if (user.emailVerified) {
+            // Account exists and is already verified — user should log in instead
+            await auth.signOut();
+            return {
+                success: false,
+                error: {
+                    is: 'Þetta netfang er þegar skráð og staðfest. Vinsamlegast skráðu þig inn.',
+                    en: 'This email is already registered and verified. Please log in instead.'
+                }
+            };
+        }
+
+        // Account exists but is NOT verified — resend verification email
+        if (additionalData.fullName && user.displayName !== additionalData.fullName) {
+            try {
+                await user.updateProfile({ displayName: additionalData.fullName });
+            } catch (profileError) {
+                console.warn('Could not update profile during re-signup:', profileError);
+            }
+        }
+
+        try {
+            await user.sendEmailVerification({
+                url: 'https://sleipnirmc.com/login',
+                handleCodeInApp: false
+            });
+            console.log('Verification email re-sent to:', user.email);
+        } catch (verificationError) {
+            console.error('Error re-sending verification email:', verificationError);
+        }
+
+        return {
+            success: true,
+            user: user,
+            emailVerificationSent: true,
+            message: {
+                is: 'Staðfestingarpóstur hefur verið sendur á ' + email,
+                en: 'A verification email has been sent to ' + email
+            }
+        };
+
+    } catch (signInError) {
+        console.error('Recovery sign-in failed:', signInError);
+
+        if (signInError.code === 'auth/wrong-password' ||
+            signInError.code === 'auth/invalid-credential') {
+            return {
+                success: false,
+                error: {
+                    is: 'Aðgangur með þetta netfang er þegar til. Ef þú hefur þegar skráð þig, reyndu að skrá þig inn eða endurstilla lykilorðið.',
+                    en: 'An account with this email already exists. If you already registered, try logging in or reset your password.'
+                }
+            };
+        }
+
+        if (signInError.code === 'auth/too-many-requests' ||
+            signInError.code === 'auth/user-disabled') {
+            return { success: false, error: getAuthErrorMessage(signInError.code) };
+        }
+
+        return {
+            success: false,
+            error: {
+                is: 'Aðgangur með þetta netfang er þegar til. Reyndu að skrá þig inn eða endurstilla lykilorðið.',
+                en: 'An account with this email already exists. Try logging in or resetting your password.'
+            }
+        };
     }
 }
 

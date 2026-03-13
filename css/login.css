@@ -8,26 +8,29 @@ body {
 }
 
 /* Login Page 2 - Split Screen Design */
+/* Container fills viewport; page never scrolls — only right panel scrolls internally */
 .login-split-container {
-    position: relative;
-    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
     display: flex;
     background: var(--pure-black);
-    overflow: visible;
+    overflow: hidden;
+    z-index: 5;
 }
 
-/* Left Side - Visual Section */
+/* Left Side - Visual Section (static within fixed container) */
 .login-visual-section {
-    flex: 1;
-    position: sticky;
-    top: 0;
-    height: 100vh;
+    width: 50%;
+    height: 100%;
+    position: relative;
     background: var(--midnight-black);
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s ease;
 }
 
 /* Animated Background Pattern with Parallax */
@@ -53,8 +56,6 @@ body {
             rgba(207, 35, 66, 0.03) 20px
         );
     animation: pattern-shift 20s linear infinite;
-    will-change: transform;
-    transition: transform 0.5s ease-out;
 }
 
 @keyframes pattern-shift {
@@ -68,7 +69,6 @@ body {
     z-index: 2;
     text-align: center;
     animation: logo-entrance 1.5s ease-out;
-    transition: transform 0.3s ease-out;
 }
 
 @keyframes logo-entrance {
@@ -83,8 +83,8 @@ body {
 }
 
 .visual-logo {
-    width: 400px;
-    height: 400px;
+    width: max(70vh, 500px);
+    height: max(70vh, 500px);
     object-fit: contain;
     filter: drop-shadow(0 0 50px rgba(207, 35, 66, 0.5));
     animation: logo-pulse 4s ease-in-out infinite;
@@ -100,7 +100,7 @@ body {
 }
 
 .visual-text {
-    margin-top: 30px;
+    margin-top: 5px;
 }
 
 .visual-title {
@@ -109,9 +109,7 @@ body {
     color: var(--white);
     letter-spacing: 5px;
     margin-bottom: 10px;
-    text-shadow:
-        0 0 20px rgba(207, 35, 66, 0.5),
-        0 0 40px rgba(207, 35, 66, 0.3);
+    text-shadow: none;
 }
 
 .visual-motto {
@@ -166,14 +164,15 @@ body {
     }
 }
 
-/* Right Side - Form Section */
+/* Right Side - Form Section (scrolls independently) */
 .login-form-section {
-    flex: 1;
+    width: 50%;
+    height: 100%;
+    overflow-y: auto;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     padding: 40px;
-    min-height: 100vh;
     background: linear-gradient(135deg,
         var(--norse-black) 0%,
         var(--midnight-black) 100%);
@@ -509,8 +508,8 @@ body {
 /* Responsive Design */
 @media (max-width: 1024px) {
     .visual-logo {
-        width: 320px;
-        height: 320px;
+        width: max(55vh, 400px);
+        height: max(55vh, 400px);
     }
 
     .visual-title {
@@ -568,17 +567,25 @@ body {
 @media (max-width: 768px) {
     .login-split-container {
         flex-direction: column;
+        overflow-y: auto;
     }
 
     .login-visual-section {
-        position: relative;
-        height: 50vh;
-        flex: none;
+        width: 100%;
+        height: 40vh;
+        flex-shrink: 0;
+    }
+
+    .login-form-section {
+        width: 100%;
+        height: auto;
+        overflow-y: visible;
+        padding: 20px;
     }
 
     .visual-logo {
-        width: 200px;
-        height: 200px;
+        width: 250px;
+        height: 250px;
     }
 
     .visual-title {
@@ -591,11 +598,6 @@ body {
 
     .corner-accent {
         display: none;
-    }
-
-    .login-form-section {
-        flex: 1;
-        padding: 20px;
     }
 
     .split-form-title {

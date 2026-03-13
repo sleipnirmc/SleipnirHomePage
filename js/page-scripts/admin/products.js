@@ -1,6 +1,8 @@
 (function() {
     'use strict';
 
+    if (!document.getElementById('page-dashboard')) return;
+
     // =============================================
     // PRODUCTS MODULE — Firestore-backed product management
     // Depends on: window.AdminApp, firebase
@@ -635,13 +637,11 @@
         if (addBtn) addBtn.addEventListener('click', ProductsModule.addProduct);
         if (searchInput) searchInput.addEventListener('input', AdminApp.debounce(renderProducts, 300));
         if (catFilter) catFilter.addEventListener('change', renderProducts);
-
-        loadProducts();
     });
 
     document.addEventListener('sectionShow', function(e) {
         if (e.detail.section !== 'products') return;
-        renderProducts();
+        loadProducts();
     });
 
 })();
