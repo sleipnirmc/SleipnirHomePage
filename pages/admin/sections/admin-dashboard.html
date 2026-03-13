@@ -256,7 +256,21 @@
                     <span data-i18n="admin.export.excel_btn">Flytja ut Excel</span>
                 </button>
             </div>
-            <div class="product-grid" id="productGrid"></div>
+            <div class="table-container">
+                <table class="data-table" id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>Heiti (IS)</th>
+                            <th>Name (EN)</th>
+                            <th>Flokkur</th>
+                            <th>Verð</th>
+                            <th>Stærðir</th>
+                            <th>Aðgerðir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productGrid"></tbody>
+                </table>
+            </div>
         </section>
 
         <!-- ORDERS -->

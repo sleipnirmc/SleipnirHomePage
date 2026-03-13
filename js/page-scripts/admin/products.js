@@ -74,11 +74,10 @@
     // =============================================
 
     function loadProducts() {
-        console.log('[Products] loadProducts called');
         var grid = document.getElementById('productGrid');
         if (!grid) return;
 
-        AdminApp.showLoading(grid);
+        grid.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;"><div class="loading-spinner" style="margin:0 auto;"></div></td></tr>';
 
         // Ensure db is available (may not be set if Firebase loaded after admin-app.js)
         var db = AdminApp.db;
@@ -86,7 +85,6 @@
             db = firebase.firestore();
             AdminApp.db = db;
         }
-        console.log('[Products] db available:', !!db);
         if (!db) {
             grid.innerHTML = '<div class="empty-state">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.loadError', 'Firebase ekki tilgengilegt')) + '</div>';
             return;
@@ -94,7 +92,6 @@
 
         db.collection('products').get()
             .then(function(snapshot) {
-                console.log('[Products] Query returned', snapshot.size, 'products');
                 products = [];
                 snapshot.forEach(function(doc) {
                     var data = doc.data();
@@ -110,7 +107,6 @@
                 renderProducts();
             })
             .catch(function(error) {
-                console.log('[Products] Query error:', error);
                 console.error('Error loading products:', error);
                 AdminApp.showToast(SleipnirI18n.t('admin.products.loadError', 'Villa vi\u00F0 a\u00F0 hla\u00F0a v\u00F6rum'), 'error');
                 grid.innerHTML = '<div class="empty-state">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.loadError', 'Villa vi\u00F0 a\u00F0 hla\u00F0a v\u00F6rum')) + '</div>';
@@ -122,7 +118,6 @@
     // =============================================
 
     function renderProducts() {
-        console.log('[Products] renderProducts called, count:', products.length);
         var grid = document.getElementById('productGrid');
         if (!grid) return;
 
@@ -140,64 +135,30 @@
         });
 
         if (filtered.length === 0) {
-            grid.innerHTML = '<div class="empty-state">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.empty', 'Engar v\u00F6rur fundust')) + '</div>';
+            grid.innerHTML = '<tr><td colspan="6" class="empty-state">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.empty', 'Engar v\u00F6rur fundust')) + '</td></tr>';
             return;
         }
 
         var html = '';
         filtered.forEach(function(product) {
-            var gradient = categoryGradients[product.category] || categoryGradients.other;
-            var initials = AdminApp.generateInitials(product.nameEn || product.nameIs || '');
-            var hasImage = product.images && product.images.length > 0 && product.images[0].dataUrl;
-
-            var badges = '';
-            if (product.isNew) badges += '<span class="product-badge badge-new">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.badgeNew', 'N\u00FDtt')) + '</span>';
-            if (product.isPopular) badges += '<span class="product-badge badge-popular">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.badgePopular', 'Vins\u00E6lt')) + '</span>';
-            if (product.membersOnly) badges += '<span class="product-badge badge-members">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.badgeMembers', 'A\u00F0eins me\u00F0limir')) + '</span>';
-
-            var imageHTML;
-            if (hasImage) {
-                imageHTML = '<div class="product-image" style="height:180px;border-radius:8px 8px 0 0;overflow:hidden;position:relative;">' +
-                    '<img src="' + AdminApp.escapeAttr(product.images[0].dataUrl) + '" alt="' + AdminApp.escapeAttr(product.nameIs) + '" style="width:100%;height:100%;object-fit:cover;">' +
-                    (badges ? '<div class="product-badges" style="position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:4px;">' + badges + '</div>' : '') +
-                '</div>';
-            } else {
-                imageHTML = '<div class="product-image" style="background:' + gradient + ';height:180px;display:flex;align-items:center;justify-content:center;border-radius:8px 8px 0 0;position:relative;">' +
-                    '<span class="product-image-text" style="font-size:2.5rem;font-weight:700;color:rgba(255,255,255,0.15);letter-spacing:4px;">' + AdminApp.escapeHTML(initials) + '</span>' +
-                    (badges ? '<div class="product-badges" style="position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:4px;">' + badges + '</div>' : '') +
-                '</div>';
-            }
-
             var sizes = product.availableSizes || [];
             var catLabel = categoryLabels[product.category] || product.category;
 
-            html += '<div class="product-card">' +
-                imageHTML +
-                '<div class="product-info">' +
-                    '<div class="product-name">' + AdminApp.escapeHTML(product.nameIs || '') + '</div>' +
-                    '<div class="product-name-en" style="color:#888;font-size:0.85rem;">' + AdminApp.escapeHTML(product.nameEn || '') + '</div>' +
-                    '<div class="product-price" style="color:#cf2342;font-weight:700;font-size:1.1rem;margin:8px 0;">' + AdminApp.formatPrice(product.price) + '</div>' +
-                    '<div class="product-meta" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">' +
-                        '<span class="badge badge--' + AdminApp.escapeAttr(product.category || 'other') + '">' + AdminApp.escapeHTML(catLabel) + '</span>' +
-                        '<span class="product-sizes" style="color:#888;font-size:0.8rem;">' + AdminApp.escapeHTML(sizes.join(', ')) + '</span>' +
-                    '</div>' +
-                    '<div class="product-actions" style="display:flex;gap:8px;flex-wrap:wrap;">' +
-                        '<button class="btn btn-sm btn-secondary" onclick="ProductsModule.editProduct(\'' + AdminApp.escapeAttr(product.id) + '\')">' +
-                            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> ' +
-                            AdminApp.escapeHTML(SleipnirI18n.t('admin.products.edit', 'Breyta')) +
-                        '</button>' +
-                        '<button class="btn btn-sm btn-' + (product.isPopular ? 'warning' : 'info') + '" onclick="ProductsModule.togglePopular(\'' + AdminApp.escapeAttr(product.id) + '\')" style="font-size:0.75rem;">' +
-                            (product.isPopular
-                                ? AdminApp.escapeHTML(SleipnirI18n.t('admin.products.removePopular', 'Fjarl\u00E6gja vins\u00E6lt'))
-                                : AdminApp.escapeHTML(SleipnirI18n.t('admin.products.markPopular', 'Merkja vins\u00E6lt'))) +
-                        '</button>' +
-                        '<button class="btn btn-sm btn-danger" onclick="ProductsModule.deleteProduct(\'' + AdminApp.escapeAttr(product.id) + '\')">' +
-                            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> ' +
-                            AdminApp.escapeHTML(SleipnirI18n.t('admin.products.delete', 'Ey\u00F0a')) +
-                        '</button>' +
-                    '</div>' +
-                '</div>' +
-            '</div>';
+            html += '<tr>' +
+                '<td>' + AdminApp.escapeHTML(product.nameIs || '') + '</td>' +
+                '<td>' + AdminApp.escapeHTML(product.nameEn || '') + '</td>' +
+                '<td><span class="badge badge--' + AdminApp.escapeAttr(product.category || 'other') + '">' + AdminApp.escapeHTML(catLabel) + '</span></td>' +
+                '<td>' + AdminApp.formatPrice(product.price) + '</td>' +
+                '<td>' + AdminApp.escapeHTML(sizes.join(', ')) + '</td>' +
+                '<td>' +
+                    '<button class="btn btn-sm btn-secondary" onclick="ProductsModule.editProduct(\'' + AdminApp.escapeAttr(product.id) + '\')">' +
+                        AdminApp.escapeHTML(SleipnirI18n.t('admin.products.edit', 'Breyta')) +
+                    '</button> ' +
+                    '<button class="btn btn-sm btn-danger" onclick="ProductsModule.deleteProduct(\'' + AdminApp.escapeAttr(product.id) + '\')">' +
+                        AdminApp.escapeHTML(SleipnirI18n.t('admin.products.delete', 'Ey\u00F0a')) +
+                    '</button>' +
+                '</td>' +
+            '</tr>';
         });
 
         grid.innerHTML = html;
