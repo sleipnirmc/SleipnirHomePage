@@ -92,6 +92,10 @@ open_sessions.py
 persona.txt
 tasks.txt
 
+# Firebase Admin SDK key
+*-firebase-adminsdk-*.json
+scripts/db_explorer.py
+
 # Non-production directories
 Sleipnir1212aa/
 Prototypes/
