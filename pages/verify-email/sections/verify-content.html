@@ -1,0 +1,108 @@
+<style>
+    .verify-email-container {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--pure-black);
+        z-index: 5;
+    }
+    .verify-email-card {
+        text-align: center;
+        max-width: 420px;
+        padding: 48px 32px;
+    }
+    .verify-logo {
+        width: 80px;
+        height: auto;
+        margin-bottom: 32px;
+        opacity: 0.9;
+    }
+    .verify-state h2 {
+        font-family: 'Cinzel', serif;
+        font-size: 1.6rem;
+        color: var(--white);
+        margin-bottom: 12px;
+        letter-spacing: 1px;
+    }
+    .verify-state p {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.1rem;
+        color: var(--gray);
+        margin-bottom: 28px;
+        line-height: 1.5;
+    }
+    .verify-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+    }
+    .verify-icon-success { color: #4caf50; }
+    .verify-icon-error { color: var(--mc-red); }
+    .verify-btn {
+        display: inline-block;
+        padding: 14px 40px;
+        background: var(--mc-red);
+        color: #fff;
+        font-family: 'Cinzel', serif;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+    .verify-btn:hover {
+        background: var(--mc-red-hover);
+    }
+    .verify-spinner {
+        width: 40px; height: 40px;
+        margin: 0 auto 20px;
+        border: 3px solid var(--charcoal);
+        border-top-color: var(--mc-red);
+        border-radius: 50%;
+        animation: verify-spin 0.8s linear infinite;
+    }
+    @keyframes verify-spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<div class="verify-email-container">
+    <div class="verify-email-card">
+        <img src="/assets/images/SleipnirLogo.png" alt="Sleipnir MC" class="verify-logo">
+
+        <!-- Loading state -->
+        <div id="verify-loading" class="verify-state">
+            <div class="verify-spinner"></div>
+            <h2 data-i18n="verify.loading.title">Staðfesti netfang...</h2>
+            <p data-i18n="verify.loading.text">Vinsamlegast bíðið.</p>
+        </div>
+
+        <!-- Success state -->
+        <div id="verify-success" class="verify-state" style="display:none;">
+            <div class="verify-icon verify-icon-success">&#10003;</div>
+            <h2 data-i18n="verify.success.title">Netfang staðfest!</h2>
+            <p data-i18n="verify.success.text">Netfangið þitt hefur verið staðfest. Þú getur nú skráð þig inn.</p>
+            <a href="/login" class="verify-btn" id="verify-login-btn" data-i18n="verify.success.btn">Skrá inn</a>
+        </div>
+
+        <!-- Error state -->
+        <div id="verify-error" class="verify-state" style="display:none;">
+            <div class="verify-icon verify-icon-error">&#10007;</div>
+            <h2 data-i18n="verify.error.title">Villa kom upp</h2>
+            <p id="verify-error-msg" data-i18n="verify.error.text">Ekki tókst að staðfesta netfangið. Tengillinn gæti verið útrunninn.</p>
+            <a href="/login" class="verify-btn" id="verify-error-btn" data-i18n="verify.error.btn">Fara á innskráningu</a>
+        </div>
+
+        <!-- No code state (direct visit without params) -->
+        <div id="verify-nocode" class="verify-state" style="display:none;">
+            <h2 data-i18n="verify.nocode.title">Enginn staðfestingarkóði</h2>
+            <p data-i18n="verify.nocode.text">Þessi síða er notuð til að staðfesta netfang úr tölvupósti.</p>
+            <a href="/login" class="verify-btn" data-i18n="verify.nocode.btn">Fara á innskráningu</a>
+        </div>
+    </div>
+</div>

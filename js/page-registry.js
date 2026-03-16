@@ -65,6 +65,14 @@ window.PAGE_REGISTRY = {
         ],
         scripts: []
     },
+    '/verify-email': {
+        title: 'Sleipnir MC - Staðfesting',
+        layout: 'bare',
+        sections: [
+            { url: '/pages/verify-email/sections/verify-content.html' }
+        ],
+        scripts: ['/js/page-scripts/verify-email.js']
+    },
     '/login': {
         title: 'Sleipnir MC - Login',
         layout: 'bare',
