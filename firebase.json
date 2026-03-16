@@ -11,6 +11,7 @@
   },
   "hosting": {
     "public": ".",
+    "trailingSlash": false,
     "ignore": [
       "firebase.json",
       "firebase/**",
@@ -22,23 +23,74 @@
       "**/node_modules/**"
     ],
     "rewrites": [
-      { "source": "/pages/shop.html", "destination": "/index.html" },
-      { "source": "/pages/about.html", "destination": "/index.html" },
-      { "source": "/pages/login.html", "destination": "/index.html" },
-      { "source": "/pages/admin.html", "destination": "/index.html" },
-      { "source": "/pages/sagan.html", "destination": "/index.html" },
-      { "source": "/pages/contact.html", "destination": "/index.html" },
-      { "source": "/pages/reykjavik.html", "destination": "/index.html" },
-      { "source": "/pages/akureyri.html", "destination": "/index.html" },
-      { "source": "/shop.html", "destination": "/index.html" },
-      { "source": "/admin.html", "destination": "/index.html" },
-      { "source": "/login.html", "destination": "/index.html" },
-      { "source": "/about.html", "destination": "/index.html" },
-      { "source": "/sagan.html", "destination": "/index.html" },
-      { "source": "/contact.html", "destination": "/index.html" },
-      { "source": "/Reykjav%C3%ADk.html", "destination": "/index.html" },
-      { "source": "/Akureyri.html", "destination": "/index.html" },
-      { "source": "**", "destination": "/index.html" }
+      {
+        "source": "/pages/shop.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/pages/about.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/pages/login.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/pages/admin.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/pages/sagan.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/pages/contact.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/pages/reykjavik.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/pages/akureyri.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/shop.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/admin.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/login.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/about.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/sagan.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/contact.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/Reykjav%C3%ADk.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/Akureyri.html",
+        "destination": "/index.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   }
 }
