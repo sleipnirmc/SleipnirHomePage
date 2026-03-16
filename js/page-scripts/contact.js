@@ -61,7 +61,7 @@
                 button.classList.add('success');
                 btnLoading.style.display = 'none';
                 btnText.style.display = 'block';
-                btnText.textContent = SleipnirI18n.t('contact.form.sent');
+                btnText.innerHTML = SleipnirI18n.t('contact.form.sent_label') + ' <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
 
                 successMsg.style.display = 'block';
                 e.target.reset();

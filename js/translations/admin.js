@@ -37,6 +37,8 @@
         'admin.members.save_template': 'Vista sniðmát',
         'admin.members.template_saved': 'Sniðmát vistað!',
         'admin.members.member_since': 'Meðlimur síðan',
+        'admin.members.displayOnWebsite': 'Sýna á vefsíðu',
+        'admin.members.displayOnWebsiteDesc': 'Birta þennan meðlim á meðlimasíðunni',
 
         // Users
         'admin.users.title': 'Notendur',
@@ -248,6 +250,8 @@
         'admin.members.save_template': 'Save template',
         'admin.members.template_saved': 'Template saved!',
         'admin.members.member_since': 'Member since',
+        'admin.members.displayOnWebsite': 'Display on website',
+        'admin.members.displayOnWebsiteDesc': 'Show this member on the members page',
 
         // Users
         'admin.users.title': 'Users',

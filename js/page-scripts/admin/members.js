@@ -230,6 +230,19 @@
         }
         if (!member) return;
 
+        // Check if member has a displayMembers doc before showing modal
+        AdminApp.db.collection('displayMembers').doc(docId).get()
+            .then(function(displayDoc) {
+                var isDisplayed = displayDoc.exists && displayDoc.data().isActive === true;
+                showEditModal(member, docId, isDisplayed);
+            })
+            .catch(function(err) {
+                console.error('Error checking display status:', err);
+                showEditModal(member, docId, false);
+            });
+    }
+
+    function showEditModal(member, docId, isDisplayed) {
         var bodyHTML =
             '<div class="form-group">' +
                 '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.members.fieldName', 'Nafn')) + '</label>' +
@@ -258,6 +271,15 @@
                     '<option value="Reykjavik"' + (member.chapter === 'Reykjavik' ? ' selected' : '') + '>Reykjavik</option>' +
                     '<option value="Akureyri"' + (member.chapter === 'Akureyri' ? ' selected' : '') + '>Akureyri</option>' +
                 '</select>' +
+            '</div>' +
+            '<div class="form-group" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1);">' +
+                '<label class="form-toggle-label">' +
+                    '<input type="checkbox" class="form-toggle" id="editMemberDisplay"' + (isDisplayed ? ' checked' : '') + '>' +
+                    '<span>' + AdminApp.escapeHTML(SleipnirI18n.t('admin.members.displayOnWebsite', 'Sýna á vefsíðu')) + '</span>' +
+                '</label>' +
+                '<p style="margin: 6px 0 0 56px; font-size: 13px; color: #888;">' +
+                    AdminApp.escapeHTML(SleipnirI18n.t('admin.members.displayOnWebsiteDesc', 'Birta þennan meðlim á meðlimasíðunni')) +
+                '</p>' +
             '</div>';
 
         var footerHTML =
@@ -282,6 +304,7 @@
         var motoVal = document.getElementById('editMemberMotorcycle').value.trim();
         var sinceVal = document.getElementById('editMemberSince').value.trim();
         var chapterVal = document.getElementById('editMemberChapter').value;
+        var displayVal = document.getElementById('editMemberDisplay').checked;
 
         var updateData = {
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -297,6 +320,17 @@
 
         try {
             AdminApp.db.collection('users').doc(docId).update(updateData)
+                .then(function() {
+                    // Sync displayMembers collection
+                    return syncDisplayMember(docId, displayVal, {
+                        name: nameVal,
+                        role: roleVal,
+                        quote: quoteVal,
+                        motorcycleType: motoVal,
+                        memberSince: sinceVal,
+                        chapter: chapterVal
+                    });
+                })
                 .then(function() {
                     AdminApp.closeModal();
                     AdminApp.showToast(
@@ -403,9 +437,22 @@
     function saveTemplateSelection() {
         if (!currentMemberId) return;
 
+        var memberId = currentMemberId;
+
         try {
-            AdminApp.db.collection('users').doc(currentMemberId).update({
+            AdminApp.db.collection('users').doc(memberId).update({
                 cardTemplate: selectedTemplate
+            }).then(function() {
+                // Also sync template to displayMembers if active
+                var displayRef = AdminApp.db.collection('displayMembers').doc(memberId);
+                return displayRef.get().then(function(doc) {
+                    if (doc.exists && doc.data().isActive) {
+                        return displayRef.update({
+                            cardTemplate: selectedTemplate,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                });
             }).then(function() {
                 AdminApp.showToast(
                     SleipnirI18n.t('admin.members.templateSaved', 'Sni\u00F0m\u00E1t uppf\u00E6rt'),
@@ -425,6 +472,71 @@
         } catch (err) {
             console.error('Error initiating template save:', err);
         }
+    }
+
+    // =============================================
+    // DISPLAY MEMBERS SYNC
+    // =============================================
+
+    function syncDisplayMember(docId, shouldDisplay, memberData) {
+        var displayRef = AdminApp.db.collection('displayMembers').doc(docId);
+
+        if (!shouldDisplay) {
+            return displayRef.get().then(function(doc) {
+                if (doc.exists) {
+                    return displayRef.update({
+                        isActive: false,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                return Promise.resolve();
+            });
+        }
+
+        // Toggle ON: create or update displayMembers doc
+        return displayRef.get().then(function(doc) {
+            var member = null;
+            for (var i = 0; i < allMembers.length; i++) {
+                if (allMembers[i]._id === docId) { member = allMembers[i]; break; }
+            }
+
+            var displayData = {
+                userId: docId,
+                name: memberData.name || '',
+                role: memberData.role || '',
+                quote: memberData.quote || '',
+                motorcycleType: memberData.motorcycleType || '',
+                memberSince: memberData.memberSince || '',
+                chapter: memberData.chapter || '',
+                photoUrl: (member && (member.photoUrl || member.photoURL)) || '',
+                cardTemplate: (member && member.cardTemplate) || 'classic',
+                isActive: true,
+                featured: (doc.exists && doc.data().featured) || false,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            if (doc.exists) {
+                return displayRef.update(displayData);
+            } else {
+                return getNextDisplayOrder().then(function(nextOrder) {
+                    displayData.displayOrder = nextOrder;
+                    displayData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    return displayRef.set(displayData);
+                });
+            }
+        });
+    }
+
+    function getNextDisplayOrder() {
+        return AdminApp.db.collection('displayMembers')
+            .orderBy('displayOrder', 'desc')
+            .limit(1)
+            .get()
+            .then(function(snapshot) {
+                if (snapshot.empty) return 1;
+                var maxOrder = snapshot.docs[0].data().displayOrder || 0;
+                return maxOrder + 1;
+            });
     }
 
     // =============================================

@@ -2492,8 +2492,24 @@ body.homepage {
 
 /* Success State */
 .contact-submit-btn.success {
-    background: #00cc00;
-    border-color: #00cc00;
+    background: rgba(0, 180, 80, 0.15);
+    border-color: rgba(0, 180, 80, 0.5);
+    color: #00cc66;
+    pointer-events: none;
+}
+
+.contact-submit-btn.success .btn-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.contact-submit-btn.success .btn-text svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    fill: none;
 }
 
 /* Keep original contact-grid for backwards compatibility */
@@ -2727,9 +2743,9 @@ body.homepage {
 }
 
 .form-message.success {
-    background: rgba(0,255,0,0.1);
-    border: 1px solid rgba(0,255,0,0.3);
-    color: #00ff00;
+    background: rgba(0, 180, 80, 0.08);
+    border: 1px solid rgba(0, 180, 80, 0.25);
+    color: #00cc66;
 }
 
 .form-message.error {
