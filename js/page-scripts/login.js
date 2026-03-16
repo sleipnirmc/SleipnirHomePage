@@ -301,10 +301,6 @@
     var tabs = document.querySelectorAll('.tab-btn');
     var confirmGroup = document.getElementById('confirmGroup');
     var nameGroup = document.getElementById('nameGroup');
-    var phoneGroup = document.getElementById('phoneGroup');
-    var addressGroup = document.getElementById('addressGroup');
-    var cityGroup = document.getElementById('cityGroup');
-    var postalGroup = document.getElementById('postalGroup');
     var submitBtn = document.querySelector('.split-submit-btn');
     var formTitle = document.querySelector('.split-form-title');
     var formSubtitle = document.querySelector('.split-form-subtitle');
@@ -323,10 +319,6 @@
 
             confirmGroup.style.display = isSignup ? 'block' : 'none';
             nameGroup.style.display = isSignup ? 'block' : 'none';
-            phoneGroup.style.display = isSignup ? 'block' : 'none';
-            addressGroup.style.display = isSignup ? 'block' : 'none';
-            cityGroup.style.display = isSignup ? 'block' : 'none';
-            postalGroup.style.display = isSignup ? 'block' : 'none';
 
             if (isSignup) {
                 setTimeout(function() {
@@ -416,10 +408,6 @@
                 if (isSignup) {
                     var confirmPassword = document.getElementById('confirmPassword').value;
                     var fullName = document.getElementById('fullName').value;
-                    var phone = document.getElementById('phone').value;
-                    var address = document.getElementById('address').value;
-                    var city = document.getElementById('city').value;
-                    var postalCode = document.getElementById('postalCode').value;
 
                     if (password !== confirmPassword) {
                         sleipnirAuth.showAuthMessage({
@@ -431,21 +419,13 @@
                     }
 
                     var result = await sleipnirAuth.signUp(email, password, {
-                        fullName: fullName,
-                        phone: phone,
-                        address: address,
-                        city: city,
-                        postalCode: postalCode
+                        fullName: fullName
                     });
 
                     if (result.success) {
                         // Keep user signed in for polling (_sleipnirLoginPageHandling prevents auto-signout)
                         showVerificationScreen(email, 'polling', {
-                            fullName: fullName,
-                            phone: phone,
-                            address: address,
-                            city: city,
-                            postalCode: postalCode
+                            fullName: fullName
                         });
                         return;
                     } else {

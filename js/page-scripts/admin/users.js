@@ -99,11 +99,18 @@
         if (!tbody) return;
 
         var filtered = getFilteredUsers();
-        var totalPages = Math.ceil(filtered.length / perPage) || 1;
-        if (currentPage > totalPages) currentPage = totalPages;
+        var pageData;
+        var totalPages;
 
-        var start = (currentPage - 1) * perPage;
-        var pageData = filtered.slice(start, start + perPage);
+        if (perPage === 0) {
+            pageData = filtered;
+            totalPages = 1;
+        } else {
+            totalPages = Math.ceil(filtered.length / perPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            var start = (currentPage - 1) * perPage;
+            pageData = filtered.slice(start, start + perPage);
+        }
 
         var html = '';
         if (pageData.length === 0) {
@@ -143,7 +150,12 @@
                         SleipnirI18n.t('admin.users.makeMember', 'Gera me\u00F0lim') + '</button>';
                 }
 
-                html += '<tr>' +
+                // View Shipping button
+                actionHtml += '<button class="view-shipping-btn" onclick="UsersModule.toggleShipping(\'' + userId + '\', this)" title="' +
+                    AdminApp.escapeAttr(SleipnirI18n.t('admin.users.viewShipping', 'Sko\u00F0a sendingu')) + '">' +
+                    SleipnirI18n.t('admin.users.viewShipping', 'Sko\u00F0a sendingu') + '</button>';
+
+                html += '<tr data-user-id="' + userId + '">' +
                     '<td>' + displayName + '</td>' +
                     '<td>' + email + '</td>' +
                     '<td><span class="badge badge--' + AdminApp.escapeAttr(role) + '">' + AdminApp.escapeHTML(role) + '</span></td>' +
@@ -172,7 +184,7 @@
         var container = document.getElementById('usersPagination');
         if (!container) return;
 
-        if (totalPages <= 1) {
+        if (perPage === 0 || totalPages <= 1) {
             container.innerHTML = '';
             return;
         }
@@ -243,6 +255,76 @@
     }
 
     // =============================================
+    // VIEW SHIPPING INFO (expandable detail row)
+    // =============================================
+
+    function toggleShipping(userId, btnEl) {
+        var userRow = btnEl.closest('tr');
+        if (!userRow) return;
+
+        // Check if detail row already exists
+        var existingDetail = userRow.nextElementSibling;
+        if (existingDetail && existingDetail.classList.contains('shipping-detail-row')) {
+            // Collapse: remove the detail row
+            existingDetail.remove();
+            return;
+        }
+
+        // Create detail row placeholder
+        var detailRow = document.createElement('tr');
+        detailRow.className = 'shipping-detail-row';
+        detailRow.innerHTML = '<td colspan="7"><div class="shipping-detail-content">' +
+            '<span style="color:#888;">' + SleipnirI18n.t('admin.common.loading', 'Hle\u00F0ur...') + '</span>' +
+            '</div></td>';
+        userRow.parentNode.insertBefore(detailRow, userRow.nextSibling);
+
+        // Fetch shipping info from Firestore
+        if (!AdminApp.db) {
+            detailRow.querySelector('.shipping-detail-content').innerHTML =
+                '<span class="no-shipping-info">' + SleipnirI18n.t('admin.common.error', 'Villa') + '</span>';
+            return;
+        }
+
+        AdminApp.db.collection('shippingInfo').doc(userId).get()
+            .then(function(doc) {
+                var content = detailRow.querySelector('.shipping-detail-content');
+                if (!content) return; // Row may have been removed
+
+                if (!doc.exists) {
+                    content.innerHTML = '<span class="no-shipping-info">' +
+                        SleipnirI18n.t('admin.users.noShipping', 'Engar sendingauppl\u00FDsingar') + '</span>';
+                    return;
+                }
+
+                var data = doc.data();
+                var items = [
+                    { label: SleipnirI18n.t('admin.users.shippingAddress', 'Heimilisfang'), value: data.address },
+                    { label: SleipnirI18n.t('admin.users.shippingCity', 'Borg'), value: data.city },
+                    { label: SleipnirI18n.t('admin.users.shippingPostal', 'P\u00F3stn\u00FAmer'), value: data.postalCode },
+                    { label: SleipnirI18n.t('admin.users.shippingPhone', 'S\u00EDman\u00FAmer'), value: data.phone }
+                ];
+
+                var html = '';
+                items.forEach(function(item) {
+                    html += '<div class="shipping-detail-item">' +
+                        '<span class="shipping-detail-label">' + AdminApp.escapeHTML(item.label) + '</span>' +
+                        '<span class="shipping-detail-value">' + AdminApp.escapeHTML(item.value || '-') + '</span>' +
+                        '</div>';
+                });
+
+                content.innerHTML = html;
+            })
+            .catch(function(err) {
+                console.error('Error fetching shipping info for user ' + userId + ':', err);
+                var content = detailRow.querySelector('.shipping-detail-content');
+                if (content) {
+                    content.innerHTML = '<span class="no-shipping-info">' +
+                        SleipnirI18n.t('admin.common.error', 'Villa') + '</span>';
+                }
+            });
+    }
+
+    // =============================================
     // SEARCH, FILTER & SORT BINDINGS
     // =============================================
 
@@ -259,6 +341,15 @@
 
         if (filterEl) {
             filterEl.addEventListener('change', function() {
+                currentPage = 1;
+                renderUsers();
+            });
+        }
+
+        var perPageEl = document.getElementById('usersPerPage');
+        if (perPageEl) {
+            perPageEl.addEventListener('change', function() {
+                perPage = parseInt(this.value);
                 currentPage = 1;
                 renderUsers();
             });
@@ -286,6 +377,7 @@
 
     window.UsersModule = {
         toggleMember: toggleMember,
+        toggleShipping: toggleShipping,
         goToPage: function(page) {
             currentPage = page;
             renderUsers();

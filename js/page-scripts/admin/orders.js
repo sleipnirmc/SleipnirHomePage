@@ -9,6 +9,8 @@
     var orders = [];
     var currentTab = 'all';
     var expandedOrder = null;
+    var currentPage = 1;
+    var perPage = 0;
 
     var statusLabels = {
         pending: '\u00CD bi\u00F0',
@@ -81,11 +83,24 @@
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#888;">' +
                 AdminApp.escapeHTML(SleipnirI18n.t('admin.orders.empty', 'Engar pantanir fundust')) +
             '</td></tr>';
+            renderOrdersPagination(1);
             return;
         }
 
+        var pageData;
+        var totalPages;
+        if (perPage === 0) {
+            pageData = filtered;
+            totalPages = 1;
+        } else {
+            totalPages = Math.ceil(filtered.length / perPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            var start = (currentPage - 1) * perPage;
+            pageData = filtered.slice(start, start + perPage);
+        }
+
         var html = '';
-        filtered.forEach(function(order) {
+        pageData.forEach(function(order) {
             var orderId = order.id.slice(-6).toUpperCase();
             var items = order.items || [];
             var itemsStr = items.map(function(item) {
@@ -128,6 +143,31 @@
         });
 
         tbody.innerHTML = html;
+        renderOrdersPagination(totalPages);
+    }
+
+    function renderOrdersPagination(totalPages) {
+        var container = document.getElementById('ordersPagination');
+        if (!container) return;
+
+        if (perPage === 0 || totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        var html = '';
+        html += '<button class="page-btn" ' + (currentPage === 1 ? 'disabled' : '') +
+            ' onclick="OrdersModule.goToPage(' + (currentPage - 1) + ')">&laquo;</button>';
+
+        for (var p = 1; p <= totalPages; p++) {
+            html += '<button class="page-btn ' + (p === currentPage ? 'active' : '') +
+                '" onclick="OrdersModule.goToPage(' + p + ')">' + p + '</button>';
+        }
+
+        html += '<button class="page-btn" ' + (currentPage === totalPages ? 'disabled' : '') +
+            ' onclick="OrdersModule.goToPage(' + (currentPage + 1) + ')">&raquo;</button>';
+
+        container.innerHTML = html;
     }
 
     function renderDetailRow(order) {
@@ -210,6 +250,7 @@
                 this.classList.add('active');
                 currentTab = this.dataset.tab;
                 expandedOrder = null;
+                currentPage = 1;
                 renderOrders();
             });
         }
@@ -220,6 +261,11 @@
     // =============================================
 
     window.OrdersModule = {
+
+        goToPage: function(page) {
+            currentPage = page;
+            renderOrders();
+        },
 
         toggleRow: function(id) {
             expandedOrder = (expandedOrder === id) ? null : id;
@@ -324,6 +370,16 @@
         if (e.detail.section !== 'orders') return;
 
         setupTabs();
+
+        var perPageEl = document.getElementById('ordersPerPage');
+        if (perPageEl) {
+            perPageEl.addEventListener('change', function() {
+                perPage = parseInt(this.value);
+                currentPage = 1;
+                renderOrders();
+            });
+        }
+
         loadOrders();
     });
 

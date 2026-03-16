@@ -36,7 +36,14 @@ service cloud.firestore {
         (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'members']) || isAdmin());
       allow delete: if false; // Never allow user deletion through client
     }
-    
+
+    // Shipping info - users manage their own, admins can read
+    match /shippingInfo/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create, update: if isOwner(userId);
+      allow delete: if false;
+    }
+
     // Products - everyone can read (filtering happens client-side for better UX)
     match /products/{product} {
       allow read: if true;

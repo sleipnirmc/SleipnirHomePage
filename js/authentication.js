@@ -128,14 +128,20 @@ async function createUserDocument(userId, authUser, additionalData = {}) {
     const userData = {
         email: authUser.email,
         displayName: authUser.displayName || additionalData.fullName || '',
-        members: false, // Default to non-member
+        members: false,
         emailVerified: authUser.emailVerified || false,
         verificationEmailSent: false,
+        shippingInfoComplete: false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-        ...additionalData
+        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
     };
-    
+
+    // Carry over verification-specific fields if present
+    if (additionalData.emailVerified !== undefined) userData.emailVerified = additionalData.emailVerified;
+    if (additionalData.emailVerifiedAt) userData.emailVerifiedAt = additionalData.emailVerifiedAt;
+    if (additionalData.verificationEmailSent !== undefined) userData.verificationEmailSent = additionalData.verificationEmailSent;
+    if (additionalData.verificationEmailSentAt) userData.verificationEmailSentAt = additionalData.verificationEmailSentAt;
+
     try {
         await db.collection('users').doc(userId).set(userData);
         return { id: userId, ...userData };
@@ -788,7 +794,15 @@ async function deleteUser(userId, archiveData = true) {
         // Delete user document from Firestore
         await db.collection('users').doc(userId).delete();
         console.log(`Deleted user document for ${userId}`);
-        
+
+        // Delete shipping info document if it exists
+        try {
+            await db.collection('shippingInfo').doc(userId).delete();
+            console.log(`Deleted shipping info for ${userId}`);
+        } catch (shippingError) {
+            console.warn('Error deleting shipping info:', shippingError);
+        }
+
         // Check if user has a display member profile and remove it
         try {
             const memberSnapshot = await db.collection('displayMembers')
@@ -1193,6 +1207,46 @@ async function protectVerifiedPage(redirectUrl = '/login') {
     return true;
 }
 
+// Get shipping info for a user
+async function getShippingInfo(userId) {
+    var uid = userId || (currentUser ? currentUser.uid : null);
+    if (!uid) return null;
+    try {
+        var doc = await db.collection('shippingInfo').doc(uid).get();
+        return doc.exists ? doc.data() : null;
+    } catch (error) {
+        console.error('Error getting shipping info:', error);
+        return null;
+    }
+}
+
+// Save shipping info for current user
+async function saveShippingInfo(data) {
+    if (!currentUser) return { success: false, error: 'Not authenticated' };
+    try {
+        var shippingData = {
+            address: data.address || '',
+            city: data.city || '',
+            postalCode: data.postalCode || '',
+            phone: data.phone || '',
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        await db.collection('shippingInfo').doc(currentUser.uid).set(shippingData, { merge: true });
+
+        // Update shippingInfoComplete flag on user doc
+        var hasAddress = !!(data.address && data.address.trim());
+        await db.collection('users').doc(currentUser.uid).update({
+            shippingInfoComplete: hasAddress
+        });
+        if (userDocument) userDocument.shippingInfoComplete = hasAddress;
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error saving shipping info:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 // Export functions for use in other scripts
 window.sleipnirAuth = {
     signUp,
@@ -1223,6 +1277,8 @@ window.sleipnirAuth = {
     clearAdminSession,
     checkMemberStatus,
     fixMemberStatus,
+    getShippingInfo,
+    saveShippingInfo,
     getCachedAuthState
 };
 

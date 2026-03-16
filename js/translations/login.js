@@ -15,10 +15,6 @@
         'login.password': 'Lykilor\u00f0',
         'login.confirm_password': 'Sta\u00f0festa lykilor\u00f0',
         'login.fullname': 'Fullt nafn',
-        'login.phone': 'S\u00edman\u00famer',
-        'login.address': 'Heimilisfang',
-        'login.city': 'Borg/B\u00e6r',
-        'login.postal': 'P\u00f3stn\u00famer',
 
         // Buttons
         'login.btn.login': 'Innskr\u00e1',
@@ -83,10 +79,6 @@
         'login.password': 'Password',
         'login.confirm_password': 'Confirm Password',
         'login.fullname': 'Full Name',
-        'login.phone': 'Phone Number',
-        'login.address': 'Street Address',
-        'login.city': 'City',
-        'login.postal': 'Postal Code',
 
         // Buttons
         'login.btn.login': 'Login',

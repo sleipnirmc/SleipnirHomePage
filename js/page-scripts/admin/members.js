@@ -12,6 +12,8 @@
     var currentMemberId = null;
     var selectedTemplate = 'classic';
     var initialized = false;
+    var currentPage = 1;
+    var perPage = 0;
 
     var TEMPLATE_NAMES = {
         classic: 'Classic Vertical',
@@ -32,12 +34,17 @@
         AdminApp.showLoading(grid);
 
         try {
-            AdminApp.db.collection('displayMembers').get()
+            AdminApp.db.collection('users').where('members', '==', true).get()
                 .then(function(snapshot) {
                     allMembers = [];
                     snapshot.docs.forEach(function(doc) {
                         var data = doc.data();
                         data._id = doc.id;
+                        // Map user fields to member display format
+                        data.name = data.displayName || data.name || data.email || 'N/A';
+                        data.role = data.memberRole || (data.role === 'admin' ? 'Admin' : 'Meðlimur');
+                        data.joinDate = data.joinDate || data.createdAt;
+                        data.photoUrl = data.photoUrl || data.photoURL || '';
                         allMembers.push(data);
                     });
                     renderMembers();
@@ -108,11 +115,24 @@
             grid.innerHTML = '<div class="empty-state">' +
                 SleipnirI18n.t('admin.members.noResults', 'Engir me\u00F0limir fundust') +
                 '</div>';
+            renderMembersPagination(1);
             return;
         }
 
+        var pageData;
+        var totalPages;
+        if (perPage === 0) {
+            pageData = filtered;
+            totalPages = 1;
+        } else {
+            totalPages = Math.ceil(filtered.length / perPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            var start = (currentPage - 1) * perPage;
+            pageData = filtered.slice(start, start + perPage);
+        }
+
         var html = '';
-        filtered.forEach(function(member) {
+        pageData.forEach(function(member) {
             var name = AdminApp.escapeHTML(member.name || '');
             var nickname = member.nickname ? AdminApp.escapeHTML(member.nickname) : '';
             var role = AdminApp.escapeHTML(member.role || 'Me\u00F0limur');
@@ -172,14 +192,130 @@
         });
 
         grid.innerHTML = html;
+        renderMembersPagination(totalPages);
+    }
+
+    function renderMembersPagination(totalPages) {
+        var container = document.getElementById('membersPagination');
+        if (!container) return;
+
+        if (perPage === 0 || totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        var html = '';
+        html += '<button class="page-btn" ' + (currentPage === 1 ? 'disabled' : '') +
+            ' onclick="MembersModule.goToPage(' + (currentPage - 1) + ')">&laquo;</button>';
+
+        for (var p = 1; p <= totalPages; p++) {
+            html += '<button class="page-btn ' + (p === currentPage ? 'active' : '') +
+                '" onclick="MembersModule.goToPage(' + p + ')">' + p + '</button>';
+        }
+
+        html += '<button class="page-btn" ' + (currentPage === totalPages ? 'disabled' : '') +
+            ' onclick="MembersModule.goToPage(' + (currentPage + 1) + ')">&raquo;</button>';
+
+        container.innerHTML = html;
     }
 
     // =============================================
-    // EDIT MEMBER (placeholder)
+    // EDIT MEMBER
     // =============================================
 
     function editMember(docId) {
-        alert(SleipnirI18n.t('admin.members.editComingSoon', 'Breytingar \u00E1 me\u00F0limum ver\u00F0ur \u00FAtf\u00E6rt fr\u00E1br.'));
+        var member = null;
+        for (var i = 0; i < allMembers.length; i++) {
+            if (allMembers[i]._id === docId) { member = allMembers[i]; break; }
+        }
+        if (!member) return;
+
+        var bodyHTML =
+            '<div class="form-group">' +
+                '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.members.fieldName', 'Nafn')) + '</label>' +
+                '<input type="text" class="form-input" id="editMemberName" value="' + AdminApp.escapeAttr(member.displayName || member.name || '') + '">' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.members.fieldRole', 'Staða')) + '</label>' +
+                '<input type="text" class="form-input" id="editMemberRole" placeholder="t.d. Forseti, Varaforseti, Meðlimur" value="' + AdminApp.escapeAttr(member.memberRole || '') + '">' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.members.fieldQuote', 'Tilvitnun')) + '</label>' +
+                '<input type="text" class="form-input" id="editMemberQuote" placeholder="t.d. &quot;Frelsið finnst á opnum vegi.&quot;" value="' + AdminApp.escapeAttr(member.quote || '') + '">' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.members.fieldMotorcycle', 'Mótorhjól')) + '</label>' +
+                '<input type="text" class="form-input" id="editMemberMotorcycle" placeholder="t.d. Harley-Davidson Night Rod Special" value="' + AdminApp.escapeAttr(member.motorcycleType || '') + '">' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.members.fieldMemberSince', 'Meðlimur síðan')) + '</label>' +
+                '<input type="text" class="form-input" id="editMemberSince" placeholder="t.d. 2010" value="' + AdminApp.escapeAttr(member.memberSince || '') + '">' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.members.fieldChapter', 'Staðsetning')) + '</label>' +
+                '<select class="form-select" id="editMemberChapter">' +
+                    '<option value="">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.members.selectChapter', 'Veldu staðsetningu')) + '</option>' +
+                    '<option value="Reykjavik"' + (member.chapter === 'Reykjavik' ? ' selected' : '') + '>Reykjavik</option>' +
+                    '<option value="Akureyri"' + (member.chapter === 'Akureyri' ? ' selected' : '') + '>Akureyri</option>' +
+                '</select>' +
+            '</div>';
+
+        var footerHTML =
+            '<button class="btn btn-secondary" onclick="AdminApp.closeModal()">' +
+                AdminApp.escapeHTML(SleipnirI18n.t('admin.common.cancel', 'Hætta við')) +
+            '</button>' +
+            '<button class="btn btn-primary" onclick="MembersModule.saveMemberEdit(\'' + AdminApp.escapeAttr(docId) + '\')">' +
+                AdminApp.escapeHTML(SleipnirI18n.t('admin.members.saveChanges', 'Vista breytingar')) +
+            '</button>';
+
+        AdminApp.openModal(
+            SleipnirI18n.t('admin.members.editMember', 'Breyta meðlim'),
+            bodyHTML,
+            footerHTML
+        );
+    }
+
+    function saveMemberEdit(docId) {
+        var nameVal = document.getElementById('editMemberName').value.trim();
+        var roleVal = document.getElementById('editMemberRole').value.trim();
+        var quoteVal = document.getElementById('editMemberQuote').value.trim();
+        var motoVal = document.getElementById('editMemberMotorcycle').value.trim();
+        var sinceVal = document.getElementById('editMemberSince').value.trim();
+        var chapterVal = document.getElementById('editMemberChapter').value;
+
+        var updateData = {
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        // Set or clear each optional field
+        updateData.displayName = nameVal || firebase.firestore.FieldValue.delete();
+        updateData.memberRole = roleVal || firebase.firestore.FieldValue.delete();
+        updateData.quote = quoteVal || firebase.firestore.FieldValue.delete();
+        updateData.motorcycleType = motoVal || firebase.firestore.FieldValue.delete();
+        updateData.memberSince = sinceVal || firebase.firestore.FieldValue.delete();
+        updateData.chapter = chapterVal || firebase.firestore.FieldValue.delete();
+
+        try {
+            AdminApp.db.collection('users').doc(docId).update(updateData)
+                .then(function() {
+                    AdminApp.closeModal();
+                    AdminApp.showToast(
+                        SleipnirI18n.t('admin.members.editSuccess', 'Meðlimur uppfærður'),
+                        'success'
+                    );
+                    AdminApp.logActivity('member_updated', 'Member ' + (nameVal || docId) + ' updated');
+                    loadMembers();
+                })
+                .catch(function(err) {
+                    console.error('Error updating member:', err);
+                    AdminApp.showToast(
+                        SleipnirI18n.t('admin.members.editError', 'Villa við að uppfæra meðlim'),
+                        'error'
+                    );
+                });
+        } catch (err) {
+            console.error('Error initiating member update:', err);
+        }
     }
 
     // =============================================
@@ -190,7 +326,7 @@
         currentMemberId = docId;
 
         try {
-            AdminApp.db.collection('displayMembers').doc(docId).get()
+            AdminApp.db.collection('users').doc(docId).get()
                 .then(function(doc) {
                     if (!doc.exists) {
                         AdminApp.showToast('Me\u00F0limur fannst ekki', 'error');
@@ -268,7 +404,7 @@
         if (!currentMemberId) return;
 
         try {
-            AdminApp.db.collection('displayMembers').doc(currentMemberId).update({
+            AdminApp.db.collection('users').doc(currentMemberId).update({
                 cardTemplate: selectedTemplate
             }).then(function() {
                 AdminApp.showToast(
@@ -328,12 +464,23 @@
 
         if (searchEl) {
             searchEl.addEventListener('input', AdminApp.debounce(function() {
+                currentPage = 1;
                 renderMembers();
             }, 300));
         }
 
         if (chapterEl) {
             chapterEl.addEventListener('change', function() {
+                currentPage = 1;
+                renderMembers();
+            });
+        }
+
+        var perPageEl = document.getElementById('membersPerPage');
+        if (perPageEl) {
+            perPageEl.addEventListener('change', function() {
+                perPage = parseInt(this.value);
+                currentPage = 1;
                 renderMembers();
             });
         }
@@ -344,7 +491,12 @@
     // =============================================
 
     window.MembersModule = {
+        goToPage: function(page) {
+            currentPage = page;
+            renderMembers();
+        },
         editMember: editMember,
+        saveMemberEdit: saveMemberEdit,
         selectTemplate: selectTemplate,
         previewTemplate: function(templateName) {
             var option = document.querySelector('.template-option[data-template="' + templateName + '"]');

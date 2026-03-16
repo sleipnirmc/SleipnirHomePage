@@ -12,6 +12,8 @@
     var uploadedImages = [];
     var currentEditImages = [];
     var editNewImages = [];
+    var currentPage = 1;
+    var perPage = 0;
 
     var categoryGradients = {
         tshirt: 'linear-gradient(135deg, #1a1a2e, #16213e)',
@@ -136,11 +138,24 @@
 
         if (filtered.length === 0) {
             grid.innerHTML = '<tr><td colspan="6" class="empty-state">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.empty', 'Engar v\u00F6rur fundust')) + '</td></tr>';
+            renderProductsPagination(1);
             return;
         }
 
+        var pageData;
+        var totalPages;
+        if (perPage === 0) {
+            pageData = filtered;
+            totalPages = 1;
+        } else {
+            totalPages = Math.ceil(filtered.length / perPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            var start = (currentPage - 1) * perPage;
+            pageData = filtered.slice(start, start + perPage);
+        }
+
         var html = '';
-        filtered.forEach(function(product) {
+        pageData.forEach(function(product) {
             var sizes = product.availableSizes || [];
             var catLabel = categoryLabels[product.category] || product.category;
 
@@ -162,6 +177,31 @@
         });
 
         grid.innerHTML = html;
+        renderProductsPagination(totalPages);
+    }
+
+    function renderProductsPagination(totalPages) {
+        var container = document.getElementById('productsPagination');
+        if (!container) return;
+
+        if (perPage === 0 || totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        var html = '';
+        html += '<button class="page-btn" ' + (currentPage === 1 ? 'disabled' : '') +
+            ' onclick="ProductsModule.goToPage(' + (currentPage - 1) + ')">&laquo;</button>';
+
+        for (var p = 1; p <= totalPages; p++) {
+            html += '<button class="page-btn ' + (p === currentPage ? 'active' : '') +
+                '" onclick="ProductsModule.goToPage(' + p + ')">' + p + '</button>';
+        }
+
+        html += '<button class="page-btn" ' + (currentPage === totalPages ? 'disabled' : '') +
+            ' onclick="ProductsModule.goToPage(' + (currentPage + 1) + ')">&raquo;</button>';
+
+        container.innerHTML = html;
     }
 
     // =============================================
@@ -414,6 +454,11 @@
 
     window.ProductsModule = {
 
+        goToPage: function(page) {
+            currentPage = page;
+            renderProducts();
+        },
+
         // --- Add Product ---
         addProduct: function() {
             uploadedImages = [];
@@ -622,8 +667,23 @@
         var catFilter = document.getElementById('productCategoryFilter');
 
         if (addBtn) addBtn.addEventListener('click', ProductsModule.addProduct);
-        if (searchInput) searchInput.addEventListener('input', AdminApp.debounce(renderProducts, 300));
-        if (catFilter) catFilter.addEventListener('change', renderProducts);
+        if (searchInput) searchInput.addEventListener('input', AdminApp.debounce(function() {
+            currentPage = 1;
+            renderProducts();
+        }, 300));
+        if (catFilter) catFilter.addEventListener('change', function() {
+            currentPage = 1;
+            renderProducts();
+        });
+
+        var perPageEl = document.getElementById('productsPerPage');
+        if (perPageEl) {
+            perPageEl.addEventListener('change', function() {
+                perPage = parseInt(this.value);
+                currentPage = 1;
+                renderProducts();
+            });
+        }
     });
 
     document.addEventListener('sectionShow', function(e) {

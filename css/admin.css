@@ -2722,3 +2722,65 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding-top: 4px;
     margin-top: 2px;
 }
+
+/* =============================================
+   ADMIN: Shipping detail row in users table
+   ============================================= */
+.shipping-detail-row td {
+    background: var(--surface-1);
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--surface-3);
+}
+
+.shipping-detail-content {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+}
+
+.shipping-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.shipping-detail-label {
+    color: var(--gray-dark);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.shipping-detail-value {
+    color: var(--off-white);
+}
+
+.view-shipping-btn {
+    background: transparent;
+    color: var(--gray);
+    border: 1px solid var(--surface-3);
+    border-radius: var(--radius-sm);
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: var(--transition-base);
+    margin-left: 6px;
+}
+
+.view-shipping-btn:hover {
+    color: var(--mc-red);
+    border-color: var(--mc-red);
+}
+
+.no-shipping-info {
+    color: var(--gray-dark);
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .shipping-detail-content {
+        flex-direction: column;
+        gap: 16px;
+    }
+}

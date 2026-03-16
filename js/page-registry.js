@@ -65,6 +65,13 @@ window.PAGE_REGISTRY = {
         ],
         scripts: []
     },
+    '/shipping': {
+        title: 'Sleipnir MC - Sendingaupplýsingar',
+        sections: [
+            { url: '/pages/shipping/sections/shipping-form.html' }
+        ],
+        scripts: ['/js/page-scripts/shipping.js']
+    },
     '/verify-email': {
         title: 'Sleipnir MC - Staðfesting',
         layout: 'bare',

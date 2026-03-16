@@ -1,0 +1,58 @@
+<!-- Shipping Info Section -->
+<section class="contact-main shipping-section">
+    <div class="contact-container-single">
+        <div class="contact-card shipping-page">
+            <div class="card-header">
+                <span class="rune">&#5765;</span>
+                <h3 data-i18n="shipping.title">Sendingauppl&yacute;singar</h3>
+                <p class="card-subtitle" data-i18n="shipping.subtitle">Skr&aacute;&eth;u sendingauppl&yacute;singar &thorn;&iacute;nar</p>
+            </div>
+
+            <form class="contact-form shipping-form" id="shippingForm">
+                <!-- Address -->
+                <div class="form-group">
+                    <label for="shippingAddress">
+                        <span data-i18n="shipping.address">Heimilisfang</span> *
+                    </label>
+                    <input type="text" id="shippingAddress" name="address" required>
+                </div>
+
+                <!-- City + Postal Code row -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="shippingCity">
+                            <span data-i18n="shipping.city">Borg / Sta&eth;ur</span>
+                        </label>
+                        <input type="text" id="shippingCity" name="city">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shippingPostal">
+                            <span data-i18n="shipping.postal">P&oacute;stn&uacute;mer</span>
+                        </label>
+                        <input type="text" id="shippingPostal" name="postalCode">
+                    </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group">
+                    <label for="shippingPhone">
+                        <span data-i18n="shipping.phone">S&iacute;mi</span>
+                    </label>
+                    <input type="tel" id="shippingPhone" name="phone">
+                </div>
+
+                <!-- Save Button -->
+                <button type="submit" class="btn btn-primary btn-full shipping-save-btn" data-i18n="shipping.save">Vista</button>
+
+                <!-- Status Message -->
+                <div id="shippingMessage" class="form-message"></div>
+
+                <!-- Loading State -->
+                <div id="shippingLoading" class="shipping-loading" style="display: none;">
+                    <span class="spinner"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>

@@ -7,6 +7,19 @@ let products = [];
 let currentFilter = 'all';
 let currentUserData = null;
 
+// Hydrate auth state immediately if already resolved (SPA navigation)
+if (window.sleipnirAuth) {
+    const authData = window.sleipnirAuth.getCurrentUserData();
+    if (authData && authData.auth) {
+        currentUserData = {
+            user: authData.auth,
+            userDoc: authData.userData,
+            isMember: authData.isMember,
+            isAdmin: authData.isAdmin
+        };
+    }
+}
+
 // Lazy loading observer
 let imageObserver = null;
 
@@ -681,14 +694,156 @@ if (closeCartEl) {
     });
 }
 
+// Create order from checkout (reusable for both direct and modal paths)
+async function createOrderFromCheckout(user, shippingData) {
+    // Calculate total
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    // Create order
+    const orderData = {
+        userId: user.uid,
+        userEmail: user.email,
+        userName: user.displayName || user.email,
+        userAddress: shippingData.address || '',
+        userCity: shippingData.city || '',
+        userPostalCode: shippingData.postalCode || '',
+        items: cart.map(item => ({
+            productId: item.id,
+            productName: item.name,
+            size: item.size,
+            price: item.price,
+            quantity: item.quantity,
+            subtotal: item.price * item.quantity
+        })),
+        totalAmount: total,
+        status: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        adminNotified: false
+    };
+
+    // Save order to Firestore
+    const orderRef = await firebase.firestore().collection('orders').add(orderData);
+
+    // Send notification
+    await sendOrderNotification(orderRef.id, orderData);
+
+    // Clear cart
+    cart = [];
+    updateCartUI();
+    saveCartToLocalStorage();
+
+    // Close cart sidebar
+    document.getElementById('cartSidebar').classList.remove('open');
+
+    // Show success message
+    showOrderConfirmation(orderRef.id);
+}
+
+// Show shipping info modal for users who haven't filled in shipping details
+function showShippingInfoModal(user) {
+    var t = window.SleipnirI18n && window.SleipnirI18n.t
+        ? window.SleipnirI18n.t.bind(window.SleipnirI18n)
+        : function(key, fallback) { return fallback || key; };
+
+    var overlay = document.createElement('div');
+    overlay.className = 'shipping-modal-overlay';
+    overlay.innerHTML =
+        '<div class="shipping-modal">' +
+            '<h2 class="shipping-modal-title">' + t('shop.shipping.title', 'Sendingaupplýsingar') + '</h2>' +
+            '<p class="shipping-modal-subtitle">' + t('shop.shipping.subtitle', 'Vinsamlegast fylltu út sendingarupplýsingar áður en þú pantar') + '</p>' +
+            '<div class="shipping-modal-form">' +
+                '<div class="shipping-modal-input-group">' +
+                    '<label for="shippingAddress">' + t('shop.shipping.address', 'Heimilisfang') + ' *</label>' +
+                    '<input type="text" id="shippingAddress" required autocomplete="street-address">' +
+                '</div>' +
+                '<div class="shipping-modal-input-group">' +
+                    '<label for="shippingCity">' + t('shop.shipping.city', 'Borg/Bær') + '</label>' +
+                    '<input type="text" id="shippingCity" autocomplete="address-level2">' +
+                '</div>' +
+                '<div class="shipping-modal-input-group">' +
+                    '<label for="shippingPostal">' + t('shop.shipping.postal', 'Póstnúmer') + '</label>' +
+                    '<input type="text" id="shippingPostal" autocomplete="postal-code">' +
+                '</div>' +
+                '<div class="shipping-modal-input-group">' +
+                    '<label for="shippingPhone">' + t('shop.shipping.phone', 'Símanúmer (valfrálst)') + '</label>' +
+                    '<input type="tel" id="shippingPhone" autocomplete="tel">' +
+                '</div>' +
+                '<div class="shipping-modal-error" style="display:none;"></div>' +
+            '</div>' +
+            '<div class="shipping-modal-actions">' +
+                '<button class="shipping-modal-btn-primary" type="button">' + t('shop.shipping.save', 'Vista og halda áfram') + '</button>' +
+                '<button class="shipping-modal-btn-secondary" type="button">' + t('shop.shipping.cancel', 'Hætta við') + '</button>' +
+            '</div>' +
+        '</div>';
+
+    document.body.appendChild(overlay);
+
+    var errorEl = overlay.querySelector('.shipping-modal-error');
+
+    // Close on overlay background click
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+            overlay.remove();
+        }
+    });
+
+    // Cancel button
+    overlay.querySelector('.shipping-modal-btn-secondary').addEventListener('click', function() {
+        overlay.remove();
+    });
+
+    // Save & Continue button
+    overlay.querySelector('.shipping-modal-btn-primary').addEventListener('click', async function() {
+        var address = document.getElementById('shippingAddress').value.trim();
+        var city = document.getElementById('shippingCity').value.trim();
+        var postalCode = document.getElementById('shippingPostal').value.trim();
+        var phone = document.getElementById('shippingPhone').value.trim();
+
+        if (!address) {
+            errorEl.textContent = t('shop.shipping.address.required', 'Heimilisfang er nauðsynlegt');
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        errorEl.style.display = 'none';
+
+        var shippingData = { address: address, city: city, postalCode: postalCode, phone: phone };
+
+        try {
+            // Save shipping info via auth module
+            if (window.sleipnirAuth && window.sleipnirAuth.saveShippingInfo) {
+                await window.sleipnirAuth.saveShippingInfo(shippingData);
+            }
+
+            // Remove modal
+            overlay.remove();
+
+            // Proceed with order
+            await createOrderFromCheckout(user, shippingData);
+        } catch (err) {
+            console.error('Error saving shipping info:', err);
+            errorEl.textContent = currentLang === 'is'
+                ? 'Villa við að vista upplýsingar. Reyndu aftur.'
+                : 'Error saving information. Please try again.';
+            errorEl.style.display = 'block';
+        }
+    });
+
+    // Focus first input for accessibility
+    setTimeout(function() {
+        var firstInput = document.getElementById('shippingAddress');
+        if (firstInput) firstInput.focus();
+    }, 100);
+}
+
 // Checkout button
 document.getElementById('checkoutBtn').addEventListener('click', async () => {
     if (cart.length === 0) return;
 
     const user = firebase.auth().currentUser;
     if (!user) {
-        const msg = currentLang === 'is' 
-            ? 'Þú þarft að skrá þig inn til að panta. Viltu skrá þig inn núna?' 
+        const msg = currentLang === 'is'
+            ? 'Þú þarft að skrá þig inn til að panta. Viltu skrá þig inn núna?'
             : 'You need to be logged in to place an order. Would you like to login now?';
         if (confirm(msg)) {
             window.location.href = '/login';
@@ -697,56 +852,25 @@ document.getElementById('checkoutBtn').addEventListener('click', async () => {
     }
 
     try {
-        // Get user data
+        // Check shipping info status
         const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-        const userData = userDoc.data();
-        
-        // Calculate total
-        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        
-        // Create order
-        const orderData = {
-            userId: user.uid,
-            userEmail: user.email,
-            userName: userData?.fullName || user.email,
-            userAddress: userData?.address || '',
-            userCity: userData?.city || '',
-            userPostalCode: userData?.postalCode || '',
-            items: cart.map(item => ({
-                productId: item.id,
-                productName: item.name,
-                size: item.size,
-                price: item.price,
-                quantity: item.quantity,
-                subtotal: item.price * item.quantity
-            })),
-            totalAmount: total,
-            status: 'pending',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            adminNotified: false
-        };
-        
-        // Save order to Firestore
-        const orderRef = await firebase.firestore().collection('orders').add(orderData);
-        
-        // Send email notification (this would typically be done via a cloud function)
-        // For now, we'll just mark that notification is needed
-        await sendOrderNotification(orderRef.id, orderData);
-        
-        // Clear cart
-        cart = [];
-        updateCartUI();
-        saveCartToLocalStorage();
-        
-        // Close cart sidebar
-        document.getElementById('cartSidebar').classList.remove('open');
-        
-        // Show success message
-        showOrderConfirmation(orderRef.id);
-        
+        const userData = userDoc.exists ? userDoc.data() : {};
+
+        if (userData.shippingInfoComplete) {
+            // Shipping info already filled — read from shippingInfo collection
+            const shippingDoc = await firebase.firestore().collection('shippingInfo').doc(user.uid).get();
+            const shippingData = shippingDoc.exists ? shippingDoc.data() : {};
+            await createOrderFromCheckout(user, shippingData);
+        } else {
+            // No shipping info — show modal to collect it
+            showShippingInfoModal(user);
+        }
     } catch (error) {
-        console.error('Error placing order:', error);
-        alert('Error placing order. Please try again.');
+        console.error('Error during checkout:', error);
+        const errMsg = currentLang === 'is'
+            ? 'Villa við pöntun. Vinsamlegast reyndu aftur.'
+            : 'Error placing order. Please try again.';
+        alert(errMsg);
     }
 });
 
@@ -1108,6 +1232,21 @@ updateCartUI();
 
 // Reload on auth state changes (member-only product visibility)
 firebase.auth().onAuthStateChanged(() => {
+    // Sync currentUserData from authentication.js module state
+    if (window.sleipnirAuth) {
+        const authData = window.sleipnirAuth.getCurrentUserData();
+        if (authData && authData.auth) {
+            currentUserData = {
+                user: authData.auth,
+                userDoc: authData.userData,
+                isMember: authData.isMember,
+                isAdmin: authData.isAdmin
+            };
+        } else {
+            currentUserData = null;
+        }
+    }
+
     if (document.getElementById('productGrid')) {
         if (products.length > 0) {
             displayProducts();

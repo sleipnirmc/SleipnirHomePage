@@ -71,6 +71,12 @@
         'admin.users.bulk_process': 'Vinna úr',
         'admin.users.member_status_granted': 'Meðlimastöðu veitt',
         'admin.users.member_status_removed': 'Meðlimastöðu fjarlægt',
+        'admin.users.viewShipping': 'Skoða sendingu',
+        'admin.users.noShipping': 'Engar sendingaupplýsingar',
+        'admin.users.shippingAddress': 'Heimilisfang',
+        'admin.users.shippingCity': 'Borg',
+        'admin.users.shippingPostal': 'Póstnúmer',
+        'admin.users.shippingPhone': 'Símanúmer',
 
         // Products
         'admin.products.title': 'Vörur',
@@ -276,6 +282,12 @@
         'admin.users.bulk_process': 'Process',
         'admin.users.member_status_granted': 'Member status granted',
         'admin.users.member_status_removed': 'Member status removed',
+        'admin.users.viewShipping': 'View Shipping',
+        'admin.users.noShipping': 'No shipping info',
+        'admin.users.shippingAddress': 'Address',
+        'admin.users.shippingCity': 'City',
+        'admin.users.shippingPostal': 'Postal Code',
+        'admin.users.shippingPhone': 'Phone',
 
         // Products
         'admin.products.title': 'Products',

@@ -97,6 +97,7 @@
         var logoutLabel = t('nav.logout', '\u00datskr\u00e1');
         var ordersLabel = t('nav.orders', 'Pantanir m\u00ednar');
         var outstandingLabel = t('nav.outstanding', '\u00d3afgreiddar pantanir');
+        var shippingLabel = t('nav.shipping', 'Sendingauppl\u00fdsingar');
         var adminLabel = t('nav.admin', 'Stj\u00f3rnbor\u00f0');
         var accountLabel = t('nav.account', 'Minn a\u00f0gangur');
 
@@ -163,6 +164,7 @@
         html += '</div>';
         html += '<a href="#" class="orders-link">' + ordersLabel + '</a>';
         html += '<a href="#" class="outstanding-orders-link">' + outstandingLabel + '</a>';
+        html += '<a href="/shipping" class="shipping-link">' + shippingLabel + '</a>';
         html += '<a href="/admin" class="admin-link" style="display: none;">' + adminLabel + '</a>';
         html += '<a href="#" class="logout-btn">' + logoutLabel + '</a>';
         html += '</div>';

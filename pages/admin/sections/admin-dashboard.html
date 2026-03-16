@@ -178,6 +178,13 @@
                     <option value="Reykjavik" data-i18n="admin.members.filter_reykjavik">Reykjavik</option>
                     <option value="Akureyri" data-i18n="admin.members.filter_akureyri">Akureyri</option>
                 </select>
+                <select class="toolbar-select" id="membersPerPage">
+                    <option value="0" selected>Allt</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
                 <button class="btn btn-outline btn-sm" onclick="ExportModule.exportTab('members')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     <span data-i18n="admin.export.excel_btn">Flytja ut Excel</span>
@@ -192,6 +199,7 @@
                 </div>
             </div>
             <div class="member-grid" id="memberGrid"></div>
+            <div class="table-pagination" id="membersPagination"></div>
         </section>
 
         <!-- USERS -->
@@ -206,6 +214,13 @@
                     <option value="all" data-i18n="admin.users.filter_all">Allir</option>
                     <option value="members" data-i18n="admin.users.filter_members">Medlimir</option>
                     <option value="nonmembers" data-i18n="admin.users.filter_guests">Gestir</option>
+                </select>
+                <select class="toolbar-select" id="usersPerPage">
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="0">Allt</option>
                 </select>
                 <button class="btn btn-outline btn-sm" onclick="ExportModule.exportTab('users')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -251,6 +266,13 @@
                     <option value="jeans" data-i18n="admin.products.filter_jeans">Buxur</option>
                     <option value="other" data-i18n="admin.products.filter_other">Annad</option>
                 </select>
+                <select class="toolbar-select" id="productsPerPage">
+                    <option value="0" selected>Allt</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
                 <button class="btn btn-outline btn-sm" onclick="ExportModule.exportTab('products')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     <span data-i18n="admin.export.excel_btn">Flytja ut Excel</span>
@@ -271,6 +293,7 @@
                     <tbody id="productGrid"></tbody>
                 </table>
             </div>
+            <div class="table-pagination" id="productsPagination"></div>
         </section>
 
         <!-- ORDERS -->
@@ -288,6 +311,13 @@
                     <button class="tab-btn" data-tab="completed" data-i18n="admin.orders.tab_completed">Klaradar</button>
                     <button class="tab-btn" data-tab="cancelled" data-i18n="admin.orders.tab_cancelled">Afturkalladar</button>
                 </div>
+                <select class="toolbar-select" id="ordersPerPage">
+                    <option value="0" selected>Allt</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
                 <button class="btn btn-outline btn-sm" onclick="ExportModule.exportTab('orders')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     <span data-i18n="admin.export.excel_btn">Flytja ut Excel</span>
@@ -310,6 +340,7 @@
                     <tbody id="ordersTableBody"></tbody>
                 </table>
             </div>
+            <div class="table-pagination" id="ordersPagination"></div>
         </section>
 
         <!-- DATA EXPORT -->
