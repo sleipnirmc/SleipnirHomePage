@@ -92,7 +92,7 @@
        ------------------------------------------------------------------- */
     function buildNavbar() {
         var lang = getLang();
-        var langToggleLabel = lang === 'is' ? t('nav.lang.toggle.is', 'EN') : t('nav.lang.toggle.en', 'IS');
+        var langToggleLabel = lang === 'is' ? 'IS' : 'EN';
         var cartLabel = t('nav.cart', 'Karfa');
         var logoutLabel = t('nav.logout', '\u00datskr\u00e1');
         var ordersLabel = t('nav.orders', 'Pantanir m\u00ednar');
