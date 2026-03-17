@@ -1479,15 +1479,18 @@ th.sort-desc .sort-icon::after {
    SECTION 13: FORMS — scoped under .admin-layout
    ============================================= */
 
-.admin-layout .form-group {
+.admin-layout .form-group,
+.modal-body .form-group {
     margin-bottom: 18px;
 }
 
-.admin-layout .form-group:last-child {
+.admin-layout .form-group:last-child,
+.modal-body .form-group:last-child {
     margin-bottom: 0;
 }
 
-.admin-layout .form-label {
+.admin-layout .form-label,
+.modal-body .form-label {
     display: block;
     font-family: 'Cormorant Garamond', serif;
     font-size: 0.8rem;
@@ -1500,7 +1503,10 @@ th.sort-desc .sort-icon::after {
 
 .admin-layout .form-input,
 .admin-layout .form-select,
-.admin-layout .form-textarea {
+.admin-layout .form-textarea,
+.modal-body .form-input,
+.modal-body .form-select,
+.modal-body .form-textarea {
     width: 100%;
     background: var(--surface-3);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1515,18 +1521,24 @@ th.sort-desc .sort-icon::after {
 }
 
 .admin-layout .form-input::placeholder,
-.admin-layout .form-textarea::placeholder {
+.admin-layout .form-textarea::placeholder,
+.modal-body .form-input::placeholder,
+.modal-body .form-textarea::placeholder {
     color: var(--gray-dark);
 }
 
 .admin-layout .form-input:focus,
 .admin-layout .form-select:focus,
-.admin-layout .form-textarea:focus {
+.admin-layout .form-textarea:focus,
+.modal-body .form-input:focus,
+.modal-body .form-select:focus,
+.modal-body .form-textarea:focus {
     border-color: var(--mc-red);
     box-shadow: 0 0 0 4px rgba(207, 35, 66, 0.12), inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.admin-layout .form-select {
+.admin-layout .form-select,
+.modal-body .form-select {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -1537,12 +1549,14 @@ th.sort-desc .sort-icon::after {
     cursor: pointer;
 }
 
-.admin-layout .form-select option {
+.admin-layout .form-select option,
+.modal-body .form-select option {
     background: var(--surface-1);
     color: var(--white);
 }
 
-.admin-layout .form-textarea {
+.admin-layout .form-textarea,
+.modal-body .form-textarea {
     min-height: 100px;
     resize: vertical;
     line-height: 1.5;
