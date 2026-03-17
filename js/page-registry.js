@@ -122,7 +122,6 @@ window.NAV_ITEMS = [
         i18nKey: 'nav.about', label: 'Um Okkur', href: '/about',
         children: [
             { i18nKey: 'nav.about.members', label: 'Hópurinn', href: '/about' },
-            { i18nKey: 'nav.about.story', label: 'Sagan', href: '/sagan' },
             {
                 i18nKey: 'nav.about.chapters', label: 'Chapterar', href: '#',
                 children: [

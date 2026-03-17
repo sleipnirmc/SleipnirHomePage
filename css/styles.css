@@ -276,6 +276,12 @@ h1, h2, h3, h4, h5, h6 {
     border: 2px solid var(--mc-red);
 }
 
+.btn-outline.active {
+    background: var(--mc-red);
+    border-color: var(--mc-red);
+    color: var(--white);
+}
+
 .btn-outline:hover {
     background: var(--mc-red);
     color: var(--white);
