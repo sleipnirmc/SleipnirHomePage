@@ -218,63 +218,70 @@
         var currentSizes = p.availableSizes || [];
 
         var sizesHTML = sizes.map(function(s) {
-            var checked = currentSizes.indexOf(s) !== -1 ? ' checked' : '';
-            return '<label class="size-checkbox" style="display:inline-flex;align-items:center;gap:4px;margin-right:12px;cursor:pointer;">' +
-                '<input type="checkbox" name="productSize" value="' + AdminApp.escapeAttr(s) + '"' + checked + '> ' + AdminApp.escapeHTML(s) +
-            '</label>';
+            var activeClass = currentSizes.indexOf(s) !== -1 ? ' active' : '';
+            return '<span class="size-pill' + activeClass + '" data-size="' + AdminApp.escapeAttr(s) + '">' + AdminApp.escapeHTML(s) + '</span>';
         }).join('');
 
         return '<form id="productForm" class="admin-form">' +
-            '<div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
-                '<div class="form-group">' +
-                    '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.nameIs', 'Heiti (\u00CDslenska)')) + '</label>' +
-                    '<input type="text" class="form-input" name="nameIs" value="' + AdminApp.escapeAttr(p.nameIs) + '" required>' +
+            '<div class="form-section">' +
+                '<div class="form-row">' +
+                    '<div class="form-group">' +
+                        '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.nameIs', 'Heiti (\u00CDslenska)')) + '</label>' +
+                        '<input type="text" class="form-input" name="nameIs" value="' + AdminApp.escapeAttr(p.nameIs) + '" required>' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                        '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.nameEn', 'Name (English)')) + '</label>' +
+                        '<input type="text" class="form-input" name="nameEn" value="' + AdminApp.escapeAttr(p.nameEn) + '" required>' +
+                    '</div>' +
                 '</div>' +
                 '<div class="form-group">' +
-                    '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.nameEn', 'Name (English)')) + '</label>' +
-                    '<input type="text" class="form-input" name="nameEn" value="' + AdminApp.escapeAttr(p.nameEn) + '" required>' +
+                    '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.description', 'L\u00FDsing')) + '</label>' +
+                    '<textarea class="form-textarea" name="description" rows="3">' + AdminApp.escapeHTML(p.description || '') + '</textarea>' +
                 '</div>' +
             '</div>' +
-            '<div class="form-group">' +
-                '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.description', 'L\u00FDsing')) + '</label>' +
-                '<textarea class="form-textarea" name="description" rows="3">' + AdminApp.escapeHTML(p.description || '') + '</textarea>' +
+            '<div class="form-section">' +
+                '<div class="form-row">' +
+                    '<div class="form-group">' +
+                        '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.category', 'Flokkur')) + '</label>' +
+                        '<select class="form-select" name="category" id="modalCategorySelect">' +
+                            '<option value="tshirt"' + (cat === 'tshirt' ? ' selected' : '') + '>Bolir</option>' +
+                            '<option value="hoodie"' + (cat === 'hoodie' ? ' selected' : '') + '>Hettupeysa</option>' +
+                            '<option value="jacket"' + (cat === 'jacket' ? ' selected' : '') + '>Jakkar</option>' +
+                            '<option value="jeans"' + (cat === 'jeans' ? ' selected' : '') + '>Buxur</option>' +
+                            '<option value="other"' + (cat === 'other' ? ' selected' : '') + '>Anna\u00F0</option>' +
+                        '</select>' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                        '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.price', 'Ver\u00F0 (ISK)')) + '</label>' +
+                        '<input type="number" class="form-input" name="price" value="' + (p.price || '') + '" min="0" required>' +
+                    '</div>' +
+                '</div>' +
             '</div>' +
-            '<div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
+            '<div class="form-section">' +
                 '<div class="form-group">' +
-                    '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.category', 'Flokkur')) + '</label>' +
-                    '<select class="form-select" name="category" id="modalCategorySelect">' +
-                        '<option value="tshirt"' + (cat === 'tshirt' ? ' selected' : '') + '>Bolir</option>' +
-                        '<option value="hoodie"' + (cat === 'hoodie' ? ' selected' : '') + '>Hettupeysa</option>' +
-                        '<option value="jacket"' + (cat === 'jacket' ? ' selected' : '') + '>Jakkar</option>' +
-                        '<option value="jeans"' + (cat === 'jeans' ? ' selected' : '') + '>Buxur</option>' +
-                        '<option value="other"' + (cat === 'other' ? ' selected' : '') + '>Anna\u00F0</option>' +
-                    '</select>' +
+                    '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.sizes', 'St\u00E6r\u00F0ir \u00ED bo\u00F0i')) + '</label>' +
+                    '<div class="size-pills-row" id="modalSizeGroup">' + sizesHTML + '</div>' +
                 '</div>' +
                 '<div class="form-group">' +
-                    '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.price', 'Ver\u00F0 (ISK)')) + '</label>' +
-                    '<input type="number" class="form-input" name="price" value="' + (p.price || '') + '" min="0" required>' +
+                    '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.membersOnly', 'A\u00F0eins me\u00F0limir')) + '</label>' +
+                    '<label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;">' +
+                        '<input type="checkbox" name="membersOnly"' + (p.membersOnly ? ' checked' : '') + ' class="toggle-input">' +
+                        '<span class="toggle-switch"></span> ' +
+                        '<span style="font-family:Cormorant Garamond,serif;font-size:15px;color:var(--off-white);">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.common.yes', 'J\u00E1')) + '</span>' +
+                    '</label>' +
                 '</div>' +
             '</div>' +
-            '<div class="form-group">' +
-                '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.sizes', 'St\u00E6r\u00F0ir \u00ED bo\u00F0i')) + '</label>' +
-                '<div class="form-checkbox-group" id="modalSizeGroup" style="display:flex;flex-wrap:wrap;gap:4px;padding:8px 0;">' + sizesHTML + '</div>' +
-            '</div>' +
-            '<div class="form-group">' +
-                '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.membersOnly', 'A\u00F0eins me\u00F0limir')) + '</label>' +
-                '<label class="toggle-label" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">' +
-                    '<input type="checkbox" name="membersOnly"' + (p.membersOnly ? ' checked' : '') + ' class="toggle-input"> ' +
-                    '<span class="toggle-switch"></span> ' + AdminApp.escapeHTML(SleipnirI18n.t('admin.common.yes', 'J\u00E1')) +
-                '</label>' +
-            '</div>' +
-            '<div class="form-group">' +
-                '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.images', 'Myndir')) + '</label>' +
-                '<div id="modalExistingImages" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>' +
-                '<div id="modalNewImagePreviews" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>' +
-                '<div id="modalImageUploadZone" class="image-upload-zone" style="border:2px dashed rgba(255,255,255,0.15);border-radius:8px;padding:30px;text-align:center;cursor:pointer;transition:border-color 0.2s;">' +
-                    '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
-                    '<p style="color:#888;margin-top:8px;margin-bottom:0;">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.dragImages', 'Smelltu e\u00F0a drag\u00F0u myndir hinga\u00F0')) + '</p>' +
+            '<div class="form-section">' +
+                '<div class="form-group">' +
+                    '<label class="form-label">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.images', 'Myndir')) + '</label>' +
+                    '<div id="modalExistingImages" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>' +
+                    '<div id="modalNewImagePreviews" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>' +
+                    '<div id="modalImageUploadZone" class="image-upload-zone">' +
+                        '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
+                        '<p class="image-upload-text">' + AdminApp.escapeHTML(SleipnirI18n.t('admin.products.dragImages', 'Smelltu e\u00F0a drag\u00F0u myndir hinga\u00F0')) + '</p>' +
+                    '</div>' +
+                    '<input type="file" id="modalImageFileInput" accept="image/*" multiple style="display:none;">' +
                 '</div>' +
-                '<input type="file" id="modalImageFileInput" accept="image/*" multiple style="display:none;">' +
             '</div>' +
         '</form>';
     }
@@ -283,8 +290,21 @@
     // MODAL INTERACTIVITY SETUP
     // =============================================
 
+    function bindSizePills(container) {
+        var pills = container.querySelectorAll('.size-pill');
+        pills.forEach(function(pill) {
+            pill.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+    }
+
     function setupModalInteractions() {
         setTimeout(function() {
+            // Bind size pill clicks
+            var sizeGroup = document.getElementById('modalSizeGroup');
+            if (sizeGroup) bindSizePills(sizeGroup);
+
             // Category change -> update sizes
             var select = document.getElementById('modalCategorySelect');
             if (select) {
@@ -294,10 +314,9 @@
                     var group = document.getElementById('modalSizeGroup');
                     if (!group) return;
                     group.innerHTML = sizes.map(function(s) {
-                        return '<label class="size-checkbox" style="display:inline-flex;align-items:center;gap:4px;margin-right:12px;cursor:pointer;">' +
-                            '<input type="checkbox" name="productSize" value="' + AdminApp.escapeAttr(s) + '"> ' + AdminApp.escapeHTML(s) +
-                        '</label>';
+                        return '<span class="size-pill" data-size="' + AdminApp.escapeAttr(s) + '">' + AdminApp.escapeHTML(s) + '</span>';
                     }).join('');
+                    bindSizePills(group);
                 });
             }
 
@@ -316,25 +335,25 @@
                 zone.addEventListener('dragenter', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    zone.style.borderColor = '#cf2342';
+                    zone.classList.add('dragover');
                 });
 
                 zone.addEventListener('dragover', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    zone.style.borderColor = '#cf2342';
+                    zone.classList.add('dragover');
                 });
 
                 zone.addEventListener('dragleave', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    zone.style.borderColor = 'rgba(255,255,255,0.15)';
+                    zone.classList.remove('dragover');
                 });
 
                 zone.addEventListener('drop', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    zone.style.borderColor = 'rgba(255,255,255,0.15)';
+                    zone.classList.remove('dragover');
                     handleImageFiles(e.dataTransfer.files);
                 });
             }
@@ -428,9 +447,9 @@
         }
 
         var sizes = [];
-        var sizeCheckboxes = form.querySelectorAll('[name="productSize"]:checked');
-        for (var i = 0; i < sizeCheckboxes.length; i++) {
-            sizes.push(sizeCheckboxes[i].value);
+        var activePills = document.querySelectorAll('#modalSizeGroup .size-pill.active');
+        for (var i = 0; i < activePills.length; i++) {
+            sizes.push(activePills[i].getAttribute('data-size'));
         }
         if (sizes.length === 0) {
             AdminApp.showToast(SleipnirI18n.t('admin.products.sizeRequired', 'Vinsamlegast veldu amk eina st\u00E6r\u00F0'), 'error');
